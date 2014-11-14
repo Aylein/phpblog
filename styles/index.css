@@ -1,0 +1,9 @@
+@charset "utf-8";
+.pano_left { width: 975px; float: left; height: 1800px; background-color: #ffffff; }
+.pano_right { width: 300px; float: right; height: 600px; }
+.pano_right .item { background-color: #ffffff; }
+.namespace { height: 100px; }
+.imgspace { width: 90px; height: 90px; margin: 5px; float: left; }
+.imgspace img { width: 90px; height: 90px; }
+.name { width: 190px; height: 90px; margin: 5px; float: right; }
+.sign { font-size: 14px; color: #666; margin-top: 5px; }

@@ -9,8 +9,8 @@ create table if not exists Types (
 )auto_increment = 12580;
 
 create table if not exists Documents (
-	docid int primary key auto_increment,
-	typeid int references Types(typeid) on delete cascade on update cascade,
+    docid int primary key auto_increment,
+    typeid int references Types(typeid) on delete cascade on update cascade,
     docpid int default 0,
     doctitle nvarchar(15) not null,
     docsubtitle nvarchar(50) default "",
@@ -23,8 +23,8 @@ create table if not exists Documents (
 )auto_increment = 12315;
 
 create table if not exists Comments (
-	comid int primary key auto_increment,
-	docid int references Documents(docid) on delete cascade on update cascade,
+    comid int primary key auto_increment,
+    docid int references Documents(docid) on delete cascade on update cascade,
     compid int default 0,
     comname nvarchar(12) not null,
     comdate timestamp default current_timestamp,
@@ -32,3 +32,20 @@ create table if not exists Comments (
     comsort int default 0,
     comvalid int default 1
 )auto_increment = 12306;
+
+create table if not exists Main ( 
+    id int primary key auto_increment,
+    key nvarchar(15) not null,
+    value nvarchar(15)
+)auto_increment = 1;
+
+create table if not exists BBS (
+    bbsid int primary key auto_increment,
+    bbspid int default 0,
+    bbsname nvarchar(12) not null,
+    bbsre nvarchar(12),
+    bbscontent nvarchar(450) not null,
+    bbsdate timestamp default current_timestamp, 
+    bbssort int default 0,
+    bbsvalid int default 1
+)auto_increment = 1;
