@@ -35,8 +35,8 @@ create table if not exists Comments (
 
 create table if not exists Main ( 
     id int primary key auto_increment,
-    key nvarchar(15) not null,
-    value nvarchar(15)
+    _key nvarchar(15) not null,
+    _value nvarchar(15)
 )auto_increment = 1;
 
 create table if not exists BBS (
@@ -49,3 +49,13 @@ create table if not exists BBS (
     bbssort int default 0,
     bbsvalid int default 1
 )auto_increment = 1;
+
+create table if not exists Action (
+	actid int primary key auto_increment,
+    acttype nvarchar(15) not null,
+    acttitle nvarchar(25) not null,
+    actlink nvarchar(50),
+    actdate timestamp default current_timestamp
+);
+
+update Types set typevalid = case when typevalid = 0 then 1 else 1 end where typeid = 1; 

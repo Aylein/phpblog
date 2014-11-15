@@ -1,3 +1,5 @@
 @charset "utf-8";
 .left_hand { float: left; width: 305px; background-color: #ffffff; height: 800px; }
 .right_hand { float: right; width: 970px; background-color: #ffffff; height: 1800px; }
+.m_title { width: 200px; margin: 0 auto; margin-top: 15px; font-size: 25px; color: #666;  }
+.m_item { width: 170px; margin-top: 5px; margin-left: 80px; color: #666;  }

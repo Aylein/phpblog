@@ -1,3 +1,7 @@
+<?php
+    include("lib/type.php");
+    $type = new Type();
+?>
 <!DOCTYPE html>
 <html>
     <head>
@@ -10,7 +14,9 @@
         <section class="header"><?php require("require/header.php"); ?></section>
         <section class="topimg"></section>
         <section class="bodypano">
-            <div class="pano_left"></div>
+            <div class="pano_left">
+                <?php echo Type::Exists("ds") ? "yes" : "no"; ?>
+            </div>
             <div class="pano_right">
                 <div class="item namespace">
                     <div class="imgspace"><img src="/images/master.jpg"/></div>
