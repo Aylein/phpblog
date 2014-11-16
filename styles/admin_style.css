@@ -3,3 +3,8 @@
 .right_hand { float: right; width: 970px; background-color: #ffffff; height: 1800px; }
 .m_title { width: 200px; margin: 0 auto; margin-top: 15px; font-size: 25px; color: #666;  }
 .m_item { width: 170px; margin-top: 5px; margin-left: 80px; color: #666;  }
+.rh_title { width: 950px; margin: 0 auto; margin-top: 10px; font-size: 25px; color: #666; border-bottom: 1px solid #CCC; }
+.rh_item { margin-top: 10px; }
+.rh_item .form_title { float: left; width: 120px; text-align: right; color: #666; }
+.rh_item .form_value { float: left; margin-left: 15px; }
+.rh_item .form_hid { float: left; margin-left: 15px; color: #ff0000; }

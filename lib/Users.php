@@ -1,5 +1,5 @@
 <?php
-include("Entity.php");
+include_once("Entity.php");
 class Users {
     var $userid;
     var $username;

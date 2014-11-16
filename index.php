@@ -22,7 +22,7 @@
                     <div class="imgspace"><img src="/images/master.jpg"/></div>
                     <div class="name">
                         <div class="bb1s666">AyleinOter IV</div>
-                        <div class="sign">在这里你找不到微博 找不到微信 找不到扣扣 找不到MSN 找不到博客</div>
+                        <div class="sign">What a loser</div>
                     </div>
                     <div class="clear"></div>
                 </div>

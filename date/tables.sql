@@ -1,13 +1,14 @@
 use php;
-
+drop table if exists Types;
 create table if not exists Types (
     typeid int primary key auto_increment,
     typepid int default 0,
+    typeshow int default 0,
     typename nvarchar(15) not null,
     typesort int default 0,
     typevalid int default 1
 )auto_increment = 12580;
-
+drop table if exists Documents;
 create table if not exists Documents (
     docid int primary key auto_increment,
     typeid int references Types(typeid) on delete cascade on update cascade,
@@ -21,7 +22,7 @@ create table if not exists Documents (
     docsort int default 0,
     docvalid int default 1
 )auto_increment = 12315;
-
+drop table if exists Comments;
 create table if not exists Comments (
     comid int primary key auto_increment,
     docid int references Documents(docid) on delete cascade on update cascade,
@@ -32,13 +33,13 @@ create table if not exists Comments (
     comsort int default 0,
     comvalid int default 1
 )auto_increment = 12306;
-
+drop table if exists Main;
 create table if not exists Main ( 
     id int primary key auto_increment,
     _key nvarchar(15) not null,
     _value nvarchar(15)
 )auto_increment = 1;
-
+drop table if exists BBS;
 create table if not exists BBS (
     bbsid int primary key auto_increment,
     bbspid int default 0,
@@ -49,13 +50,11 @@ create table if not exists BBS (
     bbssort int default 0,
     bbsvalid int default 1
 )auto_increment = 1;
-
+drop table if exists Action;
 create table if not exists Action (
-	actid int primary key auto_increment,
+    actid int primary key auto_increment,
     acttype nvarchar(15) not null,
     acttitle nvarchar(25) not null,
     actlink nvarchar(50),
     actdate timestamp default current_timestamp
 );
-
-update Types set typevalid = case when typevalid = 0 then 1 else 1 end where typeid = 1; 

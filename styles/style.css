@@ -1,5 +1,5 @@
 @charset "utf-8";
-* { border: 0; margin: 0; text-decoration: none; list-style: none; font-family: "微软雅黑"; }
+* { margin: 0; text-decoration: none; list-style: none; font-family: "微软雅黑"; }
 a { color: #666; }
 a:hover { color: #000000; }
 /*a:visited { color: #666; }*/
@@ -8,6 +8,7 @@ body { background-color: #F5F5F5; }
 
 .clear { clear: both; }
 .lh52 { line-height: 52px; }
+.w80 { width: 80px; }
 .h80 { height: 80px; }
 .fr { float: right; }
 .fl { float: left; }
