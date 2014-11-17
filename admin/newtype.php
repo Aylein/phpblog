@@ -1,11 +1,11 @@
 <?php
     include("../lib/type.php");
     $id = 0;
-    if(isset($_GET["id"]) && is_int($_GET["id"])) $id = (int)$_GET["id"];
+    if(isset($_GET["id"]) && is_numeric($_GET["id"])) $id = (int)$_GET["id"];
     $type = null;
     if($id > 0) $type = Type::GetType($id);
     $update = $type == null ? false : true;
-    $res = Type::GetTypes();
+    $res = Type::GetTypes(0);
 ?>
 <!DOCTYPE html>
 <html>
@@ -31,7 +31,7 @@
                             <option value="0">主要分类</option>
                             <?php if(count($res->list) > 0): ?>
                             <?php for ($i=0, $z = count($res->list); $i < $z ; $i++): ?>
-                            <option value="<?=$res->list[$i]->typeid ?>" <?=$update && $type->typeid == $res->list[$i]->typeid ? "selected=\"sekected\"" : "" ?>><?=$res->list[$i]->typename ?></option>
+                            <option value="<?=$res->list[$i]->typeid ?>" <?=$update && $type->typepid == $res->list[$i]->typeid ? "selected=\"sekected\"" : "" ?>><?=$res->list[$i]->typename ?></option>
                             <?php endfor ?>
                             <?php endif ?>
                         </select>
@@ -72,8 +72,8 @@
                 <div class="rh_item">
                     <div class="form_title">&nbsp;</div>
                     <div class="form_value">
-                        <input type="submit" id="yes_bt" class="w80"/>
-                        <input type="reset" id="reset_bt" class="w80"/>
+                        <input type="submit" id="yes_bt" class="w80" value="OK"/>
+                        <input type="reset" id="reset_bt" class="w80" value="Reset"/>
                     </div>
                     <div class="clear"></div>
                 </div>
@@ -86,4 +86,5 @@
 </body>
 <script src="/scripts/jquery-1.11.1.min.js"></script>
 <script src="/scripts/form.js"></script>
+<script src="/scripts/newtype.js"></script>
 </html>

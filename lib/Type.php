@@ -38,13 +38,6 @@ class Type{
         }
     }
 
-    //Json格式
-    public function MakeJson(){
-        $str = "{ \"typeid\": \"".$this->typeid."\", \"typepid\": \"".$this->typepid."\", \"typeshow\": \"".$this->typeshow
-            ."\", \"typename\": \"".$this->typename."\", \"typesort\": \"".$this->typesort."\", \"typevalid\": \"".$this->typevalid."\" }";
-        return $str;
-    }
-
     //检查存在
     public static function Exists($name){
         if(!$name) return ture;
@@ -76,45 +69,52 @@ class Type{
     public static function Update($type){
         if(!is_a($type, "Type")) return false;
         if(!Type::exists($type->typeid)) return Type::Add($type);
-        $str = "update Types set typepid = :typepid, typeshow = :typepid, typename = :typepid, typesort = :typepid, "
-            ."typevalid = :typepid where typeid = :typeid; ";
+        $str = "update Types set typepid = :typepid, typeshow = :typeshow, typename = :typename, typesort = :typesort, "
+            ."typevalid = :typevalid where typeid = :typeid; ";
         $paras = array(":typepid" => $type->typepid, ":typeshow" => $type->typeshow, ":typename" => $type->typename, 
             ":typesort" => $type->typesort, ":typevalid" => $type->typevalid, ":typeid" => $type->typeid);
         $en = new Entity();
         return $en->Exec($str, $paras);
     }
 
-    public static function GetTypes($typeid = 0, $show = -1, $pagenum = 1, $pagesize = 0){
-        $typeid = is_int($typeid) ? $typeid : 0;
+    public static function GetTypes($typepid = -1, $show = -1, $pagenum = 1, $pagesize = 0){
+        $typepid = is_int($typepid) ? $typepid : 0;
         $show = is_int($show) ? $show : -1;
         $pagenum = is_int($pagenum) ? $pagenum : 1;
         $pagesize = is_int($pagesize) ? $pagesize : 0;
         $str = "select typeid, typepid, typeshow, typename, typesort, typevalid from Types ";
         $con = "select count(*) as count from Types ";
         $paras = array();
-        if($typeid > 0){ 
+        if ($typepid < -1){
+            $str .= "where typepid > 0 ";
+            $con .= "where typepid > 0 ";
+        }
+        else if($typepid > -1){ 
             $str .= "where typepid = :typepid ";
             $con .= "where typepid = :typepid ";
-            $paras[":typeid"] = $typeid;
+            $paras[":typepid"] = $typepid;
         }
-        if($show != -1){
+        if($show < -1){
+            $str .= "where typeshow > 0 ";
+            $con .= "where typeshow > 0 ";
+        }
+        else if($show > -1){
             $str .= "where typeshow = :typeshow ";
             $con .= "where typeshow = :typeshow ";
             $paras[":typeshow"] = $show;
         }
-        if($pagenum > 0){
-            $str .= "limit :offset, :rows; ";
-            $paras[":offset"] = $pagesize > 1 ? ($pagenum - 1) * $pagesize : 0;
-            $paras[":rows"] = $pagesize;
-        }
+        $str .= "order by typesort desc, typeid desc ";
+        $con .= "order by typesort desc, typeid desc ";
+        if($pagenum > 0 && $pagesize > 0)
+            $str .= "limit ".($pagesize > 1 ? ($pagenum - 1) * $pagesize : 0).", ".$pagesize." ";
         $str .= ";";
         $con .= ";";
         $en = new Entity();
-        $res = $en->Query($con.$str, $paras);
         $list = new Resaults();
-        if(!$res || count($res) != 2) return $list;
-        $list->page->MakePage((int)$res[0]["count"], $pagenum, $pagesize);
-        for($i = 0, $z = count($res[1]); $i < $z; $i++) $list->list[] = new Type($res[1][$i]);
+        $res = $en->Query($con, $paras);
+        if($res) $list->page->MakePage((int)$res[0]["count"], $pagenum, $pagesize);
+        $res = $en->Query($str, $paras);
+        if($res) for($i = 0, $z = count($res); $i < $z; $i++) $list->list[] = new Type($res[$i]);
         return $list;
     }
 

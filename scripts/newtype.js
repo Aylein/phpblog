@@ -47,7 +47,7 @@ $(function(){
                     if(data.err){
                         return;
                     }
-                    //window.location = "/admin/types.php";
+                    window.location = "/admin/types.php";
                 }
             });
         }

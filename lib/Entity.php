@@ -17,7 +17,6 @@ class Entity {
 
     public function Query($query, $paras = null){
         if(!$this->EntityState()) return false;
-        $this->conn->beginTransaction();
         if($paras && !is_array($paras)) $paras = null;
         $qu = $this->conn->prepare($query);
         if($qu->execute($paras)) return $qu->fetchAll();
@@ -37,7 +36,9 @@ class Entity {
             if(!$this->EntityState()) return false;
             $this->conn->beginTransaction();
             if($paras && !is_array($paras)) $paras = null;
-            return $this->conn->prepare($query)->execute($paras);
+            $cn = $this->conn->prepare($query)->execute($paras);
+            $this->conn->commit();
+            return $cn;
         } catch(Exception $e){
             $this->conn->rollback();
             return false;
@@ -46,7 +47,6 @@ class Entity {
 
     public function Scalar($query, $paras = null){
         if(!$this->EntityState()) return false;
-        $this->conn->beginTransaction();
         if($paras && !is_array($paras)) $paras = null;
         $qu = $this->conn->prepare($query);
         if($qu->execute($paras)) return $qu->fetch()[0];

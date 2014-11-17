@@ -1,5 +1,5 @@
 <?php
-class Page {
+class Page{
     var $pagenum;
     var $pagesize;
     var $totalnum;
@@ -20,19 +20,15 @@ class Page {
         $this->totalnum = $count;
         $this->pagenum = $page;
         $this->pagesize = $size;
-        $this->totalpage = (int)$count / $size;
+        $this->totalpage = (int)($count / $size);
         $this->totalpage = $this->totalpage < $count / $size ? $this->totalpage + 1 : $this->totalpage;
-    }
-
-    public function MakeJson(){
-        $str = "{ \"pagenum\": \"".$this->pagenum."\", \"pagesize\": \"".$this->pagesize."\", \"totalnum\": \"".$this->totalnum."\", \"totalpage\": \"".$this->totalpage."\" }";
-        return $str;
     }
 }
 
-class Resaults {
+class Resaults{
     var $list;
     var $page;
+
     public function __construct(){
         $this->list = array();
         $this->page = new Page();

@@ -1,6 +1,10 @@
 <?php
     include("lib/type.php");
+    $typeid = isset($_GET["type"]) && is_numeric($_GET["type"]) ? (int)$_GET["type"] : 0;
     $type = new Type();
+    if(isset($type->MakeJson)) echo "yes";
+    else echo "no";
+    die();
 ?>
 <!DOCTYPE html>
 <html>
@@ -15,7 +19,6 @@
         <section class="topimg"></section>
         <section class="bodypano">
             <div class="pano_left">
-                <?php echo Type::Exists("ds") ? "yes" : "no"; ?>
             </div>
             <div class="pano_right">
                 <div class="item namespace">
