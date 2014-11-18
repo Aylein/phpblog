@@ -1,10 +1,7 @@
 <?php
     include("lib/type.php");
+    include("lib/Document.php");
     $typeid = isset($_GET["type"]) && is_numeric($_GET["type"]) ? (int)$_GET["type"] : 0;
-    $type = new Type();
-    if(isset($type->MakeJson)) echo "yes";
-    else echo "no";
-    die();
 ?>
 <!DOCTYPE html>
 <html>

@@ -7,9 +7,9 @@
             <div class="master lh52">The 4th AyleinOter@What a loser</div>
             <div class="menu lh52">
                 <a href="/index.php" class="<?=!isset($typeid) || $typeid == 0 ? "c000" : "" ?>">全部</a>
-            <?php if($counta > 0): for($i = 0; $i < $counta; $i++): ?>
-                <a href="/index.php?type=<?=$atype->list[$i]->typeid ?>" class="<?=isset($typeid) && $typeid > 0 && $atype->list[$i]->typeid == $typeid ? "c000" : "" ?>"><?=$atype->list[$i]->typename ?></a>
-            <?php endfor; endif; ?>
+            <?php if($counta > 0): foreach($atype->list as $key => $value): ?>
+                <a href="/index.php?type=<?=$value->typeid ?>" class="<?=isset($typeid) && $typeid > 0 && $value->typeid == $typeid ? "c000" : "" ?>"><?=$value->typename ?></a>
+            <?php endforeach; endif; ?>
             </div>
             <div class="clear"></div>
         </div>

@@ -23,6 +23,12 @@ class Page{
         $this->totalpage = (int)($count / $size);
         $this->totalpage = $this->totalpage < $count / $size ? $this->totalpage + 1 : $this->totalpage;
     }
+
+    public function MakeJson(){
+        $str = "{ \"pagenum\": \"".$this->pagenum."\", \"pagesize\": \"".$this->pagesize."\", \"totalnum\": \""
+            .$this->totalnum."\", \"totalpage\": \"".$this->totalpage."\" }";
+        return $str;
+    }
 }
 
 class Resaults{
@@ -32,6 +38,15 @@ class Resaults{
     public function __construct(){
         $this->list = array();
         $this->page = new Page();
+    }
+
+    public function MakeJson(){
+        $str = "{ \"page\": ".$this->page->MakeJson().", \"list\": [ ";
+        $count = count($this->list);
+        if($count > 0) foreach($this->list as $key => $value) $str .= $value->MakeJson().", ";
+        if($count > 0) $str = substr($str, 0, -2)." ";
+        $str .= " ] }";
+        return $str;
     }
 }
 ?>
