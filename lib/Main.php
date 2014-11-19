@@ -7,13 +7,89 @@ class Main{
 
     public function __construct($array = null){
         if(!isset($array) || !is_array($array)){
-
+            $this->id = 0;
+            $this->_key = "";
+            $this->_value = "";
         }
         else{
             $this->id = isset($array["id"]) && is_numeric($array["id"]) ? (int)$array["id"] : 0;
             $this->_key = isset($array["_key"]) ? $array["_key"] : "";
             $this->_value = isset($array["_value"]) ? $array["_value"] : "";
         }
+    }
+
+    public function MakeJson(){
+        $str = "{ \"id\": \"".$this->id."\", \"_key\": \"".$this->_key."\", \"_value\": \"".$this->_value."\" }";
+        return $str;
+    }
+
+    public static function Exists($name){
+        if(!isset($name)) return true;
+        $str = "select count(*) from Main where ";
+        $paras = array();
+        if(is_int($name)){
+            $str .= "id = :id; ";
+            $paras[":id"] = $name;
+        }
+        else{
+            $str .= "_key = :_key; ";
+            $paras[":_key"] = $name;
+        }
+        $en = new Entity();
+        $num = $en->Scalar($str, $paras);
+        return $num != 0;
+    }
+
+    public static function GetValue($key){
+        if(!isset($key) || is_string($key)) return false;
+        $str = "select _value from Main where _key = $_key; ";
+        $array = array(":_key" => $key);
+        return (new Entity())->Scalar($str, $paras);
+    }
+
+    public static function Add($main){
+        if(is_a($main, "Main")) return false;
+        $str = "insert into Main (_key, _value) values (:_key, :_value); ";
+        $paras = array(":_key" => $main->_key, ":_value" => $main->_value);
+        return (new Entity())->Exec($str, $paras);
+    }
+
+    public static function Update($main){
+        if(is_a($main, "Main")) return false;
+        $str = "update Main set _key = :_key, _value = :_value where id = :id; ";
+        $paras = array(":_key" => $main->_key, ":_value" => $main->_value, ":id" => $main->id);
+        return (new Entity())->Exec($str, $paras);
+    }
+
+    public static function GetMains($pagenum = 1, $pagesize = 0){
+        $str = "select id, _key, _value ";
+        $count = "select count(*) as count ";
+        $where = "from Main where 1 = 1 ";
+        $paras = array();
+        $count .= $where.";";
+        $where .= "order by typesort desc, typeid desc ";
+        $select .= $where;
+        if($pagenum > 0 && $pagesize > 0)
+            $select .= "limit ".($pagesize > 1 ? ($pagenum - 1) * $pagesize : 0).", ".$pagesize."; ";
+        else $select .= "; ";
+        $en = new Entity();
+        $list = new Resaults();
+        $res = $en->Query($count, $paras);
+        if($res) $list->page->MakePage((int)$res[0]["count"], $pagenum, $pagesize);
+        $res = $en->Query($select, $paras);
+        if($res) foreach($res as $key => $value) $list->list[] = new Main($value);
+        return $list;
+    }
+
+    public static function GetMain($id){
+        $id = is_int($id) ? $id : 0;
+        if($id < 1) return false;
+        $str = "select id, _key, _value from Main where id = :id; ";
+        $paras = array(":id" => $id);
+        $en = new Entity();
+        $res = $en->First($str, $paras);
+        if(!$res) return false;
+        return new Main($res);
     }
 }
 

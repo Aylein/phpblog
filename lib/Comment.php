@@ -66,7 +66,7 @@ class Comment{
     }
 
     public static function GetComms($comtype = "other", $comtypeid = -1, $pid = -1, $valid = -1, $pagenum = 1, $pagesize = 0, $order = "sort"){
-        $comtype = is_string($comtype) ? $comtype : "main";
+        $comtype = is_string($comtype) ? $comtype : "other";
         $comtypeid = is_int($comtypeid) ? $comtypeid : -1;
         $pid = is_int($pid) ? $pid : -1;
         $valid = is_int($valid) ? $valid : -1;

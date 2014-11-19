@@ -40,7 +40,7 @@ drop table if exists Comments;
 create table if not exists Comments (
     comid int primary key auto_increment,
     comtype nvarchar(15) not null,
-    comtypeid int not null,
+    comtypeid int default 0,
     compid int default 0,
     comname nvarchar(12) not null,
     comrename nvarchar(12) default "",
@@ -59,7 +59,9 @@ drop table if exists Action;
 create table if not exists Action (
     actid int primary key auto_increment,
     acttype nvarchar(15) not null,
+    acttypeid int defautl 0,
     acttitle nvarchar(25) not null,
     actlink nvarchar(50),
-    actdate timestamp default current_timestamp
+    actdate timestamp default current_timestamp,
+    actvalid int default 1
 );

@@ -74,7 +74,7 @@ class Type{
 
     public static function Update($type){
         if(!is_a($type, "Type")) return false;
-        if(!Type::exists($type->typeid)) return Type::Add($type);
+        //if(!Type::exists($type->typeid)) return Type::Add($type);
         $str = "update Types set typepid = :typepid, typeshow = :typeshow, typename = :typename, typesort = :typesort, "
             ."typevalid = :typevalid where typeid = :typeid; ";
         $paras = array(":typepid" => $type->typepid, ":typeshow" => $type->typeshow, ":typename" => $type->typename, 
