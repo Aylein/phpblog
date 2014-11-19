@@ -1,4 +1,22 @@
 <?php
+include_once("Entity.php");
+class Main{
+    var $id;
+    var $_key;
+    var $_value;
+
+    public function __construct($array = null){
+        if(!isset($array) || !is_array($array)){
+
+        }
+        else{
+            $this->id = isset($array["id"]) && is_numeric($array["id"]) ? (int)$array["id"] : 0;
+            $this->_key = isset($array["_key"]) ? $array["_key"] : "";
+            $this->_value = isset($array["_value"]) ? $array["_value"] : "";
+        }
+    }
+}
+
 class Page{
     var $pagenum;
     var $pagesize;
