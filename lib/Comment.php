@@ -1,4 +1,7 @@
 <?php
+/*
+comtype
+*/
 include_once("Entity.php");
 class Comment{
     var $comid; // int primary key auto_increment,
@@ -41,7 +44,7 @@ class Comment{
     public function MakeJson(){
         $str = "{ \"comid\": \"".$this->comid."\", \"comtype\": \"".$this->comtype."\", \"comtypeid\": \"".$this->comtypeid."\", \"compid\": \"".$this->compid."\", \"comname\": \""
             .$this->comname."\", \"comrename\": \"".$this->comrename."\",\"comdate\": \"".date("Y-m-d H:i:s", $this->comdate)."\", \"comment\": \"".$this->comment."\", \"comsort\": \""
-            .$this->comsort."\", \"comvalid\": \"".$this->comvalid)." }";
+            .$this->comsort."\", \"comvalid\": \"".$this->comvalid." }";
         return $str;
     }
 
@@ -83,12 +86,12 @@ class Comment{
         if($comtypeid < -1) $where .= "and comtypeid > 0 ";
         else if($comtypeid > -1){
             $where .= "and comtypeid = :comtypeid ";
-            $paras[":comtypeid"] = $comtypeid
+            $paras[":comtypeid"] = $comtypeid;
         }
         if($pid < -1) $where .= "and compid > 0";
         else if($pid > -1){
             $where .= "and compid = :compid";
-            $paras[":compid"] = $pid
+            $paras[":compid"] = $pid;
         }
         if($valid < -1) $where .= "and comvalid > 0 ";
         else if($valid > -1){

@@ -21,7 +21,7 @@
     }
     echo $str;
 
-    function NewType(){
+    private function NewType(){
         $type = new Type();
         $type->typeid = isset($_POST["typeid"]) && is_numeric($_POST["typeid"]) ? (int)$_POST["typeid"] : 0;
         $type->typepid = isset($_POST["typepid"]) && is_numeric($_POST["typepid"]) ? (int)$_POST["typepid"] : 0;

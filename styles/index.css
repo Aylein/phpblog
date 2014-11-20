@@ -7,3 +7,11 @@
 .imgspace img { width: 90px; height: 90px; }
 .name { width: 190px; height: 90px; margin: 5px; float: right; }
 .sign { font-size: 14px; color: #666; margin-top: 5px; }
+
+.says { width: 960px; margin: 0 auto; }
+.says_left { width: 50px; height: 250px; float: left; }
+.says_right { width: 900px; height: 250px; float: right; }
+.say_title { width: 60px; float: left; text-align: right; }
+.say_button { height: 30px; border-left: 1px solid #ccc; border-top: 1px solid #ccc; border-right: 1px solid #ccc; }
+.say_item { width: 820px; height: 250px; float: left; margin-left: 15px; }
+.say_comment { border: 1px solid #CCC; height: 168px; overflow-y: scroll; word-wrap: break-word; padding: 5px; }

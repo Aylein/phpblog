@@ -59,7 +59,7 @@ drop table if exists Action;
 create table if not exists Action (
     actid int primary key auto_increment,
     acttype nvarchar(15) not null,
-    acttypeid int defautl 0,
+    acttypeid int default 0,
     acttitle nvarchar(25) not null,
     actlink nvarchar(50),
     actdate timestamp default current_timestamp,
