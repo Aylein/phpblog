@@ -99,11 +99,14 @@ class Page{
     var $totalnum;
     var $totalpage;
 
-    public function __construct(){
-        $this->totalnum = 0;
-        $this->pagenum = 1;
-        $this->pagesize = 0;
-        $this->totalpage = 0;
+    public function __construct($count = null, $page = null, $size = null){
+        if($count == null || $page == null || $size == null) {
+            $this->totalnum = 0;
+            $this->pagenum = 1;
+            $this->pagesize = 0;
+            $this->totalpage = 0;
+        }
+        else $this->MakePage($count, $page, $size);
     }
 
     public function MakePage($count, $page, $size){
@@ -141,6 +144,20 @@ class Resaults{
         if($count > 0) $str = substr($str, 0, -2)." ";
         $str .= " ] }";
         return $str;
+    }
+}
+
+class Message{
+    var $res;
+    var $code;
+    var $msg;
+    var $obj;
+
+    public function __construct($res = false, $code = "", $msg = "", $obj = null){
+        $this->res = $res;
+        $this->code = $code;
+        $this->msg = $msg;
+        $this->obj = $obj;
     }
 }
 ?>

@@ -10,6 +10,7 @@
         <title>Index</title>
         <link rel="stylesheet" href="styles/style.css" />
         <link rel="stylesheet" href="styles/index.css" />
+        <link rel="stylesheet" href="styles/extra.css" />
     </head>
     <body>
         <section class="header"><?php require("require/header.php"); ?></section>
@@ -26,10 +27,14 @@
                     </div>
                     <div class="clear"></div>
                 </div>
+                <div class="item namespace mt5">
+                    <div><audio controls="controls" autoplay="autoplay" src="sounds/白いスーツのテーマ.mp3">您的浏览器不支持 audio 标签。</audio></div>
+                </div>
             </div>
             <div class="clear"></div>
             <br />
         </section>
         <section class="footer"><?php require("require/footer.php"); ?></section>
     </body>
+    <script src="scripts/oter.js"></script>
 </html>

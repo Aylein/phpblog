@@ -14,6 +14,7 @@
     <title>admin types</title>
     <link rel="stylesheet" href="/styles/style.css" />
     <link rel="stylesheet" href="/styles/admin_style.css" />
+    <link rel="stylesheet" href="/styles/extra.css" />
 </head>
 <body>
     <section class="header"><?php require("../require/header.php"); ?></section>

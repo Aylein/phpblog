@@ -4,6 +4,11 @@
     $ctype = Type::GetTypes(-2);
     $counta = count($atype->list);
     $countc = count($ctype->list);
+
+    $s = new SoapClient(null, array("location"=>"http://localhost:82/server/types.php","uri"=>"types.php"));
+    $h = new SoapHeader('http://localhost:82/server/types.php', 'auth', '123456789', false, SOAP_ACTOR_NEXT);
+    $s->__setSoapHeaders(array($h));
+    //print_r(json_encode($s->postType(new Type())));
 ?>
 <!DOCTYPE html>
 <html>
@@ -12,6 +17,7 @@
     <title>admin types</title>
     <link rel="stylesheet" href="/styles/style.css" />
     <link rel="stylesheet" href="/styles/admin_style.css" />
+    <link rel="stylesheet" href="/styles/extra.css" />
 </head>
 <body>
     <section class="header"><?php require("../require/header.php"); ?></section>
@@ -19,7 +25,7 @@
     <section class="bodypano">
         <div class="left_hand"><?php require("../require/admin_menu.php"); ?></div>
         <div class="right_hand">
-            <div class="rh_title">所有类别</div>
+            <div class="rh_title" id="typelist">所有类别</div>
             <?php if($counta > 0): ?>
             <?php for($i = 0; $i < $counta; $i++): ?>
             <div class="rh_item <?=$atype->list[$i]->typevalid == 1 ? "c666" : "cCCC" ?>">

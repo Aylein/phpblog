@@ -1,0 +1,19 @@
+
+.clear { clear: both; }
+.lh52 { line-height: 52px; }
+.w80 { width: 80px; }
+.h24 { height: 24px; }
+.h30 { height: 30px; }
+.h80 { height: 80px; }
+.fr { float: right; }
+.fl { float: left; }
+.fs14 { font-size: 14px; }
+.c666 { color: #666; }
+.cCCC { color: #CCC; }
+.c000 { color: #000000; }
+.bb1s666 { border-bottom: 1px solid #CCC; }
+.mt5 { margin-top: 5px; }
+.mt9 { margin-top: 9px; }
+.mt15 { margin-top: 15px; }
+.bc666 { background-color: #666; }
+.bold { font-weight: bold; }

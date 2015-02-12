@@ -13,5 +13,6 @@
 .says_right { width: 900px; height: 250px; float: right; }
 .say_title { width: 60px; float: left; text-align: right; }
 .say_button { height: 30px; border-left: 1px solid #ccc; border-top: 1px solid #ccc; border-right: 1px solid #ccc; }
+.say_button div { height: 30px; line-height: 30px; width: 80px; text-align: center; border-right: 1px solid #ccc; cursor: pointer; }
 .say_item { width: 820px; height: 250px; float: left; margin-left: 15px; }
 .say_comment { border: 1px solid #CCC; height: 168px; overflow-y: scroll; word-wrap: break-word; padding: 5px; }
