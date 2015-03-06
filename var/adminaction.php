@@ -1,4 +1,5 @@
 <?php
+    include("../lib/main.php");
     include("../lib/Json.php");
     include("../lib/Users.php");
     include("../lib/Type.php");
@@ -7,6 +8,7 @@
     //    echo Json::MakeJson(false, "no_login", "请先登录");
     //    die();
     //}
+
     if(!isset($_POST["action"])){
         echo Json::MakeJson(false, "no_action", "你想干什么 0 0~");
         die();
@@ -21,7 +23,7 @@
     }
     echo $str;
 
-    private function NewType(){
+    function NewType(){
         $type = new Type();
         $type->typeid = isset($_POST["typeid"]) && is_numeric($_POST["typeid"]) ? (int)$_POST["typeid"] : 0;
         $type->typepid = isset($_POST["typepid"]) && is_numeric($_POST["typepid"]) ? (int)$_POST["typepid"] : 0;

@@ -19,6 +19,9 @@ $(function(){
     $("#typename").blur(typename);
     $("#typesort").blur(typesort);
     $("#yes_bt").click(function(){
+        var _this = $(this);
+        if(Unable.isLock(_this)) return false;
+        else Unable.lock(_this);
         var bo = true;
         bo = bo && typename();
         bo = bo && typesort();
@@ -31,7 +34,7 @@ $(function(){
             var typevalid_v = $("#typevalid").val();
             $.ajax({
                 type: "post",
-                url: "/var/adminaction.php",
+                url: "/var/types.php",
                 data: { 
                     typeid: typeid_v,
                     typepid: typepid_v,
@@ -43,6 +46,7 @@ $(function(){
                 },
                 dataType: "Json",
                 success: function(data){
+                    Unable.unLock($("#yes_bt"));
                     alert(data.msg);
                     if(data.err){
                         return;
@@ -51,6 +55,7 @@ $(function(){
                 }
             });
         }
+        else Unable.unLock(_this);
         return false;
     });
 });

@@ -8,11 +8,11 @@ class serverTypes{
             throw new SoapFault("Server", "您无权访问");
     }
     public function postType($type){
-        //if(!($type instanceof Type)) return new Message(); 
+        //if(!($type instanceof Type)) return new Message();
         return new Message(true, "ok", "", $type);
     }
     public function putType($type){
-        //if(!($type instanceof Type)) return new Message(); 
+        //if(!($type instanceof Type)) return new Message();
         return new Message(true, "ok", "", $type);
     }
     public function deleteType($id){

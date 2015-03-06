@@ -4,7 +4,7 @@ class Entity {
 
     public function __construct(){
         try{
-            $this->conn = new PDO("mysql:host=localhost;dbname=php", "adminWMGHtJR", "Q7rkc92SQQeK");
+            $this->conn = new PDO("mysql:host=localhost;dbname=phpMyBlog", "section", "mm19880209");
         } catch (Exception $e) {
             //exit(); //die("数据库连接失败");
             return;

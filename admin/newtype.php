@@ -18,7 +18,7 @@
 </head>
 <body>
     <section class="header"><?php require("../require/header.php"); ?></section>
-    <section class="topimg"></section>
+    <section class="topimg"><?php require("../require/headimg.php"); ?></section>
     <section class="bodypano">
         <div class="left_hand"><?php require("../require/admin_menu.php"); ?></div>
         <div class="right_hand">

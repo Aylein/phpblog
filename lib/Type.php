@@ -38,18 +38,12 @@ class Type{
         }
     }
 
-    public function MakeJson(){
-        $str = "{ \"typeid\": \"".$this->typeid."\", \"typepid\": \"".$this->typepid."\", \"typeshow\": \"".$this->typeshow."\", \"typename\": \""
-            .$this->typename."\", \"typesort\": \"".$this->typesort."\", \"typevalid\": \"".$this->typevalid."\" }";
-        return $str;
-    }
-
     //检查存在
     public static function Exists($name){
         if(!$name) return ture;
         $str = "select count(*) from Types where ";
         $paras = array();
-        if(is_int($name)){ 
+        if(is_int($name)){
             $str .= "typeid = :typeid; ";
             $paras[":typeid"] = $name;
         }
@@ -94,7 +88,7 @@ class Type{
         $where = "from Types where 1 = 1 ";
         $paras = array();
         if ($typepid < -1) $where .= "and typepid > 0 ";
-        else if($typepid > -1){ 
+        else if($typepid > -1){
             $where .= "and typepid = :typepid ";
             $paras[":typepid"] = $typepid;
         }

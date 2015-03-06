@@ -7,3 +7,19 @@ var regex = {
     _byte: /[^\x00-\xff]/ig,
     blank: /\s+/
 };
+
+!function(){
+    Unable = {
+        isLock: function(q){ return q.attr("lock"); },
+        lock: function(q){
+            if(!Unable.isLock(q)){
+                q.attr("disabled", "disabled").attr("lock", "lock").css("opacity", "0.4");
+            }
+        },
+        unLock: function(q){
+            if(Unable.isLock(q)){
+                q.removeAttr("disabled", "disabled").removeAttr("lock", "lock").css("opacity", "1.0");
+            }
+        }
+    };
+}();
