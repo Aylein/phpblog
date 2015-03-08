@@ -24,7 +24,7 @@
     <section class="topimg"><?php require("../require/headimg.php"); ?></section>
     <section class="bodypano">
         <div class="left_hand"><?php require("../require/admin_menu.php"); ?></div>
-        <div class="right_hand" ng-app="asp" ng-controller="asptta">
+        <div class="right_hand" ng-app="app" ng-controller="typesController">
             <div class="rh_title" id="typelist">所有类别</div>
             <div class="rh_item_c" ng-show="types.length < 1">目前尚未有类型</div>
             <div ng-show="types.length > 0">
@@ -32,6 +32,7 @@
                     <a href="/admin/newtype.php?id={{type.typeid}}" class="{{type.typevalid == 1 ? 'c666' : 'cCCC'}}" ng-bind="type.typename"></a> /
                     <span ng-bind="type.typeid"></span> /
                     <span ng-bind="type.typeshow == 1 ? 'show' : 'hide'"></span>
+
                 </div>
             </div>
             <!--div>
@@ -64,10 +65,22 @@
 </body>
 <script src="../scripts/jquery-1.11.1.min.js"></script>
 <script src="../scripts/angular.min.js"></script>
-<script src="../scripts/params.js"></script>
+<script src="../scripts/ag_module.js"></script>
 <script>
+    ///*
+    //var app = angular.module("app");
+    app.controller("typesController", function($scope, web){
+        web.post("/var/types.php", {"action": "gettypes"}, function(data){
+            console.log(data);
+            if(data.err == false) return;
+            $scope.types = data.list;
+        });
+    });
+    //*/
+
+    /*
     var asp = angular.module("asp", []);
-    asp.controller("asptta", function($scope, $http){
+    asp.controller("typesController", function($scope, $http){
         $http({
             method: "post",
             url: "/var/types.php",
@@ -80,5 +93,6 @@
             $scope.types = data.list;
         });
     });
+    */
 </script>
 </html>
