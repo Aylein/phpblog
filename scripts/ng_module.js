@@ -1,34 +1,49 @@
-var app = angular.module("app", []);
+var app = angular.module("app", ["ngRoute"]);
+///*
+app.config(function($routeProvider){
+    $routeProvider.when("/index", {
+        templateUrl: "/view/ngMain.html",
+        controller: "urlController"
+    }).when("/says", {
+        templateUrl: "/view/ngSays.html",
+        controller: "urlController"
+    }).when("/found:typeid", {
+        templateUrl: "/view/ngFound.html",
+        controller: "urlController"
+    }).otherwise({redirectTo: "/index"});
+});
+//*/
 var Param = function(obj) {
-    var query = '', name, value, fullSubName, subName, subValue, innerObj, i;
+    var query = "", name, value, fullSubName, subName, subValue, innerObj, i;
     for(name in obj) {
         value = obj[name];
         if(value instanceof Array) {
             for(i=0; i<value.length; ++i) {
                 subValue = value[i];
-                fullSubName = name + '[' + i + ']';
+                fullSubName = name + "[" + i + "]";
                 innerObj = {};
                 innerObj[fullSubName] = subValue;
-                query += param(innerObj) + '&';
+                query += param(innerObj) + "&";
             }
         }
         else if(value instanceof Object) {
             for(subName in value) {
                 subValue = value[subName];
-                fullSubName = name + '[' + subName + ']';
+                fullSubName = name + "[" + subName + "]";
                 innerObj = {};
                 innerObj[fullSubName] = subValue;
-                query += param(innerObj) + '&';
+                query += param(innerObj) + "&";
             }
         }
         else if(value !== undefined && value !== null)
-            query += encodeURIComponent(name) + '=' + encodeURIComponent(value) + '&';
+            query += encodeURIComponent(name) + "=" + encodeURIComponent(value) + "&";
     }
     return query.length ? query.substr(0, query.length - 1) : query;
 };
 var web_Config = function(){
     this.type = "get";
     this.url = "";
+    this.data = {};
     this.param = {};
     this.headers = {};
     this.callback = function(data){};
@@ -46,7 +61,8 @@ app.service("web", function($http){
         $http({
             method: op.type,
             url: op.url,
-            data: op.param,
+            param: op.param,
+            data: op.data,
             headers: op.headers,
             transformRequest: Param
         }).success(op.callback);
@@ -58,11 +74,11 @@ app.service("web", function($http){
         op.callback = callback;
         this.http(op);
     };
-    this.post = function(url, param, callback){
+    this.post = function(url, data, callback){
         var op = new web_Config();
         op.type = "post";
         op.url = url;
-        op.param = param;
+        op.data = data;
         op.headers = {"Content-Type": "application/x-www-form-urlencoded"};
         op.callback = callback;
         this.http(op);
