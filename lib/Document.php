@@ -109,7 +109,7 @@ class Document{
         $where = "from Documents where 1 = 1 ";
         $paras = array();
         if ($typeid < -1) $where .= "and typeid > 0 ";
-        else if($typeid > -1){ 
+        else if($typeid > -1){
             $where .= "and typeid = :typeid ";
             $paras[":typeid"] = $typeid;
         }
@@ -129,7 +129,7 @@ class Document{
             case "docview":
                 $where .= "order by docview desc, docsort desc, docid desc ";
                 break;
-            default: 
+            default:
                 $where .= "order by docsort desc, docid desc ";
                 break;
         }

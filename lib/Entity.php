@@ -19,7 +19,21 @@ class Entity {
         if(!$this->EntityState()) return false;
         if($paras && !is_array($paras)) $paras = null;
         $qu = $this->conn->prepare($query);
-        if($qu->execute($paras)) return $qu->fetchAll();
+        if($qu->execute($paras))
+            return $qu->fetchAll(PDO::FETCH_NAMED);
+        return false;
+    }
+
+    public function Querys($query, $paras = null){
+        if(!$this->EntityState()) return false;
+        if($paras && !is_array($paras)) $paras = null;
+        $qu = $this->conn->prepare($query);
+        if($qu->execute($paras)){
+            $res = Array();
+            do $res[] = $qu->fetchAll(PDO::FETCH_NAMED);
+            while($qu->nextRowset());
+            return $res;
+        }
         return false;
     }
 

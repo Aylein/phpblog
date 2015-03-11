@@ -1,5 +1,33 @@
 <?php
 include_once("Entity.php");
+class Commen{
+    public static function GetIP(){
+        if(!empty($_SERVER["HTTP_CLIENT_IP"])) return $_SERVER["HTTP_CLIENT_IP"];
+        elseif(!empty($_SERVER["HTTP_X_FORWARDED_FOR"])) return $_SERVER["HTTP_X_FORWARDED_FOR"];
+        elseif(!empty($_SERVER["REMOTE_ADDR"])) return $_SERVER["REMOTE_ADDR"];
+        else return "noipaddress";
+    }
+    public static function UUID() {
+        if(function_exists('com_create_guid')) return com_create_guid();
+        else {
+            //mt_srand((double)microtime() * 10000); //optional for php 4.2.0 and up.随便数播种，4.2.0以后不需要了。
+            $charid = strtoupper(md5(uniqid(rand(), true))); //根据当前时间（微秒计）生成唯一id.
+            $hyphen = chr(45); // "-"
+            return substr($charid, 0, 8).$hyphen.substr($charid, 8, 4).$hyphen.substr($charid, 12, 4).
+                $hyphen.substr($charid, 16, 4).$hyphen.substr($charid, 20, 12);
+        }
+    }
+    public static function Rand($len){
+        $arr = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n",
+            "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z","A", "B", "C", "D",
+            "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
+            "U", "V", "W", "X", "Y", "Z"];
+        $name = "";
+        for($i = 0; $i < $len; $i++) $name .= $arr[rand(0, 31)];
+        return $name;
+    }
+}
+
 class Main{
     var $id;
     var $_key;

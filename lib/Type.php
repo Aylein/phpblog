@@ -11,6 +11,7 @@ class Type{
     var $typeshow;
     //类型名
     var $typename; // nvarchar(15) not null,
+    var $typecreatetime;
     //排序
     var $typesort; // int default 0,
     //是否可用
@@ -33,6 +34,7 @@ class Type{
             $this->typepid = isset($array["typepid"]) && is_numeric($array["typepid"]) ? (int)$array["typepid"] : 0;
             $this->typeshow = isset($array["typeshow"]) && is_numeric($array["typeshow"]) ? (int)$array["typeshow"] : 0;
             $this->typename = isset($array["typename"])  ? $array["typename"] : "";
+            $this->typecreatetime = isset($array["typecreatetime"])  ? strtotime($array["typecreatetime"]) : -1;
             $this->typesort = isset($array["typesort"]) && is_numeric($array["typesort"]) ? (int)$array["typesort"] : 0;
             $this->typevalid = isset($array["typevalid"]) && is_numeric($array["typevalid"]) ? (int)$array["typevalid"] : 0;
         }
@@ -60,7 +62,7 @@ class Type{
         if(!is_a($type, "Type")) return false;
         $str = "insert into Types (typepid, typeshow, typename, typesort, typevalid) "
             ."values (:typepid, :typeshow, :typename, :typesort, :typevalid);";
-        $paras = array(":typepid" => $type->typepid, ":typeshow" => $type->typeshow, 
+        $paras = array(":typepid" => $type->typepid, ":typeshow" => $type->typeshow,
             ":typename" => $type->typename, ":typesort" => $type->typesort, ":typevalid" => $type->typevalid);
         $en = new Entity();
         return $en->Exec($str, $paras);
@@ -71,7 +73,7 @@ class Type{
         //if(!Type::exists($type->typeid)) return Type::Add($type);
         $str = "update Types set typepid = :typepid, typeshow = :typeshow, typename = :typename, typesort = :typesort, "
             ."typevalid = :typevalid where typeid = :typeid; ";
-        $paras = array(":typepid" => $type->typepid, ":typeshow" => $type->typeshow, ":typename" => $type->typename, 
+        $paras = array(":typepid" => $type->typepid, ":typeshow" => $type->typeshow, ":typename" => $type->typename,
             ":typesort" => $type->typesort, ":typevalid" => $type->typevalid, ":typeid" => $type->typeid);
         $en = new Entity();
         return $en->Exec($str, $paras);
@@ -84,7 +86,7 @@ class Type{
         $pagenum = is_int($pagenum) ? $pagenum : 1;
         $pagesize = is_int($pagesize) ? $pagesize : 0;
         $count = "select count(*) as count ";
-        $select = "select typeid, typepid, typeshow, typename, typesort, typevalid ";
+        $select = "select typeid, typepid, typeshow, typename, typecreatetime, typesort, typevalid ";
         $where = "from Types where 1 = 1 ";
         $paras = array();
         if ($typepid < -1) $where .= "and typepid > 0 ";
@@ -120,7 +122,7 @@ class Type{
     public static function GetType($id){
         $id = is_int($id) ? $id : 0;
         if($id < 1) return false;
-        $str = "select typeid, typepid, typename, typesort, typevalid from Types where typeid = :typeid; ";
+        $str = "select typeid, typepid, typename, typecreatetime, typesort, typevalid from Types where typeid = :typeid; ";
         $paras = array(":typeid" => $id);
         $en = new Entity();
         $res = $en->First($str, $paras);

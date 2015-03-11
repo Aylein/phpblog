@@ -11,16 +11,16 @@
         <section class="header" ng-controller="ngMainController">
             <div class="myname">
                 <div class="master"><img src="/images/master.jpg"/>&nbsp;&nbsp;</div>
-                <div class="master lh52" ng-bind="'The 4th AyleinOter@' + sign"></div>
+                <div class="master lh52" ng-bind="'The 4th AyleinOter@' + sign.sign"></div>
                 <div class="menu lh52">
-                    <a ng-click="click(all.typeid)" href="javascript: void(0);" ng-bind="all.typename" class="ml5 {{all.cur == 1 ? 'c000' :'c666'}}"></a>
-                    <a ng-repeat="type in types" ng-click="click(type.typeid)" href="javascript: void(0);" ng-bind="type.typename" class="ml5 {{type.cur == 1 ? 'c000' :'c666'}}"></a>
-                    <a ng-click="click(say.typeid)" href="javascript: void(0);" ng-bind="say.typename" class="ml5 {{say.cur == 1 ? 'c000' :'c666'}}"></a>
+                    <a ng-click="click(sign.all.typeid)" href="javascript: void(0);" ng-bind="sign.all.typename" class="ml5 {{sign.all.cur == 1 ? 'c000' :'c666'}}"></a>
+                    <a ng-repeat="type in sign.types" ng-click="click(type.typeid)" href="javascript: void(0);" ng-bind="type.typename" class="ml5 {{type.cur == 1 ? 'c000' :'c666'}}"></a>
+                    <a ng-click="click(sign.say.typeid)" href="javascript: void(0);" ng-bind="sign.say.typename" class="ml5 {{sign.say.cur == 1 ? 'c000' :'c666'}}"></a>
                 </div>
                 <div class="clear"></div>
             </div>
         </section>
-        <section class="topimg" ng-controller="ngMainController"><img src="{{himg}}"/></section>
+        <section class="topimg" ng-controller="ngMainController"><img src="{{sign.himg}}"/></section>
         <section class="bodypano">
             <div class="pano_left" ng-view></div>
             <div class="pano_right">
@@ -28,7 +28,7 @@
                     <div class="imgspace"><img src="/images/master.jpg"/></div>
                     <div class="name" ng-controller="ngMainController">
                         <div class="bb1s666">AyleinOter IV</div>
-                        <div class="sign" ng-bind="sign"></div>
+                        <div class="sign" ng-bind="sign.sign" ng-click="clearCur()"></div>
                     </div>
                     <div class="clear"></div>
                 </div>
@@ -51,6 +51,7 @@
         </section>
     </body>
     <script src="scripts/angular.min.js"></script>
+    <script src="scripts/cookies.js"></script>
     <script src="scripts/angular-route.min.js"></script>
     <script src="scripts/ng_module.js"></script>
     <script src="scripts/ng_directive.js"></script>

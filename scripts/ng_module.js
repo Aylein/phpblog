@@ -1,5 +1,4 @@
 var app = angular.module("app", ["ngRoute"]);
-///*
 app.config(function($routeProvider){
     $routeProvider.when("/index", {
         templateUrl: "/view/ngMain.html",
@@ -7,12 +6,11 @@ app.config(function($routeProvider){
     }).when("/says", {
         templateUrl: "/view/ngSays.html",
         controller: "urlController"
-    }).when("/found:typeid", {
+    }).when("/found/:typeid", {
         templateUrl: "/view/ngFound.html",
         controller: "urlController"
     }).otherwise({redirectTo: "/index"});
 });
-//*/
 var Param = function(obj) {
     var query = "", name, value, fullSubName, subName, subValue, innerObj, i;
     for(name in obj) {
