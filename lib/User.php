@@ -25,7 +25,7 @@ class User {
         if(!is_a($user, "User")) return false;
         $str = "insert into Users (username, userpass, userimg, usersort, uservalid) "
             ."values (:username, :userpass, :userimg, :usersort, :uservalid);";
-        $str .= "select userid, username, userpass, userimg, userreatetime, usersort, uservalid from "
+        $str .= "select userid, username, userimg, usercreatetime, usersort, uservalid from "
             ."Users where userid = @@identity;";
         $paras = array(":username" => $user->username, ":userpass" => $user->userpass, ":userimg" => $user->userimg,
             ":usersort" => $user->usersort, ":uservalid" => $user->uservalid);
@@ -42,14 +42,13 @@ class User {
         $paras = array(":userid" => $user->userid, ":username" => $user->username,
             ":userpass" => $user->userpass, ":userimg" => $user->userimg, ":usersort" => $user->usersort,
             ":uservalid" => $user->uservalid);
-        $en = new Entity();
         return $en->Exec($str, $paras);
     }
 
     public static function Get($id){
         $id = is_int($id) ? $id : 0;
         if($id < 1) return false;
-        $str = "select userid, username, userpass, userimg, usercreatetime, usersort, uservalid "
+        $str = "select userid, username, userimg, usercreatetime, usersort, uservalid "
             ."from Users where userid = :userid; ";
         $paras = array(":userid" => $id);
         $en = new Entity();
@@ -59,24 +58,25 @@ class User {
     }
 
     public static function SignIn($pass){
-        $id = is_int($id) ? $id : 0;
-        if($id < 1) return false;
-        $str = "select userid, username, userpass, userimg, usercreatetime, usersort, uservalid "
+        $str = "select userid, username, userimg, usercreatetime, usersort, uservalid "
             ."from Users where userpass = :userpass; ";
-        $paras = array(":userpass" => md5($id));
+        $paras = array(":userpass" => $pass);
         $en = new Entity();
         $res = $en->First($str, $paras);
-        if(!$res) return false;
-        return new User($res);
+        if(!$res) return new Message();
+        return new Message(true, "ok", "ok", new User($res)); //new User($res);
     }
 
     public static function SignUp($pass){
-        $user = User::SignIn($pass);
-        if($user) return $user;
         $now = date("H");
-        $arr = array("username" => Commen::Rand(3)."#".Commen::Rand(5).".".chr($now + 65).chr($now + 97),
-            "userpass" => md5($pass), "userimg" => "images/ac/" + rand(1, 50));
+        $name = Commen::Rand(3)."#".Commen::Rand(5).".".chr($now + 65).chr($now + 97);
+        $arr = array("username" => $name, "userpass" => md5($name." ".$pass), "userimg" => "images/ac/ac_".rand(1, 50).".jpg");
         return User::Add(new User($arr));
+    }
+
+    public static function MakeUser($pass, $name = null){
+        if($name == null) return User::SignUp($pass);
+        else return User::SignIn(md5($name." ".$pass));
     }
 }
 ?>

@@ -4,10 +4,12 @@ class Entity {
 
     public function __construct(){
         try{
-            $this->conn = new PDO("mysql:host=localhost;dbname=phpMyBlog", "section", "mm19880209");
+            $this->conn = new PDO("mysql:host=localhost;dbname=phpMyBlog;charset=utf8", "section", "mm19880209");
+            //$this->conn->setAttribute(PDO::ATTR_PERSISTENT, true); //mysql 长链接
+            //$this->conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false); //关闭php注入模拟 使用mysql参数注入 //加上报错
         } catch (Exception $e) {
             //exit(); //die("数据库连接失败");
-            return;
+            return $this->conn = false;
         }
     }
 
@@ -25,15 +27,15 @@ class Entity {
     }
 
     public function Querys($query, $paras = null){
-        if(!$this->EntityState()) return false;
-        if($paras && !is_array($paras)) $paras = null;
-        $qu = $this->conn->prepare($query);
+        if(!$this->EntityState()) return false; //判断状态
+        if($paras && !is_array($paras)) $paras = null; //检查参数数组
+        $qu = $this->conn->prepare($query); //prepare
         if($qu->execute($paras)){
             $res = Array();
             do $res[] = $qu->fetchAll(PDO::FETCH_NAMED);
             while($qu->nextRowset());
             return $res;
-        }
+        } //excute and retruen
         return false;
     }
 

@@ -1,30 +1,27 @@
 <?php
     include_once("../lib/User.php");
     include_once("../lib/Comment.php");
+    include_once("../lib/Main.php");
 
     if(!isset($_POST["action"])){
-        echo Json::MakeJson(false, "no_action", "你想干什么 0 0~");
-        die();
+        echo json_encode(new Message(false, "no_action", "你想干什么 0 0~"));
+        exit();
     }
     if(!isset($_POST["pass"])){
-        echo Json::MakeJson(false, "no_pass", "需要一个密码");
-        die();
+        echo json_encode(new Message(false, "no_pass", "需要一个密码"));
+        exit();
     }
     $action = $_POST["action"];
     $pass = $_POST["pass"];
-    $uuid = isset($_COOKIE["ao"]) ? $_COOKIE["ao"] : false;
-    $user = false;
-    if(!$uuid){
-        $user = User::SignUp($pass);
-        setCookie("ao", Commen::UUID());
+    $name = isset($_COOKIE["ao"]) ? $_COOKIE["ao"] : null;
+    $user = User::MakeUser($pass, $name)->obj;
+
+    if($user == null){
+        echo json_encode(new Message(false, "no_user", "获取用户或注册失败，如要更换用户，请清空当前cookie并在此输入密码。"));
+        exit();
     }
-    else{
-        $user = User::SignIn($pass);
-    }
-    if(!$user){
-        echo json_encode(new Message(false, "no_user", "获取用户失败，如要更换用户，请清空当前cookie并在此输入密码。"));
-        die();
-    }
+    else setCookie("ao", $user->username, strtotime(date('Y-m-d H:i:s',strtotime("+ 1 year"))));
+
     $str = "";
     switch($action){
         case "newcom":
@@ -33,15 +30,15 @@
         case "getcomms":
             $str = GetComments();
             break;
-        default: $str = Json::MakeJson(false, "no_action", "你想干什么 0 0~"); break;
+        default: $str = new Message(false, "no_action", "你想干什么 0 0~"); break;
     }
-    echo $str;
+    echo json_encode($str);
 
-    private function NewComment(){
+    function NewComment(){
         return Json::MakeJson(false);
     }
 
-    private function GetComments(){
+    function GetComments(){
         return Json::MakeJson(false);
     }
 ?>

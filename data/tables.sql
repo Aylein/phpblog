@@ -12,7 +12,7 @@ drop table if exists Users;
 
 create table if not exists Users(
     userid int primary key auto_increment,
-    username nvarchar(12) unique not null, #
+    username nvarchar(12) unique not null, # sYs#tsdfet.Aa
     userpass char(32) unique not null,
     userimg nvarchar(150),
     usercreatetime timestamp default current_timestamp,
