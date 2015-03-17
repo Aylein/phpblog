@@ -6,10 +6,13 @@ app.config(function($routeProvider){
     }).when("/says", {
         templateUrl: "/view/ngSays.html",
         controller: "urlController"
+    }).when("/about", {
+        templateUrl: "/view/ngAbout.html",
+        controller: "urlController"
     }).when("/found/:typeid", {
         templateUrl: "/view/ngFound.html",
         controller: "urlController"
-    }).otherwise({redirectTo: "/index"});
+    }).otherwise({redirectTo: "/about"});
 });
 var Param = function(obj) {
     var query = "", name, value, fullSubName, subName, subValue, innerObj, i;

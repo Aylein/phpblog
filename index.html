@@ -16,6 +16,7 @@
                     <a ng-click="click(sign.all.typeid)" href="javascript: void(0);" ng-bind="sign.all.typename" class="ml5 {{sign.all.cur == 1 ? 'c000' :'c666'}}"></a>
                     <a ng-repeat="type in sign.types" ng-click="click(type.typeid)" href="javascript: void(0);" ng-bind="type.typename" class="ml5 {{type.cur == 1 ? 'c000' :'c666'}}"></a>
                     <a ng-click="click(sign.say.typeid)" href="javascript: void(0);" ng-bind="sign.say.typename" class="ml5 {{sign.say.cur == 1 ? 'c000' :'c666'}}"></a>
+                    <a ng-click="click(sign.about.typeid)" href="javascript: void(0);" ng-bind="sign.about.typename" class="ml5 {{sign.about.cur == 1 ? 'c000' :'c666'}}"></a>
                 </div>
                 <div class="clear"></div>
             </div>
@@ -32,8 +33,8 @@
                     </div>
                     <div class="clear"></div>
                 </div>
-                <div class="item namespace mt5">
-                    <!--div><audio controls="controls" autoplay="autoplay" src="sounds/白いスーツのテーマ.mp3">您的浏览器不支持 audio 标签。</audio></div-->
+                <div class="item namespace mt5 h30">
+                    <div><audio class="audio_main" controls="controls" volume="0.3" loop="loop" src="sounds/シドニア - angela.mp3">シドニア - angela</audio></div>
                 </div>
             </div>
             <div class="clear"></div>
@@ -51,8 +52,8 @@
         </section>
     </body>
     <script src="scripts/angular.min.js"></script>
-    <script src="scripts/cookies.js"></script>
     <script src="scripts/angular-route.min.js"></script>
+    <script src="scripts/cookies.js"></script>
     <script src="scripts/ng_module.js"></script>
     <script src="scripts/ng_directive.js"></script>
     <script src="scripts/ng_controller.js"></script>

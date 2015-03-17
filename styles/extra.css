@@ -2,6 +2,8 @@
 .clear { clear: both; }
 .lh52 { line-height: 52px; }
 .w80 { width: 80px; }
+.w280 { width: 280px; }
+.w300 { width: 300px; }
 .h24 { height: 24px; }
 .h30 { height: 30px; }
 .h80 { height: 80px; }
@@ -15,6 +17,7 @@
 .mt5 { margin-top: 5px; }
 .mt9 { margin-top: 9px; }
 .mt15 { margin-top: 15px; }
+.mt25 { margin-top: 25px; }
 .ml5 { margin-left: 5px; }
 .ml25 { margin-left: 25px; }
 .bc666 { background-color: #666; }

@@ -1,5 +1,5 @@
 @charset "utf-8";
-.pano_left { width: 975px; float: left; height: 1800px; background-color: #ffffff; }
+.pano_left { width: 975px; float: left; min-height: 600px; background-color: #ffffff; }
 .pano_right { width: 300px; float: right; height: 600px; }
 .pano_right .item { background-color: #ffffff; }
 .namespace { height: 100px; }
@@ -16,3 +16,6 @@
 .say_button div { height: 30px; line-height: 30px; width: 80px; text-align: center; border-right: 1px solid #ccc; cursor: pointer; }
 .say_item { width: 820px; height: 250px; float: left; margin-left: 15px; }
 .say_comment { border: 1px solid #CCC; height: 168px; overflow-y: scroll; word-wrap: break-word; padding: 5px; }
+
+.l_title { width: 950px; height: 30px; margin: 10px auto; font-size: 25px; line-height: 25px; border-bottom: 1px solid #CCC; }
+.l_ground { width: 950px; margin-left: 30px; }

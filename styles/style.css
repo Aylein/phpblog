@@ -19,3 +19,4 @@ body { background-color: #F5F5F5; }
 .about { width: 980px; height: 48px; margin: 0 auto; border-top: 2px solid #ffffff; text-align: center; line-height: 35px; color: #ffffff; }
 .face_r { width: 250px; height: 250px; }
 .face_r img { width: 250px; vertical-align: middle; }
+.audio_main { width: 300px; height: 30px; }

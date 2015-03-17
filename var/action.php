@@ -33,11 +33,11 @@
         $type->typevalid = isset($_POST["typevalid"]) && is_numeric($_POST["typevalid"]) ? (int)$_POST["typevalid"] : 0;
         if($type->typename == "") return Json::MakeJson(false, "no_typename", "类型名称不能为空");
 
-        if($type->typeid != 0) { 
+        if($type->typeid != 0) {
             if(Type::Update($type)) return Json::MakeJson(true, "ok", "修改成功！");
             else return Json::MakeJson(false, "update_error", "修改失败！");
         }
-        else { 
+        else {
             if(Type::Add($type)) return Json::MakeJson(true, "ok", "添加成功！");
             else return Json::MakeJson(false, "add_error", "添加失败！");
         }
