@@ -15,6 +15,7 @@ create table if not exists Users(
     username nvarchar(12) unique not null, # sYs#tsdfet.Aa
     userpass char(32) unique not null,
     userimg nvarchar(150),
+    usertype char(5) default "visit", #visit admin
     usercreatetime timestamp default current_timestamp,
     usersort int default 0,
     uservalid int default 1
@@ -22,6 +23,9 @@ create table if not exists Users(
 
 create index user_name on Users(username);
 create index user_pass on Users(userpass);
+
+insert into Users(username, userpass, userimg, usertype) values
+    ("AyleinOter", MD5("AyleinOter mm19880209"), "/images/master.jpg", "admin");
 
 create table if not exists Types(
     typeid int primary key auto_increment,

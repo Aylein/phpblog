@@ -4,6 +4,7 @@
 .w80 { width: 80px; }
 .w280 { width: 280px; }
 .w300 { width: 300px; }
+.h21 { height: 21px; }
 .h24 { height: 24px; }
 .h30 { height: 30px; }
 .h80 { height: 80px; }
@@ -13,6 +14,7 @@
 .c666 { color: #666; }
 .cCCC { color: #CCC; }
 .c000 { color: #000000; }
+.cFF6600 { color: #FF6600; }
 .bb1s666 { border-bottom: 1px solid #CCC; }
 .mt5 { margin-top: 5px; }
 .mt9 { margin-top: 9px; }
@@ -22,3 +24,4 @@
 .ml25 { margin-left: 25px; }
 .bc666 { background-color: #666; }
 .bold { font-weight: bold; }
+.db { display: block; }

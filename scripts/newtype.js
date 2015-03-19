@@ -35,7 +35,7 @@ $(function(){
             $.ajax({
                 type: "post",
                 url: "/var/types.php",
-                data: { 
+                data: {
                     typeid: typeid_v,
                     typepid: typepid_v,
                     typeshow: typeshow_v,

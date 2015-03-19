@@ -1,4 +1,5 @@
 <?php
+    require("../require/state.php");
     include("../lib/type.php");
     $id = 0;
     if(isset($_GET["id"]) && is_numeric($_GET["id"])) $id = (int)$_GET["id"];

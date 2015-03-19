@@ -1,6 +1,9 @@
-<?
+<?php
+    Session_start();
     if(!isset($_SESSION["admin"])) {
-        header("location: /index.php");
-        exit;
+        echo "no session";
+        header("location: /signin.html");
+        exit();
     }
+    echo "yes";
 ?>

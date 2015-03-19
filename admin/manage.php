@@ -1,3 +1,6 @@
+<?php
+    require("../require/state.php");
+?>
 <!DOCTYPE html>
 <html ng-app="app">
 <head>

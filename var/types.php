@@ -2,16 +2,16 @@
     include("../lib/Main.php");
     include("../lib/Type.php");
 
-    //if(!isset($_SESSION["admin"])){
-    //    echo Json::MakeJson(false, "no_login", "请先登录");
-    //    die();
-    //}
-
+    if(!isset($_SESSION["admin"])){
+        echo json_encode(new Message(false, "no_login", "请先登录"));
+        die();
+    }
     if(!isset($_POST["action"])){
         echo json_encode(new Message(false, "no_action", "你想干什么 0 0~"));
         die();
     }
     $action = $_POST["action"];
+
     $str = "";
     try{
         switch($action){

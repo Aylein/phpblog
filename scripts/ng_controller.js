@@ -37,7 +37,7 @@ app.controller("ngMainController", function($scope, $rootScope, $location, $rout
         $rootScope.sign.all = {cur: 0, typeid: "all", typename: "全部"};
         $rootScope.sign.say = {cur: 0, typeid: "say", typename: "Says"};
         $rootScope.sign.about = {cur: 0, typeid: "about", typename: "About"};
-        web.post("/var/types.php", {"action": "gettypes", "typepid": 0}, function(data){
+        web.post("/var/action.php", {"action": "gettypes", "typepid": 0}, function(data){
             if(data.err == false) return;
             for(var i = 0, z = data.list.length; i < z; i++){
                 data.list[i].cur = 0;

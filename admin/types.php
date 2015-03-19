@@ -1,4 +1,5 @@
 <?php
+    require("../require/state.php");
     include("../lib/Type.php");
     $atype = Type::GetTypes(0);
     $ctype = Type::GetTypes(-2);
