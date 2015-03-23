@@ -18,4 +18,13 @@
 .say_comment { border: 1px solid #CCC; height: 168px; overflow-y: scroll; word-wrap: break-word; padding: 5px; }
 
 .l_title { width: 950px; height: 30px; margin: 10px auto; font-size: 25px; line-height: 25px; border-bottom: 1px solid #CCC; }
-.l_ground { width: 950px; margin-left: 30px; }
+.l_ground { width: 920px; margin: 0 auto; }
+.says_pano { width: 950px; margin: 0 auto; }
+.says_p_left { width: 100px; float: left; }
+.says_p_head { width: 80px; height: 80px; float: left; overflow: hidden; border: 1px solid #666; }
+.says_p_head { -moz-border-radius: 50%; -webkit-border-radius: 50%; border-radius: 50%; }
+.says_p_right { width: 850px; min-height: 100px; float: right; }
+.says_p_hov { min-height: 100px; }
+.says_p_ch { width: 850px; margin-top: 10px; }
+.says_c_left { width: 100px; float: left; }
+.says_c_right { width: 750px; min-height: 100px; float: right; }
