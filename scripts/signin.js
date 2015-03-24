@@ -18,6 +18,7 @@ var sub = function(name, pass){
         success: function(data){
             if(data.res == false){
                 alert(data.msg);
+                form.admin_pass.value = "";
                 return;
             }
             if(data.code == "session") window.location = "/admin/index.php";

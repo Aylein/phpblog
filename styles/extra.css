@@ -1,6 +1,8 @@
 @charset "utf-8";
 .clear { clear: both; }
 .lh52 { line-height: 52px; }
+.w26 { width: 26px; }
+.w50 { width: 50px; }
 .w80 { width: 80px; }
 .w280 { width: 280px; }
 .w300 { width: 300px; }
@@ -16,6 +18,7 @@
 .c000 { color: #000000; }
 .cFF6600 { color: #FF6600; }
 .bb1s666 { border-bottom: 1px solid #CCC; }
+.bt1sccc { border-top: 1px solid #CCC; }
 .mt5 { margin-top: 5px; }
 .mt9 { margin-top: 9px; }
 .mt15 { margin-top: 15px; }
