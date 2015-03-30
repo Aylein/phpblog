@@ -1,4 +1,20 @@
 var app = angular.module("app");
+app.directive("ngPress", function(){
+    return {
+        restrict: "A",
+        link: function($scope, $elem){
+            $elem.on("keydown", function(){
+                var $e = event || window.event;
+                if($scope.press_callback){
+                    if($scope.press_callback($e, $elem)){
+                        if($e.preventDefault) $e.preventDefault();
+                        else window.event.returnValue = false;
+                    }
+                }
+            });
+        }
+    };
+});
 app.directive("ngHtype", function(){
     return {
         restrict: "A",

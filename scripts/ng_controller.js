@@ -54,3 +54,47 @@ app.controller("ngMainController", function($scope, $rootScope, $location, $rout
 app.controller("urlController", function($scope, web, $location, $routeParams){
     var path = $location.path(), typeid = $routeParams.typeid;
 });
+app.controller("saysController", function($scope, web){
+    var content = document.getElementById("content");
+    $scope.load = function(){
+
+    };
+    $scope._bold = function(){
+        document.execCommand("Bold");
+    };
+    $scope._italic = function(){
+        document.execCommand("Italic");
+    };
+    $scope._line = function(){
+        document.execCommand("Underline");
+    };
+    $scope._clear = function(){
+        content.innerHTML = "";
+        content.focus();
+    };
+    $scope._send = function(){
+        content.contentEditable = false;
+        console.log(content.innerHTML);
+        setTimeout($scope.load, 2000);
+    };
+    $scope.press_callback = function(e, elem){
+        //console.log(e.keyCode);
+        if(e.repeat) return;
+        else if(e.keyCode == 27) document.execCommand("undo"); //撤销
+        else if(e.keyCode == 9){
+            document.execCommand("Indent"); //tab
+            return true;
+        }
+        //else if(e.keyCode == 65 && e.ctrKey){
+        //    document.execCommand("SelectAll"); //control + a
+        //    return true;
+        //}
+        else if(e.keyCode == 13 && e.ctrlKey) $scope._send(); //control + enter
+        else if(e.keyCode == 8 && e.ctrlKey) content.innerHTML = ""; //control + backspace
+    };
+    var init = function(){
+        $scope.ac = [], src = "images/ac/ac_", p = ".png";
+        for(var i = 1; i <= 50; i++) $scope.ac.push(src + i + p);
+    }
+    init();
+});
