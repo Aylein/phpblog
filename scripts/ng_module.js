@@ -24,6 +24,38 @@ app.service("main", function(){
         else if(elem.attachEvent)
             elem.attachEvent(type, callback);
     };
+    this.hide = function(elem){
+        elem.style.display = "none";
+    };
+    this.show = function(elem){
+        elem.style.display = "block";
+    };
+    this.tango = function(elem){
+        if(elem.style.display && elem.style.display == "none")
+            elem.style.display = "block";
+        else elem.style.display = "none";
+    };
+    this.html = function(elem, html){
+        var bo = html == undefined;
+        return bo ? elem.innerHTML : elem.innerHTML = html.toString();
+    };
+    this.text = function(elem, text){
+        var bo = text == undefined;
+        var fun = elem.innerText != undefined ? "innerText" : undefined;
+        fun = fun == undefined && elem.textContent ? "textContent" : undefined;
+        return fun != undefined ? (bo ? elem[fun] : elem[fun] = text.toString()) : "";
+    };
+});
+app.service("extra", function(){
+    this.extend = function(obj, src, deep){
+        for(var i in src)
+            if(obj[i] != undefined)
+                obj[i] = src[i];
+        return obj;
+    };
+    this.merge = function(obj, src, deep){
+
+    };
 });
 app.service("cookie", function(){
 

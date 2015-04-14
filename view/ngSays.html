@@ -1,35 +1,6 @@
             <div class="l_title">This is the Says page</div>
-            <div class="says" style="margin-top: 15px;">
-                <div class="says_left bc666"></div>
-                <div class="says_right">
-                    <div>
-                        <div class="say_title">填充 :</div>
-                        <div class="say_item">
-                            <div class="say_button pr">
-                                <input class="say_button_item w26" value="B" type="button" ng-click="_bold()" />
-                                <input class="say_button_item w26" value="I" type="button" ng-click="_italic()" />
-                                <input class="say_button_item w26" value="__" type="button" ng-click="_line()" />
-                                <div class="say_button_item w26" id="color_type">A</div>
-                                <div class="say_button_item w50" id="ac_type">AcFun</div>
-                                <div class="says_image">
-                                    <img ng-repeat="src in ac" src="{{src}}" alt="" />
-                                    <div class="clear"></div>
-                                </div>
-                                <div class="clear"></div>
-                            </div>
-                            <div class="say_comment" id="content" ng-press="" contenteditable="true"></div>
-                            <div class="bt1sccc">
-                                <div class="say_button_sub fl" id="sub_bt" ng-click="_send()">Send</div>
-                                <div class="say_subcoin fl" id="sub_coin">Now Sending</div>
-                                <div class="say_button_sub fr" id="can_bt" ng-click="_clear()">Clear</div>
-                                <div class="clear"></div>
-                            </div>
-                        </div>
-                        <div class="clear"></div>
-                    </div>
-                </div>
-                <div class="clear"></div>
-            </div>
+            <ng-promp></ng-promp>
+            <ao-sc></ao-sc>
             <br />
             <br />
             <div class="says_pano">

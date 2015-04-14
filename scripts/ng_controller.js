@@ -54,8 +54,13 @@ app.controller("ngMainController", function($scope, $rootScope, $location, $rout
 app.controller("urlController", function($scope, web, $location, $routeParams){
     var path = $location.path(), typeid = $routeParams.typeid;
 });
-app.controller("saysController", function($scope, web){
+app.controller("saysController", function($scope, web, main){
+    //$scope.sinit();
+    //console.log($scope.ac);
+    //$scope.com = function(){console.log("dddd");}
+    /*
     var content = document.getElementById("content");
+    var says_images = document.getElementById("says_images");
     $scope.load = function(){
 
     };
@@ -66,6 +71,7 @@ app.controller("saysController", function($scope, web){
         document.execCommand("Italic");
     };
     $scope._line = function(){
+        $scope.tangoPromp();
         document.execCommand("Underline");
     };
     $scope._clear = function(){
@@ -73,12 +79,32 @@ app.controller("saysController", function($scope, web){
         content.focus();
     };
     $scope._send = function(){
+        var range = {};
+        if(window.getSelection) range = {r: window.getSelection(), t: "win"};
+        else if(document.selection) range = {r: document.selection.createRange(), t: "doc"};
+        console.log($scope.range);
+        
+        var text = main.text(content);
+        var html = main.html(content);
+        var bo = text.length > 0 || html.indexOf("img") > -1;
+        console.log(bo);
+        if(!bo) return;
         content.contentEditable = false;
         console.log(content.innerHTML);
-        setTimeout($scope.load, 2000);
+        setTimeout(function(){
+            content.innerHTML = "";
+            content.contentEditable = true;
+        }, 2000);
+        
     };
+    $scope._ac = function(src){
+        content.focus();
+        document.execCommand('InsertImage', false, src);
+        says_images.style.display = "none";
+    }
     $scope.press_callback = function(e, elem){
         //console.log(e.keyCode);
+        if(content.contentEditable != "true") return;
         if(e.repeat) return;
         else if(e.keyCode == 27) document.execCommand("undo"); //撤销
         else if(e.keyCode == 9){
@@ -92,9 +118,17 @@ app.controller("saysController", function($scope, web){
         else if(e.keyCode == 13 && e.ctrlKey) $scope._send(); //control + enter
         else if(e.keyCode == 8 && e.ctrlKey) content.innerHTML = ""; //control + backspace
     };
+    $scope.tago_img = function(){
+        if(says_images.style.display == "block")
+            says_images.style.display = "none";
+        else says_images.style.display = "block";
+    };
+    $scope.show_img = function(){ says_images.style.display = "block"; };
+    $scope.hide_img = function(){ says_images.style.display = "none"; };
     var init = function(){
         $scope.ac = [], src = "images/ac/ac_", p = ".png";
         for(var i = 1; i <= 50; i++) $scope.ac.push(src + i + p);
     }
     init();
+    */
 });
