@@ -1,19 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="app">
 <head>
     <title>test</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="styles/style.css" />
+    <link rel="stylesheet" href="styles/index.css" />
+    <link rel="stylesheet" href="styles/extra.css" />
 </head>
-<body>
-    <div ng-app="myApp" ng-controller="myCtrl">{{firstName + " " + lastName}}</div>
+<body ng-controller="saysController">
+    <ao-sc></ao-sc>
 </body>
-<script src="scripts/angular.min.js"></script>
 <script src="scripts/jquery-1.11.1.min.js"></script>
-<script>
-    var app = angular.module("myApp", []);
-    app.controller("myCtrl", function($scope){
-        $scope.firstName = "John";
-        $scope.lastName = "Kennedy";
-    });
-</script>
+<script src="scripts/angular.min.js"></script>
+<script src="scripts/angular-route.min.js"></script>
+<script src="scripts/ng_module.js"></script>
+<script src="scripts/ng_directive.js"></script>
+<script src="scripts/ng_controller.js"></script>
 </html>

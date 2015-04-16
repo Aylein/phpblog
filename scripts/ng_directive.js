@@ -1,5 +1,5 @@
 var app = angular.module("app");
-app.directive("ngPress", function(){
+app.directive("aoPress", function(){
     return {
         restrict: "A",
         link: function($scope, $elem){
@@ -15,39 +15,39 @@ app.directive("ngPress", function(){
         }
     };
 });
-app.directive("ngPromp", function(main, extra){
+app.directive("ngPromp", function(dom, main){
     return {
         restrict: "E",
         replace: true,
         templateUrl: "/require/ngPromp.html",
         link: function($scope, $elem, $attrs){
-            var Default = function(){
-                this.width = 200;
-                this.height = 150;
-                this.title = "提示";
-                this.discript = "";
+            var config = {
+                width: 200,
+                height: 150,
+                title: "提示",
+                discript: "",
             };
-            $scope.showPromp = function(option){
-                main.text($elem[0], "this is the updated promp div");
-                option = extra.extend(new Default(), option);
-                console.log(option);
+            $scope.showPromp = function(op){
+                dom.text($elem[0], "this is the updated promp div");
+                op = main.extend(true, config, op);
+                console.log(op);
             };
             $scope.tangoPromp = function(){
-                main.tango($elem[0]);
+                dom.tango($elem[0]);
             };
         }
     };
 });
-app.directive("aoSc", function(main){
+app.directive("aoSc", function(dom){
     return {
         restrict: "E",
         replace: true,
         templateUrl: "/require/ngComment.html",
         link: function($scope, $elem, $attr){
-            var aoCs = $scope.aoSc = {};
-            aoCs.sc_ac_img = main.get("sc_ac_img");
-            aoCs.sc_ac_content = main.get("sc_content");
-            //aoCs.sc_ac_range;
+            var aoCs = $scope.aoSc = {
+                sc_ac_img: dom.get("sc_ac_img"),
+                sc_ac_content: dom.get("sc_content")
+            }, range = {};
             aoCs._tango = function(){
                 aoCs.sc_ac_content.focus();
                 if(aoCs.sc_ac_img.style.display == "block")
@@ -60,62 +60,38 @@ app.directive("aoSc", function(main){
                 aoCs.sc_ac_img.style.display = "none";
             };
             aoCs._bold = function(){
-                aoCs.sc_ac_content.focus();
                 document.execCommand("Bold");
             };
             aoCs._range = function(){
-                /*
-                if(aoCs.sc_ac_img.selectionStart)
-                    console.log(aoCs.sc_ac_img.selectionStart());
-                else{
-                    var range = document.selection.createRange();
-                    range.moveStart("character",-aoCs.sc_ac_img.value.length);
-                    console.log(range.text.length);
+                if(window.getSelection) range = {s: window.getSelection(), f: "window"};
+                else if(document.selection) range = {s: document.selection.createRange(), f: "document"};
+                else if(aoCs.sc_ac_content.createTextRange) range = {s: aoCs.sc_ac_content.createTextRange(), f: "node"};
+                if(range.s && range.s.getRangeAt) range.r = range.s.getRangeAt(0);
+                else if(document.createRange){range.r = document.createRange(); range.f = "document";}
+                range.sw = range.s.toString();
+                console.log(range);
+            };
+            aoCs._keydown = function(event){
+                var e = event || window.event;        
+                //console.log(e.keyCode);
+                if(aoCs.sc_ac_content.contentEditable != "true") return;
+                if(e.repeat) return;
+                else if(e.keyCode == 27) document.execCommand("undo"); //撤销
+                else if(e.keyCode == 9){
+                    document.execCommand("Indent"); //tab
+                    dom.no(e);
                 }
-                */
-                /*
-                var select;
-                if(document.selection) select = document.selection.createRange();
-                else if(window.getSelection) select = window.getSelection();
-                else if(document.getSelection) select = document.getSelection();
-                console.log(select.toString());
-                */
+                else if(e.keyCode == 13 && e.ctrlKey) aoCs._send(); //control + enter
+                else if(e.keyCode == 8 && e.ctrlKey) aoCs.sc_ac_content.innerHTML = ""; //control + backspace
+            };
+            aoCs._send = function(){
+                console.log(aoCs.sc_ac_content.innerHTML);
             };
             var sinit = function(){
                 aoCs.sc_ac = [], src = "images/ac/ac_", p = ".png";
                 for(var i = 1; i <= 50; i++) aoCs.sc_ac.push(src + i + p);
             };
             sinit();
-        }
-    };
-});
-app.directive("ngHtype", function(){
-    return {
-        restrict: "A",
-        replace: false,
-        templateUrl: "/require/ngHeader.html",
-        link: function(scope, elem, attrs){
-            /*
-            scope.makeHead = function(t_id){
-                scope.$apply(function(){
-                    for(var i in scope.types){
-                        if(scope.types[i].typeid == t_id) scope.types[i].cur = 1;
-                        else scope.types[i].cur = 0;
-                    }
-                });
-            };
-            */
-            elem.on("click", function(event){
-                var el = event.target;
-                if(el.nodeName != "A") return false;
-                var t_id = el.getAttribute("t_id");
-                scope.$apply(function(){
-                    for(var i in scope.types){
-                        if(scope.types[i].typeid == t_id) scope.types[i].cur = 1;
-                        else scope.types[i].cur = 0;
-                    }
-                });
-            });
         }
     };
 });

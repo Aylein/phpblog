@@ -5,7 +5,7 @@
                         <div class="say_title">填充 :</div>
                         <div class="say_item">
                             <div class="say_button pr">
-                                <input class="say_button_item w26" ng-click="aoCs._bold()" value="B" type="button"/>
+                                <input class="say_button_item w26" ng-click="aoSc._bold()" value="B" type="button"/>
                                 <input class="say_button_item w26" value="I" type="button"/>
                                 <input class="say_button_item w26" value="__" type="button"/>
                                 <div class="say_button_item w26" id="color_type">A</div>
@@ -16,7 +16,7 @@
                                 </div>
                                 <div class="clear"></div>
                             </div>
-                            <div class="say_comment" id="sc_content" ng-blur="aoSc._range()" contenteditable="true"></div>
+                            <div class="say_comment" id="sc_content" ng-keydown="aoSc._keydown()" ng-blur="aoSc._range()" contenteditable="true"></div>
                             <div class="bt1sccc">
                                 <div class="say_button_sub fl" id="sub_bt">Send</div>
                                 <div class="say_subcoin fl" id="sub_coin">Now Sending</div>
