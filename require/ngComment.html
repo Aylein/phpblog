@@ -6,23 +6,25 @@
                         <div class="say_item">
                             <div class="say_button pr">
                                 <input class="say_button_item w26" ng-click="aoSc._bold()" value="B" type="button"/>
-                                <input class="say_button_item w26" value="I" type="button"/>
-                                <input class="say_button_item w26" value="__" type="button"/>
-                                <div class="say_button_item w26" id="color_type">A</div>
-                                <div class="say_button_item w50" ng-click="aoSc._tango()" id="ac_type">AcFun</div>
+                                <input class="say_button_item w26" ng-click="aoSc._italic()" value="I" type="button"/>
+                                <!--input class="say_button_item w26" value="__" type="button"/-->
+                                <!--div class="say_button_item w26" id="color_type">A</div-->
+                                <input class="say_button_item w50" ng-click="aoSc._tango()" value="AcFun" type="button"/>
+                                <!--div class="say_button_item w50" ng-click="aoSc._tango()" id="ac_type">AcFun</div-->
                                 <div class="says_image" id="sc_ac_img">
                                     <img ng-repeat="o in aoSc.sc_ac" ng-click="aoSc._img(o)" src="{{o}}" alt=""/>
                                     <div class="clear"></div>
                                 </div>
                                 <div class="clear"></div>
                             </div>
-                            <div class="say_comment" id="sc_content" ng-keydown="aoSc._keydown()" ng-blur="aoSc._range()" contenteditable="true"></div>
+                            <div class="say_comment" id="sc_content" ao-press ng-blur="aoSc._range()" contenteditable="true"></div>
                             <div class="bt1sccc">
                                 <div class="say_button_sub fl" id="sub_bt">Send</div>
                                 <div class="say_subcoin fl" id="sub_coin">Now Sending</div>
                                 <div class="say_button_sub fr" id="can_bt">Clear</div>
                                 <div class="clear"></div>
                             </div>
+                            <div id="show"></div>
                         </div>
                         <div class="clear"></div>
                     </div>

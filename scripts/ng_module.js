@@ -223,7 +223,7 @@ app.service("broswer", function(){
             return "Rendering Engine : " + (this.en||"") + " " + (this.env||"") + ", Browser : " +  (this.bs||"") + " " + (this.bsv||"")  + ", Operating System : " + (this.os||"");
         }
     };
-    var na = this.na = new navi();
+    var na = new navi();
     var init = function(){
         if(window.opera){
             na.bs = "Opera";
@@ -290,6 +290,12 @@ app.service("broswer", function(){
             if(types.isIPhone.test(ua)) na.os = "Mac OS X " + RegExp.$1;
     };
     init();
+    this.en = na.en;
+    this.env = na.env;
+    this.bs = na.bs;
+    this.bsv = na.bsv;
+    this.os = na.os;
+    this.toString = na.toString;
 });
 app.service("dom", function(){
     this.get = function(id){

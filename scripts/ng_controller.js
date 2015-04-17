@@ -55,5 +55,4 @@ app.controller("urlController", function($scope, web, $location, $routeParams){
     var path = $location.path(), typeid = $routeParams.typeid;
 });
 app.controller("saysController", function($scope, main, broswer){
-    console.log(broswer.na, broswer.na.toString());
 });
