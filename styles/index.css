@@ -1,0 +1,37 @@
+@charset "utf-8";
+.pano_left { width: 975px; float: left; min-height: 600px; background-color: #ffffff; }
+.pano_right { width: 300px; float: right; height: 600px; }
+.pano_right .item { background-color: #ffffff; }
+.namespace { height: 100px; }
+.imgspace { width: 90px; height: 90px; margin: 5px; float: left; }
+.imgspace img { width: 90px; height: 90px; }
+.name { width: 190px; height: 90px; margin: 5px; float: right; }
+.sign { font-size: 14px; color: #666; margin-top: 5px; }
+
+.says { width: 950px; margin: 0 auto; }
+.says_left { width: 50px; height: 250px; float: left; }
+.says_right { width: 900px; height: 250px; float: right; }
+.say_title { width: 60px; float: left; text-align: right; margin-top: 5px; }
+.say_button { height: 30px; border-bottom: 1px dashed #ccc; }
+.say_button_item { height: 26px; line-height: 26px; text-align: center; cursor: pointer; float: left; margin: 2px; }
+.say_button_item { background-color: #FFF; padding: 0px; border: none; font-size: 16px; }
+.say_button_item:hover { background-color: #DDD; }
+.say_item { width: 820px; height: 249px; float: left; margin-left: 18px; border: 1px solid #CCC; position: relative; }
+.say_comment { height: 175px; overflow-y: scroll; word-wrap: break-word; padding: 5px; }
+.say_button_sub { height: 26px; width: 100px; margin: 3px; background-color: #DDD; line-height: 26px; cursor: pointer; text-align: center; }
+.say_button_sub:hover { filter:alpha(opacity=80); -moz-opacity:0.8; -khtml-opacity: 0.8; opacity: 0.8; }
+.say_subcoin { height: 26px; width: 120px; margin: 3px; }
+.says_image { position: absolute; background-color: #FFFFFF; top: 31px; width: 820px; height: 218px; overflow: auto; display: none;}
+.says_image img { width: 80px; height: 62px; display: inline-block; margin-top: 4px; margin-left: 4px; float: left; cursor: pointer; }
+
+.l_title { width: 950px; height: 30px; margin: 10px auto; font-size: 25px; line-height: 25px; border-bottom: 1px solid #CCC; }
+.l_ground { width: 920px; margin: 0 auto; }
+.says_pano { width: 950px; margin: 0 auto; }
+.says_p_left { width: 100px; float: left; }
+.says_p_head { width: 80px; height: 80px; float: left; overflow: hidden; border: 1px solid #666; }
+.says_p_head { -moz-border-radius: 50%; -webkit-border-radius: 50%; border-radius: 50%; }
+.says_p_right { width: 850px; min-height: 100px; float: right; }
+.says_p_hov { min-height: 100px; }
+.says_p_ch { width: 850px; margin-top: 10px; }
+.says_c_left { width: 100px; float: left; }
+.says_c_right { width: 750px; min-height: 100px; float: right; }

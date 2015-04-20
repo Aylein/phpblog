@@ -1,8 +1,12 @@
 /test.php
 /info.php
+<<<<<<< HEAD
 /release/images/ac/*
 /release/sounds/*
 /release/scripts/*
 /release/styles/*
 /node_modules/*
 /source/bower_components/*
+=======
+/sounds/*
+>>>>>>> f746587b5d92a4a42b4d31490a783fff02e60885
