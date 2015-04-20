@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html ng-app="app">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>AyleinOter IV</title>
+        <link rel="stylesheet" href="styles/style.min.css" />
+        <link rel="stylesheet" href="styles/index.min.css" />
+        <link rel="stylesheet" href="styles/extra.min.css" />
+    </head>
+    <body>
+        <section class="header" ng-controller="ngMainController">
+            <div class="myname">
+                <div class="master"><img src="/images/master.jpg"/>&nbsp;&nbsp;</div>
+                <div class="master lh52" ng-bind="'The 4th AyleinOter@' + sign.sign"></div>
+                <div class="menu lh52">
+                    <a ng-click="click(sign.all.typeid)" href="javascript: void(0);" ng-bind="sign.all.typename" class="ml5 {{sign.all.cur == 1 ? 'c000' :'c666'}}"></a>
+                    <a ng-repeat="type in sign.types" ng-click="click(type.typeid)" href="javascript: void(0);" ng-bind="type.typename" class="ml5 {{type.cur == 1 ? 'c000' :'c666'}}"></a>
+                    <a ng-click="click(sign.say.typeid)" href="javascript: void(0);" ng-bind="sign.say.typename" class="ml5 {{sign.say.cur == 1 ? 'c000' :'c666'}}"></a>
+                    <a ng-click="click(sign.about.typeid)" href="javascript: void(0);" ng-bind="sign.about.typename" class="ml5 {{sign.about.cur == 1 ? 'c000' :'c666'}}"></a>
+                </div>
+                <div class="clear"></div>
+            </div>
+        </section>
+        <section class="topimg" ng-controller="ngMainController"><img src="{{sign.himg}}"/></section>
+        <section class="bodypano">
+            <div class="pano_left" ng-view></div>
+            <div class="pano_right">
+                <div class="item namespace">
+                    <div class="imgspace"><img src="/images/master.jpg"/></div>
+                    <div class="name" ng-controller="ngMainController">
+                        <div class="bb1s666">AyleinOter IV <<a href="/signin.html" title="If you have a password">Sign In</a>>
+                        </div>
+                        <div class="sign" ng-bind="sign.sign" ng-click="clearCur()"></div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="item namespace mt5 h30">
+                    <div><audio class="audio_main" controls="controls" volume="0.3" loop="loop" src="sounds/シドニア - angela.mp3">シドニア - angela</audio></div>
+                </div>
+            </div>
+            <div class="clear"></div>
+            <br />
+        </section>
+        <section class="footer">
+            <div class="bigfun">
+                <div class="face fl">
+                    <div class="me"></div>
+                    <div class="about">完全不知道该怎么办的 @AyleinOter IV With no CopyRights</div>
+                </div>
+                <div class="face_r fr"><img src="/images/master.jpg"/></div>
+                <div class="clear"></div>
+            </div>
+        </section>
+    </body>
+    <script src="scripts/angular.min.js"></script>
+    <script src="scripts/angular-route.min.js"></script>
+    <script src="scripts/modules.min.js"></script>
+    <script src="scripts/directives.min.js"></script>
+    <script src="scripts/controllers.min.js"></script>
+</html>

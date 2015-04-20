@@ -1,0 +1,37 @@
+{
+  "name": "phpblog",
+  "version": "1.0.0",
+  "description": "a blog by php",
+  "main": "website/index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Aylein/phpblog.git"
+  },
+  "keywords": [
+    "php",
+    "blog"
+  ],
+  "author": "AyleinOter",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Aylein/phpblog/issues"
+  },
+  "homepage": "https://github.com/Aylein/phpblog",
+  "devDependencies": {
+    "grunt": "~0.4.5",
+    "grunt-contrib-concat": "~0.5.1",
+    "jade": "~1.9.2",
+    "grunt-contrib-jshint": "~0.11.2",
+    "grunt-contrib-watch": "~0.6.1",
+    "grunt-contrib-uglify": "~0.9.1",
+    "grunt-contrib-cssmin": "~0.12.2",
+    "grunt-contrib-copy": "~0.8.0"
+  }
+  /*
+  bower install angular
+  bower install angular-route
+  */
+}
