@@ -15,7 +15,7 @@ class Document{
     var $docsort; // int default 0,
     var $docvalid; // int default 1
 
-    var $Type;
+    var $type;
 
     public function __construct($array = null, $bo = false){
         if($array == null || !is_array($array)){
@@ -44,160 +44,193 @@ class Document{
             $this->docsort = isset($array["docsort"]) && is_numeric($array["docsort"]) ? (int)$array["docsort"] : 0;
             $this->docvalid = isset($array["docvalid"]) && is_numeric($array["docvalid"]) ? (int)$array["docvalid"] : 0;
         }
-        if($bo) $this->GetType();
-        else $this->Type = false;
+        $this->type = $bo && $this->typeid > 0 ? Type::GetType($this->typeid) : null;
     }
 
-    public function GetType($id = 0){
-        $this->typeid = $id > 0 ? $id : 0;
-        $this->Type = $this->typeid > 0 ? Type::GetType($this->typeid) : false;
-    }
-
-    public function MakeJson(){
-        $str = "{ \"docid\": \"".$this->docid."\", \"typeid\": \"".$this->typeid."\", \"doctitle\": \"".$this->doctitle."\", \"docsubtitle\": \"".$this->docsubtitle."\", \"docstgnum\": \""
-            .$this->docstgnum."\", \"doccomnum\": \"".$this->doccomnum."\", \"docview\": \"".$this->docview."\", \"doccreatetime\": \"".date("Y-m-d H:i:s", $this->doccreatetime)
-            ."\", \"docupdatetime\": \"".date("Y-m-d H:i:s", $this->docupdatetime)."\", \"docsort\": \"".$this->docsort."\", \"docvalid\": \"".$this->docvalid."\", \"Type\": "
-            .($this->Type ? $this->Type->MakeJson() : "{ }")." }";
-        return $str;
-    }
-
-    public static function Exists($name){
-        if(!isset($name)) return true;
-        $str = "select count(*) from Documents where ";
+    public static function Exists($title, $execpt = null){
+        if(!$title) return true;
+        $str = "select count(*) from Documents where doctitle = :doctitle";
         $paras = array();
-        if(is_int($name)){
-            $str .= "docid = :docid; ";
-            $paras[":docid"] = $name;
+        if($execpt != null && is_int($execpt)){
+            $str .= " and docid != :docid";
+            $paras[":docid"] = $execpt;
         }
-        else{
-            $str .= "doctitle = :doctitle; ";
-            $paras[":doctitle"] = $name;
-        }
-        $en = new Entity();
-        $num = $en->Scalar($str, $paras);
+        $paras[":doctitle"] = $title;
+        $str .= "; ";
+        $num = (new Entity())->Scalar($str, $paras);
         return $num != 0;
     }
 
     public static function Add($doc){
-        if(!is_a($doc, "Document")) return false;
-        $str = "insert into Documents (typeid, doctitle, docsubtitle, docsort, docvalid) values (:typeid, :doctitle, :docsubtitle, :docsort, :docvalid); ";
+        if(!$doc instanceof Documents) return new Message("对象类型不正确");
+        if(Documents::Exists($doc->doctitle)) return new Message("要添加的文章名称已存在");
+        $str = "insert into Documents (typeid, doctitle, docsubtitle, docsort, docvalid) values "
+            ."(:typeid, :doctitle, :docsubtitle, :docsort, :docvalid); ";
+        $str .= "select docid, typeid, doctitle, docsubtitle, docstgnum, doccomnum, docview, doccreatetime, "
+            ."docupdatetime, docsort, docvalid from Documents where docid = @@identity; ";
         $paras = array(
-            ":typeid" => $doc->typeid, ":doctitle" => $doc->doctitle, ":docsubtitle" => $doc->docsubtitle, ":docsort" => $doc->docsort, 
-            ":docvalid" => $doc->docvalid
+            ":typeid" => $doc->typeid, ":doctitle" => $doc->doctitle, ":docsubtitle" => $doc->docsubtitle, 
+            ":docsort" => $doc->docsort, ":docvalid" => $doc->docvalid
         );
-        return (new Entity())->Exec($str, $paras);
+        $en = (new Entity())->Querys($str, $paras);
+        return count($en) == 2 && count($en[1]) == 1 ? 
+            new Message("创建成功", true, new Document($obj[1][0])) : new Message("创建失败");
     }
 
-    public static function Update(){
-        if(!is_a($doc, "Document")) return false;
-        $str = "update Documents set typeid = :typeid, doctitle = :doctitle, docsubtitle = :docsubtitle, docupdatetime = :docupdatetime, "
-            ."docsort = :docsort, docvalid = :docvalid where docid = :docid ";
+    public static function Update($doc){
+        if(!$doc instanceof Documents) return new Message("对象类型不正确");
+        if(Documents::Exists($doc->doctitle, $doc->docid)) return new Message("要添加的文章名称已存在");
+        $str = "update Documents set typeid = :typeid, doctitle = :doctitle, docsubtitle = :docsubtitle, "
+            ."docupdatetime = :docupdatetime, docsort = :docsort, docvalid = :docvalid where docid = :docid ";
         $paras = array(
-            ":typeid" => $doc->typeid, ":doctitle" => $doc->doctitle, ":docsubtitle" => $doc->docsubtitle, ":docupdatetime" => time(), 
-            ":docsort" => $doc->docsort, ":docvalid" => $doc->docvalid, ":docid" => $doc->docid
+            ":typeid" => $doc->typeid, ":doctitle" => $doc->doctitle, ":docsubtitle" => $doc->docsubtitle, 
+            ":docupdatetime" => time(), ":docsort" => $doc->docsort, ":docvalid" => $doc->docvalid, ":docid" => $doc->docid
         );
-        return (new Entity())->Exec($str, $paras);
+        return (new Entity())->Exec($str, $paras) > 0 ? 
+            new Message("修改成功", true, $doc) : new Message("修改失败");
     }
 
-    public static function GetDocs($typeid = -1, $valid = -1, $pagenum = 1, $pagesize = 0, $order = "sort"){
-        $typeid = is_int($typeid) ? $typeid : -1;
-        $valid = is_int($valid) ? $valid : -1;
-        $pagenum = is_int($pagenum) ? $pagenum : 1;
-        $pagesize = is_int($pagesize) ? $pagesize : 0;
+    public static function Add_Update($doc){
+        if(!$doc instanceof Documents) return new Message("对象类型不正确");
+        return $doc->docid > 0 ? Documents::Update($doc) : Documents::Add($doc);
+    }
+
+    public static function GetAll($search = null, $deep = false){
+        $search = is_object($search) ? $search : new stdClass(); 
+        $search->title = isset($search->title) ? strval($search->title) : "";
+        $search->subtitle = isset($search->subtitle) ? strval($search->subtitle) : "";
+        $search->typeid = isset($search->typeid) && is_numeric($search->typeid) ? (int)$search->typeid : 0;
+        $search->valid = isset($search->valid) && is_numeric($search->valid) ? (int)$search->valid : 1;
+        $search->page = isset($search->page) && is_numeric($search->page) ? (int)$search->page : 0;
+        $search->rows = isset($search->rows) && is_numeric($search->rows) ? (int)$search->rows : 0;
+        $search->order = "sort"
         $count = "select count(*) as count ";
-        $select = "select docid, typeid, doctitle, docsubtitle, docstgnum, doccomnum, docview, doccreatetime, docupdatetime, docsort, docvalid ";
+        $select = "select docid, typeid, doctitle, docsubtitle, docstgnum, doccomnum, docview, doccreatetime, "
+            ."docupdatetime, docsort, docvalid ";
         $where = "from Documents where 1 = 1 ";
         $paras = array();
-        if ($typeid < -1) $where .= "and typeid > 0 ";
-        else if($typeid > -1){
-            $where .= "and typeid = :typeid ";
-            $paras[":typeid"] = $typeid;
+        if($search->title != ""){
+            $where .= "and ( ";
+            $arr = explode(" ", $search->title);
+            for($i = 0, $z = count($arr); $i < $z; $i++)
+            {
+                $where .= "doctitle like concat(\"%\", :str_a_".$i.", \"%\") ";
+                if ($i < $z - 1) $where .="or ";
+                $paras[":str_a_".$i] = $arr[$i];
+            }
+            $where .= ") ";
         }
-        if($valid < -1) $where .= "and docvalid > 0 ";
-        else if($valid > -1){
+        if($search->subtitle != ""){
+            $where .= "and ( ";
+            $arr = explode(" ", $search->subtitle);
+            for($i = 0, $z = count($arr); $i < $z; $i++)
+            {
+                $where .= "docsubtitle like concat(\"%\", :str_b_".$i.", \"%\") ";
+                if ($i < $z - 1) $where .="or ";
+                $paras[":str_b_".$i] = $arr[$i];
+            }
+            $where .= ") ";
+        }
+        if($search->typeid > 0){ 
+            $where .= "and typeid = :typeid ";
+            $paras[":typeid"] = ($search->typeid;
+        }
+        if($search->valid == 1 || $search->valid == 0){
             $where .= "and docvalid = :docvalid ";
-            $paras[":docvalid"] = $valid;
+            $paras[":docvalid"] = $search->valid;
         }
         $count .= $where."; ";
-        switch($order){
-            case "docstgnum":
+        switch($search->order){
+            case "stgnum":
                 $where .= "order by docstgnum desc, docsort desc, docid desc ";
                 break;
-            case "doccomnum":
+            case "comm":
                 $where .= "order by doccomnum desc, docsort desc, docid desc ";
                 break;
-            case "docview":
+            case "view":
                 $where .= "order by docview desc, docsort desc, docid desc ";
+                break;
+            case "update":
+                $where .= "order by docupdatetime desc, docsort desc, docid desc ";
                 break;
             default:
                 $where .= "order by docsort desc, docid desc ";
                 break;
         }
         $select .= $where;
-        if($pagenum > 0 && $pagesize > 0)
-            $select .= "limit ".($pagesize > 1 ? ($pagenum - 1) * $pagesize : 0).", ".$pagesize."; ";
+        if($search->page > 0 && $search->rows > 0){            
+            $select .= "limit :page, :rows; ";
+            $paras[":page"] = ($search->page - 1) * $search->rows;
+            $paras[":rows"] = $search->rows;
+        }
         else $select .= "; ";
-        $en = new Entity();
-        $list = new Resaults();
-        $res = $en->Query($count, $paras);
-        if($res) $list->page->MakePage((int)$res[0]["count"], $pagenum, $pagesize);
-        $res = $en->Query($select, $paras);
-        if($res) foreach($res as $key => $value) $list->list[] = new Document($value);
-        return $list;
+        $count .= $select;
+        $list = array();
+        $res = (new Entity())->Querys($count, $paras);
+        if(count($res) != 2 || count($res[0]) != 1) return new Resaults();
+        foreach($res[1] as $key => $value) $list[] = new Documents($value, $deep);
+        return new Resaults($list, (int)$res[0][0]["count"], $search->page, $search->rows);
     }
 
-    public static function GetDoc($id){
+    public static function Get($id){
         $id = is_int($id) ? $id : 0;
-        if($id < 1) return false;
-        $str = "select docid, typeid, doctitle, docsubtitle, docstgnum, doccomnum, docview, doccreatetime, docupdatetime, docsort, docvalid "
-            ."from Documents where docid = :docid; ";
+        if($id < 1) return null;
+        $str = "select docid, typeid, doctitle, docsubtitle, docstgnum, doccomnum, docview, doccreatetime, "
+            ."docupdatetime, docsort, docvalid from Documents where docid = :docid; ";
         $paras = array(":docid" => $id);
         $en = new Entity();
         $res = $en->First($str, $paras);
-        if(!$res) return false;
+        if(!$res) return null;
         return new Document($res);
     }
 
-    public static function Valid($id, $valid = -1){
+    public static function Valid($id, $valid = null){
         $id = is_int($id) ? $id : 0;
         if($id < 1) return false;
-        $valid = is_int($valid) ? $id : -1;
+        $valid = is_numeric($valid) ? (int)$valid : null;
         $str = "update Documents set ";
         $paras = array();
-        if($valid == -1){
+        if(!$valid){
             $str .= "docvalid = case when docvalid = 0 then 1 else 1 end where docid = :docid; ";
             $paras = array(":docid" => $id);
         }
         else {
             $str .= "docvalid = :docvalid where docid = :docid; ";
-            $paras = array(":docid" => $id, ":typevalid" => $valid);
+            $paras = array(":docid" => $id, ":docvalid" => $valid);
         }
         $en = new Entity();
-        return $en->Exec($str, $paras);
+        return $en->Exec($str, $paras) > 0 ? 
+            new Message("修改成功", true) : new Message("修改失败");
     }
 
     public static function StageAdd($id){
         $id = is_int($id) ? (int)$id : 0;
         if($id < 1) return false;
-        $str = "update Documents set docstgnum = docstgnum + 1 where docid = :docid; ";
+        $str = "update Documents set docstgnum = docstgnum + 1 where docid = :docid; "
+            ."select docstgnum from Documents where docid = :docid; ";
         $paras = array(":docid" => $id);
-        return (new Entity())->Exec($str, $paras);
+        return count($en) == 2 && count($en[1]) == 1 ? 
+            new Message("修改成功", true, (int)$obj[1][0]) : new Message("修改失败");
     }
 
     public static function ViewAdd($id){
         $id = is_int($id) ? (int)$id : 0;
         if($id < 1) return false;
-        $str = "update Documents set docview = docview + 1 where docid = :docid; ";
+        $str = "update Documents set docview = docview + 1 where docid = :docid; "
+            ."select docview from Documents where docid = :docid; ";
         $paras = array(":docid" => $id);
-        return (new Entity())->Exec($str, $paras);
+        return count($en) == 2 && count($en[1]) == 1 ? 
+            new Message("修改成功", true, (int)$obj[1][0]) : new Message("修改失败");
     }
 
     public static function CommAdd($id){
         $id = is_int($id) ? (int)$id : 0;
         if($id < 1) return false;
         $str = "update Documents set doccomnum = doccomnum + 1 where docid = :docid; ";
+            ."select doccomnum from Documents where docid = :docid; ";
         $paras = array(":docid" => $id);
-        return (new Entity())->Exec($str, $paras);
+        return count($en) == 2 && count($en[1]) == 1 ? 
+            new Message("修改成功", true, (int)$obj[1][0]) : new Message("修改失败");
     }
 }
 ?>

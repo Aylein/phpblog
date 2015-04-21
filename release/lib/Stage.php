@@ -44,90 +44,110 @@ class Stage{
             $this->stgsort = isset($array["stgsort"]) && is_numeric($array["stgsort"]) ? (int)$array["stgsort"] : 0;
             $this->stgvalid = isset($array["stgvalid"]) && is_numeric($array["stgvalid"]) ? (int)$array["stgvalid"] : 0;
         }
-        if($bo){
-            $this->GetDoc();
-        }
-        else{
-            $this->Dococument = false;
-        }
+        $this->Document = $bo && $this->docid > 0 ? Document::Get($this->docid) : null;
     }
 
-    public function GetDoc($id = 0){
-        $this->docid = $id > 0 ? $id : 0;
-        $this->Document = $this->docid > 0 ? Document::GetDoc($this->docid) : false;
-    }
-
-    public function MakeJson(){
-        $str = "{ \"stgid\": \"".$this->stgid."\", \"docid\": \"".$this->docid."\", \"stgpid\": \"".$this->stgpid."\", \"stgtitle\": \"".$this->stgtitle."\", \"stgsubtitle\": \""
-            .$this->stgsubtitle."\", \"stgcontent\": \"".$this->stgcontent."\", \"stgview\": \"".$this->stgview."\", \"stgcomnum\": \"".$this->stgcomnum."\", \"stgcreatetime\": \""
-            .date("Y-m-d H:i:s", $this->stgcreatetime)."\", \"stgupdatetime\": \"".date("Y-m-d H:i:s", $this->stgupdatetime)."\", \"stgsort\": \"".$this->stgsort."\", \"stgvalid\": \""
-            .$this->stgvalid."\", \"Document\": ".($this->Document ? $this->Document->MakeJson() : "{ }")." }";
-        return $str;
-    }
-
-    public static function Exists($name){
-        if(!isset($name)) return true;
-        $str = "select count(*) from Stages where ";
+    //检查存在
+    public static function Exists($title, $docid, $execpt = null){
+        if(!$title || !$docid) return true;
+        $str = "select count(*) from Stages where stgtitle = :stgtitle and docid = :docid";
         $paras = array();
-        if(is_int($name)){
-            $str .= "stgid = :stgid; ";
-            $paras[":stgid"] = $name;
+        if($execpt != null && is_int($execpt)){
+            $str .= " and typeid != :typeid";
+            $paras[":typeid"] = $execpt;
         }
-        else{
-            $str .= "stgtitle = :stgtitle; ";
-            $paras[":stgtitle"] = $name;
-        }
-        $en = new Entity();
-        $num = $en->Scalar($str, $paras);
+        $paras[":stgtitle"] = $title;
+        $paras[":docid"] = $docid;
+        $str .= "; ";
+        $num = (new Entity())->Scalar($str, $paras);
         return $num != 0;
     }
 
     public static function Add($stage){
-        if(!is_a($stage, "Stage")) return false;
-        $str = "insert into Stages (docid, stgtitle, stgsubtitle, stgcontent, stgsort, stgvalid) values (:docid, :stgtitle, :stgsubtitle, :stgcontent, :stgsort, :stgvalid); ";
+        if(!$stage instanceof Stage) return new Message("对象类型不正确");
+        if(Stage::Exists($stage->stgtitle, $stage->docid)) return new Message("要添加的章节名称已存在");
+        $str = "insert into Stages (docid, stgtitle, stgsubtitle, stgcontent, stgsort, stgvalid) values "
+            ."(:docid, :stgtitle, :stgsubtitle, :stgcontent, :stgsort, :stgvalid); ";
+        $str .= "select stgid, docid, stgtitle, stgsubtitle, stgcontent, stgview, stgcomnum, stgcreatetime, "
+            ."stgupdatetime, stgsort, stgvalid from Stages where stgid = @@identity; ";
         $paras = array(
-            ":docid" => $stage->docid, ":stgtitle" => $stage->stgtitle, ":stgsubtitle" => $stage->stgsubtitle, ":stgcontent" => $stage->stgcontent, 
-            ":stgsort" => $stage->stgsort, ":stgvalid" => $stage->stgvalid
+            ":docid" => $stage->docid, ":stgtitle" => $stage->stgtitle, ":stgsubtitle" => $stage->stgsubtitle, 
+            ":stgcontent" => $stage->stgcontent, ":stgsort" => $stage->stgsort, ":stgvalid" => $stage->stgvalid
         );
-        return (new Entity())->Exec($str, $paras);
+        $en = (new Entity())->Querys($str, $paras);
+        return count($en) == 2 && count($en[1]) == 1 ? 
+            new Message("添加成功", true, new Stage($en[1][0])) : new Message("添加失败");
     }
 
     public static function Update($stage){
-        if(!is_a($doc, "Document")) return false;
-        $str = "update Stages set docid = :docid, stgtitle = :stgtitle, stgsubtitle = :stgsubtitle, stgcontent = :stgcontent, stgupdatetime = :stgupdatetime, "
-            ."stgsort = :stgsort, stgvalid = :stgvalid where stgid = :stgid ";
+        if(!$stage instanceof Stage) return new Message("对象类型不正确");
+        if(Stage::Exists($stage->stgtitle, $stage->docid, $stage->stgid)) return new Message("要添加的章节名称已存在");
+        $str = "update Stages set docid = :docid, stgtitle = :stgtitle, stgsubtitle = :stgsubtitle, stgcontent = :stgcontent, "
+            ."stgupdatetime = :stgupdatetime, stgsort = :stgsort, stgvalid = :stgvalid where stgid = :stgid ";
         $paras = array(
-            ":docid" => $stage->docid, ":stgtitle" => $stage->stgtitle, ":stgsubtitle" => $stage->stgsubtitle, ":stgcontent" => $stage->stgcontent, 
-            ":stgupdatetime" => $stage->stgupdatetime, ":stgsort" => $stage->stgsort, ":stgvalid" => $stage->stgvalid, ":stgid" => $stage->stgid
+            ":docid" => $stage->docid, ":stgtitle" => $stage->stgtitle, ":stgsubtitle" => $stage->stgsubtitle, 
+            ":stgcontent" => $stage->stgcontent, ":stgupdatetime" => $stage->stgupdatetime, ":stgsort" => $stage->stgsort, 
+            ":stgvalid" => $stage->stgvalid, ":stgid" => $stage->stgid
         );
-        return (new Entity())->Exec($str, $paras);
+        return (new Entity())->Exec($str, $paras) > 0 ? 
+            new Message("修改成功", true, $stage) : new Message("修改失败");
     }
 
-    public static function GetStages($docid = -1, $valid = -1, $pagenum = 1, $pagesize = 0, $order = "sort"){
-        $docid = is_int($docid) ? $docid : -1;
-        $valid = is_int($valid) ? $valid : -1;
-        $pagenum = is_int($pagenum) ? $pagenum : 1;
-        $pagesize = is_int($pagesize) ? $pagesize : 0;
+    public static function Add_Update($stage){
+        if(!$stage instanceof Stage) return new Message("对象类型不正确");
+        return $stage->stgid > 0 ? Stage::Update($stage) : Stage::Add($stage);
+    }
+
+    public static function GetAll($search = null, $deep = false){
+        $search = is_object($search) ? $search : new stdClass(); 
+        $search->title = isset($search->title) ? strval($search->title) : "";
+        $search->subtitle = isset($search->subtitle) ? strval($search->subtitle) : "";
+        $search->docid = isset($search->docid) && is_numeric($search->docid) ? (int)$search->docid : 0;
+        $search->valid = isset($search->valid) && is_numeric($search->valid) ? (int)$search->valid : 1;
+        $search->page = isset($search->page) && is_numeric($search->page) ? (int)$search->page : 0;
+        $search->rows = isset($search->rows) && is_numeric($search->rows) ? (int)$search->rows : 0;
+        $search->$order = isset($search->order) ? strval($search->order) : "";
         $count = "select count(*) as count ";
-        $select = "select stgid, docid, stgtitle, stgsubtitle, stgcontent, stgview, stgcomnum, stgcreatetime, stgupdatetime, stgsort, stgvalid ";
+        $select = "select stgid, docid, stgtitle, stgsubtitle, stgcontent, stgview, stgcomnum, stgcreatetime, "
+            ."stgupdatetime, stgsort, stgvalid ";
         $where = "from Stages where 1 = 1 ";
         $paras = array();
-        if ($docid < -1) $where .= "and docid > 0 ";
-        else if($docid > -1){ 
-            $where .= "and docid = :docid ";
-            $paras[":docid"] = $docid;
+        if($search->title != ""){
+            $where .= "and ( ";
+            $arr = explode(" ", $search->title);
+            for($i = 0, $z = count($arr); $i < $z; $i++)
+            {
+                $where .= "stgtitle like concat(\"%\", :str_a_".$i.", \"%\") ";
+                if ($i < $z - 1) $where .="or ";
+                $paras[":str_a_".$i] = $arr[$i];
+            }
+            $where .= ") ";
         }
-        if($valid < -1) $where .= "and stgvalid > 0 ";
-        else if($valid > -1){
+        if($search->subtitle != ""){
+            $where .= "and ( ";
+            $arr = explode(" ", $search->subtitle);
+            for($i = 0, $z = count($arr); $i < $z; $i++)
+            {
+                $where .= "stgsubtitle like concat(\"%\", :str_b_".$i.", \"%\") ";
+                if ($i < $z - 1) $where .="or ";
+                $paras[":str_b_".$i] = $arr[$i];
+            }
+            $where .= ") ";
+        }
+        if($search->docid > 0){ 
+            $where .= "and docid = :docid ";
+            $paras[":docid"] = ($search->docid;
+        }
+        if($search->valid == 1 || $search->valid == 0){
             $where .= "and stgvalid = :stgvalid ";
-            $paras[":stgvalid"] = $valid;
+            $paras[":stgvalid"] = $search->valid;
         }
         $count .= $where."; ";
-        switch($order){
-            case "stgview":
+        switch($search->$order){
+            case "view":
                 $where .= "order by stgview desc, stgsort desc, stgid desc ";
                 break;
-            case "stgcomnum":
+            case "comm":
                 $where .= "order by stgcomnum desc, stgsort desc, stgid desc ";
                 break;
             default: 
@@ -135,37 +155,38 @@ class Stage{
                 break;
         }
         $select .= $where;
-        if($pagenum > 0 && $pagesize > 0)
-            $select .= "limit ".($pagesize > 1 ? ($pagenum - 1) * $pagesize : 0).", ".$pagesize."; ";
+        if($search->page > 0 && $search->rows > 0){            
+            $select .= "limit :page, :rows; ";
+            $paras[":page"] = ($search->page - 1) * $search->rows;
+            $paras[":rows"] = $search->rows;
+        }
         else $select .= "; ";
-        $en = new Entity();
-        $list = new Resaults();
-        $res = $en->Query($count, $paras);
-        if($res) $list->page->MakePage((int)$res[0]["count"], $pagenum, $pagesize);
-        $res = $en->Query($select, $paras);
-        if($res) foreach($res as $key => $value) $list->list[] = new Stage($value);
-        return $list;
+        $count .= $select;
+        $list = array();
+        $res = (new Entity())->Querys($count, $paras);
+        if(count($res) != 2 || count($res[0]) != 1) return new Resaults();
+        foreach($res[1] as $key => $value) $list[] = new Stage($value, $deep);
+        return new Resaults($list, (int)$res[0][0]["count"], $search->page, $search->rows);
     }
 
-    public static function GetStage($id){
+    public static function Get($id){
         $id = is_int($id) ? $id : 0;
-        if($id < 1) return false;
-        $str = "select stgid, docid, stgtitle, stgsubtitle, stgcontent, stgview, stgcomnum, stgcreatetime, stgupdatetime, stgsort, stgvalid "
-            ."from Stages where stgid = :stgid; ";
+        if($id < 1) return null;
+        $str = "select stgid, docid, stgtitle, stgsubtitle, stgcontent, stgview, stgcomnum, stgcreatetime, "
+            ."stgupdatetime, stgsort, stgvalid from Stages where stgid = :stgid; ";
         $paras = array(":stgid" => $id);
-        $en = new Entity();
-        $res = $en->First($str, $paras);
-        if(!$res) return false;
+        $res = (new Entity())->First($str, $paras);
+        if(!$res) return null;
         return new Stage($res);
     }
 
-    public static function Valid($id, $valid = -1){
+    public static function Valid($id, $valid = null){
         $id = is_int($id) ? $id : 0;
         if($id < 1) return false;
-        $valid = is_int($valid) ? $id : -1;
+        $valid = is_numeric($valid) ? (int)$valid : null;
         $str = "update Stages set ";
         $paras = array();
-        if($valid == -1){
+        if(!$valid){
             $str .= "stgvalid = case when stgvalid = 0 then 1 else 1 end where stgid = :stgid; ";
             $paras = array(":stgid" => $id);
         }
@@ -173,24 +194,28 @@ class Stage{
             $str .= "stgvalid = :stgvalid where stgid = :stgid; ";
             $paras = array(":stgid" => $id, ":stgvalid" => $valid);
         }
-        $en = new Entity();
-        return $en->Exec($str, $paras);
+        return (new Entity())->Exec($str, $paras) > 0 ? 
+            new Message("修改成功", true) : new Message("修改失败");
     }
 
     public static function ViewAdd($id){
         $id = is_int($id) ? (int)$id : 0;
         if($id < 1) return false;
-        $str = "update Stages set stgview = stgview + 1 where stgid = :stgid; ";
+        $str = "update Stages set stgview = stgview + 1 where stgid = :stgid; "
+            ."select stgview from Stages where stgid = :stgid; ";
         $paras = array(":stgid" => $id);
-        return (new Entity())->Exec($str, $paras);
+        return count($en) == 2 && count($en[1]) == 1 ? 
+            new Message("修改成功", true, (int)$obj[1][0]) : new Message("修改失败");
     }
 
     public static function CommAdd($id){
         $id = is_int($id) ? (int)$id : 0;
         if($id < 1) return false;
         $str = "update Stages set stgcomnum = stgcomnum + 1 where stgid = :stgid; ";
+            ."select stgcomnum from Stages where stgid = :stgid; ";
         $paras = array(":stgid" => $id);
-        return (new Entity())->Exec($str, $paras);
+        return count($en) == 2 && count($en[1]) == 1 ? 
+            new Message("修改成功", true, (int)$obj[1][0]) : new Message("修改失败");
     }
 }
 ?>

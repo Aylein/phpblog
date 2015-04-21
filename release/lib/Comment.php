@@ -1,27 +1,30 @@
 <?php
-/*
-comtype
-*/
 include_once("Entity.php");
+include_once("User.php");
 class Comment{
     var $comid; // int primary key auto_increment,
-    var $comtype; // nvarchar(15) not null,
+    var $comtype; // nvarchar(15) not null, //comment document stage
     var $comtypeid; // int not null,
     var $compid; // int default 0,
-    var $comname; // nvarchar(12) not null,
-    var $comrename;
+    var $userid;
+    var $repeatid; // nvarchar(12) not null,
+    var $repeatname;
     var $comdate; // timestamp default current_timestamp,
     var $comment; // nvarchar(450) not null,
     var $comsort; // int default 0,
     var $comvalid; // int default 1
 
-    public function __construct($array = null){
+    var $user;
+
+    public function __construct($array = null, $bo = false){
         if($array == null || !is_array($array)){
             $this->comid = 0;
             $this->comtype = "";
             $this->comtypeid = 0;
             $this->compid = 0;
-            $this->comname = "";
+            $this->userid = 0;
+            $this->repeatid = 0;
+            $this->repeatname = "";
             $this->comdate = -1;
             $this->comment = "";
             $this->comsort = 0;
@@ -32,106 +35,116 @@ class Comment{
             $this->comtype = isset($array["comtype"]) ? $array["comtype"] : "";
             $this->comtypeid = isset($array["comtypeid"]) && is_numeric($array["comtypeid"]) ? (int)$array["comtypeid"] : 0;
             $this->compid = isset($array["compid"]) && is_numeric($array["compid"]) ? (int)$array["compid"] : 0;
-            $this->comname = isset($array["comname"]) ? $array["comname"] : "";
-            $this->comrename = isset($array["comrename"]) ? $array["comrename"] : "";
+            $this->userid = isset($array["userid"]) && is_numeric($array["userid"]) ? (int)$array["userid"] : 0;
+            $this->repeatid = isset($array["repeatid"]) && is_numeric($array["repeatid"]) ? (int)$array["repeatid"] : 0;
+            $this->repeatname = isset($array["repeatname"]) ? $array["repeatname"] : "";
             $this->comdate = isset($array["comdate"])  ? strtotime($array["comdate"]) : -1;
             $this->comment = isset($array["comment"]) ? $array["comment"] : "";
             $this->comsort = isset($array["comsort"]) && is_numeric($array["comsort"]) ? (int)$array["comsort"] : 0;
             $this->comvalid = isset($array["comvalid"]) && is_numeric($array["comvalid"]) ? (int)$array["comvalid"] : 0;
         }
-    }
-
-    public function MakeJson(){
-        $str = "{ \"comid\": \"".$this->comid."\", \"comtype\": \"".$this->comtype."\", \"comtypeid\": \"".$this->comtypeid."\", \"compid\": \"".$this->compid."\", \"comname\": \""
-            .$this->comname."\", \"comrename\": \"".$this->comrename."\",\"comdate\": \"".date("Y-m-d H:i:s", $this->comdate)."\", \"comment\": \"".$this->comment."\", \"comsort\": \""
-            .$this->comsort."\", \"comvalid\": \"".$this->comvalid." }";
-        return $str;
-    }
-
-    public static function Exists($name){
-        if(!isset($name)) return true;
-        $str = "select count(*) from Comments where comid = :comid;";
-        $paras = array(":comid" => $name);
-        $en = new Entity();
-        $num = $en->Scalar($str, $paras);
-        return $num != 0;
+        $this->user = $bo && $this->userid > 0 ? User::Get($this->userid) : null;
     }
 
     public static function Add($com){
-        if(!is_a($com, "Document")) return false;
+        if(!$com instanceof Comment) return new Message("对象类型不正确");
         $str = "insert into Comments (comtype, comtypeid, compid, comname, comrename, comment, comsort, comvalid) values "
             ."(:comtype, :comtypeid, :compid, :comname, :comrename, :comment, :comsort, :comvalid); ";
+        $str .= "select comid, comtype, comtypeid, compid, comname, comdate, comment, comsort, comvalid "
+            ."from Comments where comid = @@identity; ";
+        $paras = array(
+            ":comtype" => $com->comtype, ":comtypeid" => $com->comtypeid, ":compid" => $com->compid, ":comname" => $com->comname, 
+            ":comrename" => $com->comrename, ":comment" => $com->comment, ":comsort" => $com->comsort, ":comvalid" => $com->comvalid
+        );
+        $en = (new Entity())->Querys($str, $paras);
+        return count($en) == 2 && count($en[1]) == 1 ? 
+            new Message("添加成功", true, new Comment($en[1][0])) : new Message("添加失败");
+    }
+
+    public static function Update($com){
+        if(!$com instanceof Comment) return new Message("对象类型不正确");
+        $str = "update Comments set comtype = :comtype, comtypeid = :comtypeid, compid = :compid, comname = :comname, "
+            ."comrename = :comrename, comment = :comment, comsort = :comsort, comvalid = :comvalid where comid = :comid; ";
         $paras = array(
             ":comtype" => $com->comtype, ":comtypeid" => $com->comtypeid, ":compid" => $com->compid, ":comname" => $com->comname, 
             ":comrename" => $com->comrename, ":comment" => $com->comment, ":comsort" => $com->comsort, ":comvalid" => $com->comvalid, 
+            ":comid" => $com->comid
         );
-        return (new Entity())->Exec($str, $paras);
+        return (new Entity())->Exec($str, $paras) > 0 ? 
+            new Message("修改成功", true, $com) : new Message("修改失败");
     }
 
-    public static function GetComms($comtype = "other", $comtypeid = -1, $pid = -1, $valid = -1, $pagenum = 1, $pagesize = 0, $order = "sort"){
-        $comtype = is_string($comtype) ? $comtype : "other";
-        $comtypeid = is_int($comtypeid) ? $comtypeid : -1;
-        $pid = is_int($pid) ? $pid : -1;
-        $valid = is_int($valid) ? $valid : -1;
-        $pagenum = is_int($pagenum) ? $pagenum : 1;
-        $pagesize = is_int($pagesize) ? $pagesize : 0;
+    public static function Add_Update($com){
+        if(!$com instanceof Comment) return new Message("对象类型不正确");
+        return $com->comid > 0 ? Comment::Update($com) : Comment::Add($com);
+    }
+
+    public static function GetAll($search = null, $deep = false){
+        $search = is_object($search) ? $search : new stdClass(); 
+        $search->type = isset($search->type) ? strval($search->type) : "other";
+        $search->typeid = isset($search->typeid) && is_numeric($search->typeid) ? (int)$search->typeid : 0;
+        $search->pid = isset($search->pid) && is_numeric($search->pid) ? (int)$search->pid : -2;
+        $search->userid = isset($search->userid) && is_numeric($search->userid) ? (int)$search->userid : 0;
+        $search->valid = isset($search->valid) && is_numeric($search->valid) ? (int)$search->valid : 1;
+        $search->page = isset($search->page) && is_numeric($search->page) ? (int)$search->page : 0;
+        $search->rows = isset($search->rows) && is_numeric($search->rows) ? (int)$search->rows : 0;
+        $search->order = isset($search->name) ? strval($search->name) : "sort";
         $count = "select count(*) as count ";
         $select = "select comid, comtype, comtypeid, compid, comname, comdate, comment, comsort, comvalid ";
         $where = "from Comments where 1 = 1 ";
         $paras = array();
-        if($comtype != "other"){
+        if($search->type != "other"){
             $where .= "and comtype = :comtype ";
-            $paras[":comtype"] = $comtype;
+            $paras[":comtype"] = $search->type;
         }
-        if($comtypeid < -1) $where .= "and comtypeid > 0 ";
-        else if($comtypeid > -1){
+        if($search->typeid > 0){
             $where .= "and comtypeid = :comtypeid ";
-            $paras[":comtypeid"] = $comtypeid;
+            $paras[":comtypeid"] = $search->typeid;
         }
-        if($pid < -1) $where .= "and compid > 0";
-        else if($pid > -1){
+        if($search->pid = -1) $where .= "and compid > 0";
+        else if($search->pid > -1){
             $where .= "and compid = :compid";
-            $paras[":compid"] = $pid;
+            $paras[":compid"] = $search->pid;
         }
-        if($valid < -1) $where .= "and comvalid > 0 ";
-        else if($valid > -1){
+        if($search->valid == 1 || $search->valid == 0){
             $where .= "and comvalid = :comvalid ";
-            $paras[":comvalid"] = $valid;
+            $paras[":comvalid"] = $search->valid;
         }
         $count .= $where."; ";
         $where .= "order by comid desc ";
         $select .= $where;
-        if($pagenum > 0 && $pagesize > 0)
-            $select .= "limit ".($pagesize > 1 ? ($pagenum - 1) * $pagesize : 0).", ".$pagesize."; ";
+        if($pagenum > 0 && $pagesize > 0){
+            $select .= "limit :page, :rows; ";
+            $paras[":page"] = ($search->page - 1) * $search->rows;
+            $paras[":rows"] = $search->rows;
+        }
         else $select .= "; ";
-        $en = new Entity();
-        $list = new Resaults();
-        $res = $en->Query($count, $paras);
-        if($res) $list->page->MakePage((int)$res[0]["count"], $pagenum, $pagesize);
-        $res = $en->Query($select, $paras);
-        if($res) foreach($res as $key => $value) $list->list[] = new Comment($value);
-        return $list;
+        $list = array();
+        $res = (new Entity())->Querys($count, $paras);
+        if(count($res) != 2 || count($res[0]) != 1) return new Resaults();
+        foreach($res[1] as $key => $value) $list[] = new Comment($value, $deep);
+        return new Resaults($list, (int)$res[0][0]["count"], $search->page, $search->rows);
     }
 
-    public static function GetComm($id){
+    public static function Get($id){
         $id = is_int($id) ? $id : 0;
-        if($id < 1) return false;
+        if($id < 1) return null;
         $str = "select comid, comtype, comtypeid, compid, comname, comdate, comment, comsort, comvalid "
             ."from Comments where comid = :comid; ";
         $paras = array(":comid" => $id);
         $en = new Entity();
         $res = $en->First($str, $paras);
-        if(!$res) return false;
+        if(!$res) return null;
         return new Comments($res);
     }
 
-    public static function Valid($id, $valid = -1){
+    public static function Valid($id, $valid = null){
         $id = is_int($id) ? $id : 0;
         if($id < 1) return false;
-        $valid = is_int($valid) ? $id : -1;
+        $valid = is_numeric($valid) ? (int)$valid : null;
         $str = "update Comments set ";
         $paras = array();
-        if($valid == -1){
+        if(!$valid){
             $str .= "comvalid = case when comvalid = 0 then 1 else 1 end where comid = :comid; ";
             $paras = array(":comid" => $id);
         }
@@ -139,8 +152,8 @@ class Comment{
             $str .= "comvalid = :comvalid where comid = :comid; ";
             $paras = array(":comid" => $id, ":comvalid" => $valid);
         }
-        $en = new Entity();
-        return $en->Exec($str, $paras);
+        return (new Entity())->Exec($str, $paras) > 0 ? 
+            new Message("修改成功", true) : new Message("修改失败");
     }
 }
 ?>

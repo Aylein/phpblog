@@ -41,102 +41,108 @@ class Type{
     }
 
     //检查存在
-    public static function Exists($name){
-        if(!$name) return ture;
-        $str = "select count(*) from Types where ";
+    public static function Exists($name, $execpt = null){
+        if(!$name) return true;
+        $str = "select count(*) from Types where typename = :typename";
         $paras = array();
-        if(is_int($name)){
-            $str .= "typeid = :typeid; ";
-            $paras[":typeid"] = $name;
+        if($execpt != null && is_int($execpt)){
+            $str .= " and typeid != :typeid";
+            $paras[":typeid"] = $execpt;
         }
-        else{
-            $str = "typename = :typename; ";
-            $paras[":typename"] = $name;
-        }
-        $en = new Entity();
-        $num = $en->Scalar($str, $paras);
+        $paras[":typename"] = $name;
+        $str .= "; ";
+        $num = (new Entity())->Scalar($str, $paras);
         return $num != 0;
     }
 
     public static function Add($type){
-        if(!is_a($type, "Type")) return false;
+        if(!$type instanceof Type) return new Message("对象类型不正确");
+        if(Type::Exists($type->typename)) return new Message("要添加的类型名称已存在");
         $str = "insert into Types (typepid, typeshow, typename, typesort, typevalid) "
-            ."values (:typepid, :typeshow, :typename, :typesort, :typevalid);";
+            ."values (:typepid, :typeshow, :typename, :typesort, :typevalid); ";
+        $str .= "select typeid, typepid, typeshow, typename, typecreatetime, typesort, typevalid "
+            ."from Types where typeid = @@identity; ";
         $paras = array(":typepid" => $type->typepid, ":typeshow" => $type->typeshow,
             ":typename" => $type->typename, ":typesort" => $type->typesort, ":typevalid" => $type->typevalid);
-        $en = new Entity();
-        return $en->Exec($str, $paras);
+        $en = (new Entity())->Querys($str, $paras);
+        return count($en) == 2 && count($en[1]) == 1 ? 
+            new Message("添加成功", true, new Type($en[1][0])) : new Message("添加失败");
     }
 
     public static function Update($type){
-        if(!is_a($type, "Type")) return false;
-        //if(!Type::exists($type->typeid)) return Type::Add($type);
+        if(!$type instanceof Type) return new Message("对象类型不正确");
+        if(Type::Exists($type->typename, $type->typeid)) return new Message("要添加的类型名称已存在");
         $str = "update Types set typepid = :typepid, typeshow = :typeshow, typename = :typename, typesort = :typesort, "
             ."typevalid = :typevalid where typeid = :typeid; ";
         $paras = array(":typepid" => $type->typepid, ":typeshow" => $type->typeshow, ":typename" => $type->typename,
             ":typesort" => $type->typesort, ":typevalid" => $type->typevalid, ":typeid" => $type->typeid);
-        $en = new Entity();
-        return $en->Exec($str, $paras);
+        return (new Entity())->Exec($str, $paras) > 0 ? 
+            new Message("修改成功", true, $type) : new Message("修改失败");
     }
 
-    public static function GetTypes($typepid = -1, $show = -1, $valid = -1, $pagenum = 1, $pagesize = 0){
-        $typepid = is_int($typepid) ? $typepid : 0;
-        $show = is_int($show) ? $show : -1;
-        $valid = is_int($valid) ? $valid : -1;
-        $pagenum = is_int($pagenum) ? $pagenum : 1;
-        $pagesize = is_int($pagesize) ? $pagesize : 0;
+    public static function Add_Update($type){
+        if(!$type instanceof Type) return new Message("对象类型不正确");
+        return $type->typeid > 0 ? Type::Update($type) : Type::Add($type);
+    }
+
+    public static function GetAll($search = null){
+        $search = is_object($search) ? $search : new stdClass(); 
+        $search->typepid = isset($search->typepid) && is_numeric($search->typepid) ? (int)$search->typepid : -2;
+        $search->show = isset($search->show) && is_numeric($search->show) ? (int)$search->show : -1;
+        $search->valid = isset($search->valid) && is_numeric($search->valid) ? (int)$search->valid : 1;
+        $search->page = isset($search->page) && is_numeric($search->page) ? (int)$search->page : 0;
+        $search->rows = isset($search->rows) && is_numeric($search->rows) ? (int)$search->rows : 0;
         $count = "select count(*) as count ";
         $select = "select typeid, typepid, typeshow, typename, typecreatetime, typesort, typevalid ";
         $where = "from Types where 1 = 1 ";
         $paras = array();
-        if ($typepid < -1) $where .= "and typepid > 0 ";
-        else if($typepid > -1){
+        if($search->typepid == -1) $where .= "and typepid > 0 ";
+        else if($search->typepid > -1){
             $where .= "and typepid = :typepid ";
-            $paras[":typepid"] = $typepid;
+            $paras[":typepid"] = $search->typepid;
         }
-        if($show < -1) $where .= "and typeshow > 0 ";
-        else if($show > -1){
+        if($search->show == 1 || $search->show == 0){
             $where .= "and typeshow = :typeshow ";
-            $paras[":typeshow"] = $show;
+            $paras[":typeshow"] = $search->show;
         }
-        if($valid < -1) $where .= "and typevalid > 0 ";
-        else if($valid > -1){
+        if($search->valid == 1 || $search->valid == 0){
             $where .= "and typevalid = :typevalid ";
-            $paras[":typevalid"] = $valid;
+            $paras[":typevalid"] = $search->valid;
         }
         $count .= $where.";";
         $where .= "order by typesort desc, typeid desc ";
         $select .= $where;
-        if($pagenum > 0 && $pagesize > 0)
-            $select .= "limit ".($pagesize > 1 ? ($pagenum - 1) * $pagesize : 0).", ".$pagesize."; ";
+        if($search->page > 0 && $search->rows > 0){            
+            $select .= "limit :page, :rows; ";
+            $paras[":page"] = ($search->page - 1) * $search->rows;
+            $paras[":rows"] = $search->rows;
+        }
         else $select .= "; ";
-        $en = new Entity();
-        $list = new Resaults();
-        $res = $en->Query($count, $paras);
-        if($res) $list->page->MakePage((int)$res[0]["count"], $pagenum, $pagesize);
-        $res = $en->Query($select, $paras);
-        if($res) foreach($res as $key => $value) $list->list[] = new Type($value);
-        return $list;
+        $count .= $select;
+        $list = array();
+        $res = (new Entity())->Querys($count, $paras);
+        if(count($res) != 2 || count($res[0]) != 1) return new Resaults();
+        foreach($res[1] as $key => $value) $list[] = new Type($value);
+        return new Resaults($list, (int)$res[0][0]["count"], $search->page, $search->rows);
     }
 
-    public static function GetType($id){
+    public static function Get($id){
         $id = is_int($id) ? $id : 0;
-        if($id < 1) return false;
+        if($id < 1) return null;
         $str = "select typeid, typepid, typename, typecreatetime, typesort, typevalid from Types where typeid = :typeid; ";
         $paras = array(":typeid" => $id);
-        $en = new Entity();
-        $res = $en->First($str, $paras);
-        if(!$res) return false;
+        $res = (new Entity())->First($str, $paras);
+        if(!$res) return null;
         return new Type($res);
     }
 
-    public static function Valid($id, $valid = -1){
+    public static function Valid($id, $valid = null){
         $id = is_int($id) ? $id : 0;
         if($id < 1) return false;
-        $valid = is_int($valid) ? $id : -1;
+        $valid = is_numeric($valid) ? (int)$valid : null;
         $str = "update Types set ";
         $paras = array();
-        if($valid == -1){
+        if(!$valid){
             $str .= "typevalid = case when typevalid = 0 then 1 else 1 end where typeid = :typeid; ";
             $paras = array(":typeid" => $id);
         }
@@ -144,8 +150,8 @@ class Type{
             $str .= "typevalid = :typevalid where typeid = :typeid; ";
             $paras = array(":typeid" => $id, ":typevalid" => $valid);
         }
-        $en = new Entity();
-        return $en->Exec($str, $paras);
+        return (new Entity())->Exec($str, $paras) > 0 ? 
+            new Message("修改成功", true) : new Message("修改失败");
     }
 }
 ?>

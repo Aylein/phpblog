@@ -24,7 +24,7 @@ app.service("cache", function(){
 app.service("main", function(cache){
     var re_typeof = /^\[object (\S+)\]$/;
     var rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g;
-    this.trim = function(str){return str == null ? "" : (str + "").replace(rtrim, "");}; //from jquery
+    this.trim = function(str){ return str == null ? "" : (str + "").replace(rtrim, ""); }; //from jquery
     this.obj = function(obj, deep){
         deep = deep != undefined ? deep : true;
         var i = 0;
@@ -171,6 +171,10 @@ app.service("main", function(cache){
                 i++;
             }
         }
+        else {
+            var _args = this.merge(true, [], args);
+            if(callback.apply(src, _args)) list = src;
+        }
         return list;
     };
     this.copy = function(target){
@@ -198,6 +202,10 @@ app.service("main", function(cache){
                 if(callback.apply(_this, _args)) break;
                 i++;
             }
+        }
+        else {
+            var _args = this.merge(true, [], args);
+            callback.apply(src, _args);
         }
     };
     this.random = function(len){

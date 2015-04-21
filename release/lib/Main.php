@@ -47,77 +47,84 @@ class Main{
         }
     }
 
-    public function MakeJson(){
-        $str = "{ \"id\": \"".$this->id."\", \"_key\": \"".$this->_key."\", \"_value\": \"".$this->_value."\" }";
-        return $str;
-    }
-
-    public static function Exists($name){
-        if(!isset($name)) return true;
-        $str = "select count(*) from Main where ";
+    //检查存在
+    public static function Exists($key, $execpt = null){
+        if(!$key) return true;
+        $str = "select count(*) from Main where _key = :key";
         $paras = array();
-        if(is_int($name)){
-            $str .= "id = :id; ";
-            $paras[":id"] = $name;
+        if($execpt != null && is_int($execpt)){
+            $str .= " and id != :id";
+            $paras[":id"] = $execpt;
         }
-        else{
-            $str .= "_key = :_key; ";
-            $paras[":_key"] = $name;
-        }
-        $en = new Entity();
-        $num = $en->Scalar($str, $paras);
+        $paras[":key"] = $key;
+        $str .= "; ";
+        $num = (new Entity())->Scalar($str, $paras);
         return $num != 0;
     }
 
     public static function GetValue($key){
         if(!isset($key) || is_string($key)) return false;
-        $str = "select _value from Main where _key = $_key; ";
+        $str = "select _value from Main where _key = :_key; ";
         $array = array(":_key" => $key);
         return (new Entity())->Scalar($str, $paras);
     }
 
     public static function Add($main){
-        if(is_a($main, "Main")) return false;
+        if(!$main instanceof Main) return new Message("对象类型不正确");
+        if(Main::Exists($main->_key)) return new Message("要添加的key值已存在");
         $str = "insert into Main (_key, _value) values (:_key, :_value); ";
+        $str = "select id, _key, _value from Main where id = @@identity; ";
         $paras = array(":_key" => $main->_key, ":_value" => $main->_value);
-        return (new Entity())->Exec($str, $paras);
+        $en = (new Entity())->Querys($str, $paras);
+        return count($en) == 2 && count($en[1]) == 1 ? 
+            new Message("添加成功", true, new Main($en[1][0])) : new Message("添加失败");
     }
 
     public static function Update($main){
-        if(is_a($main, "Main")) return false;
+        if(!$main instanceof Main) return new Message("对象类型不正确");
+        if(Main::Exists($main->_key, $main->id)) return new Message("要添加的key值已存在");
         $str = "update Main set _key = :_key, _value = :_value where id = :id; ";
         $paras = array(":_key" => $main->_key, ":_value" => $main->_value, ":id" => $main->id);
-        return (new Entity())->Exec($str, $paras);
+        return (new Entity())->Exec($str, $paras) > 0 ? 
+            new Message("修改成功", true, $main) : new Message("修改失败");
     }
 
-    public static function GetMains($pagenum = 1, $pagesize = 0){
+    public static function Add_Update($main){
+        if(!$main instanceof Main) return new Message("对象类型不正确");
+        return $main->id > 0 ? Main::Update($main) : Main::Add($main);
+    }
+
+    public static function GetAll($search = null){
+        $search = is_object($search) ? $search : new stdClass(); 
+        $search->page = isset($search->page) && is_numeric($search->page) ? (int)$search->page : 0;
+        $search->rows = isset($search->rows) && is_numeric($search->rows) ? (int)$search->rows : 0;
         $str = "select id, _key, _value ";
         $count = "select count(*) as count ";
-        $where = "from Main where 1 = 1 ";
+        $where = "from Main ";
         $paras = array();
         $count .= $where.";";
         $where .= "order by typesort desc, typeid desc ";
         $select .= $where;
-        if($pagenum > 0 && $pagesize > 0)
-            $select .= "limit ".($pagesize > 1 ? ($pagenum - 1) * $pagesize : 0).", ".$pagesize."; ";
+        if($search->page > 0 && $search->rows > 0){            
+            $select .= "limit :page, :rows; ";
+            $paras[":page"] = ($search->page - 1) * $search->rows;
+            $paras[":rows"] = $search->rows;
+        }
         else $select .= "; ";
-        $en = new Entity();
-        $list = new Resaults();
-        $res = $en->Query($count, $paras);
-        if($res) $list->page->MakePage((int)$res[0]["count"], $pagenum, $pagesize);
-        $res = $en->Query($select, $paras);
-        if($res) foreach($res as $key => $value) $list->list[] = new Main($value);
-        return $list;
+        $list = array();
+        $res = (new Entity())->Querys($count, $paras);
+        if(count($res) != 2 || count($res[0]) != 1) return new Resaults();
+        foreach($res[1] as $key => $value) $list[] = new Main($value);
+        return new Resaults($list, (int)$res[0][0]["count"], $search->page, $search->rows);
     }
 
-    public static function GetMain($id){
+    public static function Get($id){
         $id = is_int($id) ? $id : 0;
-        if($id < 1) return false;
+        if($id < 1) return null;
         $str = "select id, _key, _value from Main where id = :id; ";
         $paras = array(":id" => $id);
-        $en = new Entity();
-        $res = $en->First($str, $paras);
-        if(!$res) return false;
+        $res = (new Entity())->First($str, $paras);
+        if(!$res) return null;
         return new Main($res);
     }
 }
@@ -133,8 +140,9 @@ class Page{
     }
 
     public function MakePage($count, $page, $rows){
-        if($count == null || $page == null || $rows == null || $page < 1 || $rows < 1) {
-            $this->totalnum = 0;
+        $count = $count != null && is_numeric($count) ? (int)$count : 0;
+        if($page == null || $rows == null || $page < 1 || $rows < 1) {
+            $this->totalnum = $count;
             $this->page = 1;
             $this->rows = 0;
             $this->totalpage = 0;
@@ -153,8 +161,25 @@ class Resaults{
     var $page;
 
     public function __construct(){
-        $this->list = array();
-        $this->page = new Page();
+        $args = func_get_args();
+        $len = func_num_args();
+        if($len < 1){
+            $this->list = array();
+            $this->page = new Page();
+        }
+        else if($len == 1){
+            $this->list = is_array($args[0]) ? $args[0] : array();
+            $this->page = new Page();
+        }
+        else if($len == 2){
+            $this->list = is_array($args[0]) ? $args[0] : array();
+            $this->page = $args[1] instanceof Page ? $args[1] : new Page();
+        }
+        else if($len == 4){
+            $this->list = is_array($args[0]) ? $args[0] : array();
+            $this->page = is_numeric($args[1]) && is_numeric($args[2]) && is_numeric($args[3]) ? 
+                new Page($args[1], $args[2], $args[3]) : new Page();
+        }
     }
 }
 
@@ -164,7 +189,7 @@ class Message{
     var $msg;
     var $obj;
 
-    public function __construct($res = false, $code = "", $msg = "", $obj = null){
+    public function __construct($msg = "", $res = false, $obj = null, $code = ""){
         $this->res = $res;
         $this->code = $code;
         $this->msg = $msg;

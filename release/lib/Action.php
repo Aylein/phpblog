@@ -30,110 +30,96 @@ class Action{
         }
     }
 
-    public function MakeJson(){
-        $str = "{ \"actid\": \"".$this->actid."\", \"acttype\": \"".$this->acttype."\", \"acttypeid\":\""
-            .$this->acttypeid."\", \"acttitle\": \"".$this->acttitle."\", \"actlink\": \"".$this->actlink."\", \"actdate\": \""
-            .date("Y-m-d H:i:s", $this->actlink)."\", \"actvalid\": \"".$this->actvalid."\" }";
-        return $str;
-    }
-
-    public static function Exists($name){
-        if(!isset($name)) return true;
-        $str = "select count(*) from Action where ";
-        $paras = array();
-        if(is_int($name)){
-            $str .= "actid = :actid; ";
-            $paras[":actid"] = $name;
-        }
-        else{
-            $str .= "acttitle = :acttitle; ";
-            $paras[":acttitle"] = $name;
-        }
-        $en = new Entity();
-        $num = $en->Scalar($str, $paras);
-        return $num != 0;
-    }
-
     public static function Add($action){
-        if(!is_a($action, "Action")) return false;
+        if(!$action instanceof Action) return new Message("对象类型不正确");
         $str = "insert into Action (acttype, acttypeid, acttitle, actlink, actvalid) values "
             ."(:acttype, :acttypeid, :acttitle, :actlink, :actvalid); ";
+        $str .= "select actid, acttype, acttypeid, acttitle, actlink, actdate, actvalid "
+            ."from Action where actid = @@identity; ";
         $paras = array(
             ":acttype" => $action->acttype, ":acttypeid" => $action->acttypeid, ":acttitle" => $action->acttitle, 
             ":actlink" => $action->actlink, ":actvalid" => $action->actvalid
         );
-        return (new Entity())->Exec($str, $paras);
+        $en = (new Entity())->Querys($str, $paras);
+        return count($en) == 2 && count($en[1]) == 1 ? 
+            new Message("添加成功", true, new Action($en[1][0])) : new Message("添加失败");
     }
 
     public static function Update($action){
-        if(!is_a($action, "Action")) return false;
+        if(!$action instanceof Action) return new Message("对象类型不正确");
         $str = "update Action set acttype = :acttype, acttypeid = :acttypeid, acttitle = :acttitle, "
             ."actlink = :actlink, actvalid = :actvalid where actid = :actid; ";
         $paras = array(
             ":acttype" => $action->acttype, ":acttypeid" => $action->acttypeid, ":acttitle" => $action->acttitle, 
             ":actlink" => $action->actlink, ":actvalid" => $action->actvalid, ":actid" => $action->actid
         );
-        return (new Entity())->Exec($str, $paras);
+        return (new Entity())->Exec($str, $paras) > 0 ? 
+            new Message("修改成功", true, $action) : new Message("修改失败");
     }
 
-    public static function GetActions($type = "other", $typeid = -1, $valid = -1, $pagenum = 1, $pagesize = 0){
-        $type = is_string($type) ? $type : "other";
-        $typeid = is_int($typeid) ? $typeid : -1;
-        $valid = is_int($valid) ? $valid : -1;
-        $pagenum = is_int($pagenum) ? $pagenum : 1;
-        $pagesize = is_int($pagesize) ? $pagesize : 0;
+    public static function Add_Update($action){
+        if(!$action instanceof Action) return new Message("对象类型不正确");
+        return $action->actid > 0 ? Action::Update($action) : Action::Add($action);
+    }
+
+    public static function GetAll($search){
+        $search = is_object($search) ? $search : new stdClass(); 
+        $search->type = isset($search->type) ? strval($search->type) : "other";
+        $search->typeid = isset($search->typeid) && is_numeric($search->typeid) ? (int)$search->typeid : 0;
+        $search->valid = isset($search->valid) && is_numeric($search->valid) ? (int)$search->valid : 1;
+        $search->page = isset($search->page) && is_numeric($search->page) ? (int)$search->page : 0;
+        $search->rows = isset($search->rows) && is_numeric($search->rows) ? (int)$search->rows : 0;
         $count = "select count(*) as count ";
         $select = "select actid, acttype, acttypeid, acttitle, actlink, actdate, actvalid ";
         $where = "from Action where 1 = 1 ";
         $paras = array();
-        if($type != "other"){
+        if($search->type != "other"){
             $where .= "and acttype = :acttype ";
-            $paras[":acttype"] = $type;
+            $paras[":acttype"] = $search->type;
         }
-        if($typeid < -1) $where .= "and acttypeid > 0 ";
-        else if($typeid > -1){
+        if($search->typeid > 0){
             $where .= "and acttypeid = :acttypeid ";
-            $paras[":acttypeid"] = $typeid
+            $paras[":acttypeid"] = $search->typeid;
         }
-        if($valid < -1) $where .= "and actvalid > 0 ";
-        else if($valid > -1){
+        if($search->valid == 1 || $search->valid == 0){
             $where .= "and actvalid = :actvalid ";
-            $paras[":actvalid"] = $valid;
+            $paras[":actvalid"] = $search->valid;
         }
         $count .= $where."; ";
         $where .= "order by actid desc ";
         $select .= $where;
-        if($pagenum > 0 && $pagesize > 0)
-            $select .= "limit ".($pagesize > 1 ? ($pagenum - 1) * $pagesize : 0).", ".$pagesize."; ";
+        if($pagenum > 0 && $pagesize > 0){
+            $select .= "limit :page, :rows; ";
+            $paras[":page"] = ($search->page - 1) * $search->rows;
+            $paras[":rows"] = $search->rows;
+        }
         else $select .= "; ";
-        $en = new Entity();
-        $list = new Resaults();
-        $res = $en->Query($count, $paras);
-        if($res) $list->page->MakePage((int)$res[0]["count"], $pagenum, $pagesize);
-        $res = $en->Query($select, $paras);
-        if($res) foreach($res as $key => $value) $list->list[] = new Action($value);
-        return $list;
+        $list = array();
+        $res = (new Entity())->Querys($count, $paras);
+        if(count($res) != 2 || count($res[0]) != 1) return new Resaults();
+        foreach($res[1] as $key => $value) $list[] = new Action($value);
+        return new Resaults($list, (int)$res[0][0]["count"], $search->page, $search->rows);
     }
 
-    public static function GetAction($id){
+    public static function Get($id){
         $id = is_int($id) ? $id : 0;
-        if($id < 1) return false;
+        if($id < 1) return null;
         $str = "select actid, acttype, acttypeid, acttitle, actlink, actdate, actvalid "
             ."from Action where actid = :actid; ";
         $paras = array(":actid" => $id);
         $en = new Entity();
         $res = $en->First($str, $paras);
-        if(!$res) return false;
+        if(!$res) return null;
         return new Action($res);
     }
 
-    public static function Valid($id, $valid = -1){
+    public static function Valid($id, $valid = null){
         $id = is_int($id) ? $id : 0;
         if($id < 1) return false;
-        $valid = is_int($valid) ? $id : -1;
+        $valid = is_numeric($valid) ? (int)$valid : null;
         $str = "update Action set ";
         $paras = array();
-        if($valid == -1){
+        if(!$valid){
             $str .= "actvalid = case when actvalid = 0 then 1 else 1 end where actid = :actid; ";
             $paras = array(":actid" => $id);
         }
@@ -141,8 +127,8 @@ class Action{
             $str .= "actvalid = :actvalid where actid = :actid; ";
             $paras = array(":actid" => $id, ":actvalid" => $valid);
         }
-        $en = new Entity();
-        return $en->Exec($str, $paras);
+        return (new Entity())->Exec($str, $paras) > 0 ? 
+            new Message("修改成功", true) : new Message("修改失败");
     }
 }
 ?>

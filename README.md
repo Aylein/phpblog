@@ -4,7 +4,7 @@ a blog by php
   
 bower  
 =======  
-maybe need bower angular first
+maybe need bower angular first  
 . bower install angular  
 . bower install angular-route  
   
