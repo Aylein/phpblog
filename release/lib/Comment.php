@@ -65,13 +65,16 @@ class Comment{
         if(!$com instanceof Comment) return new Message("对象类型不正确");
         $str = "update Comments set comtype = :comtype, comtypeid = :comtypeid, compid = :compid, comname = :comname, "
             ."comrename = :comrename, comment = :comment, comsort = :comsort, comvalid = :comvalid where comid = :comid; ";
+        $str .= "select comid, comtype, comtypeid, compid, comname, comdate, comment, comsort, comvalid "
+            ."from Comments where comid = :comid; ";
         $paras = array(
             ":comtype" => $com->comtype, ":comtypeid" => $com->comtypeid, ":compid" => $com->compid, ":comname" => $com->comname, 
             ":comrename" => $com->comrename, ":comment" => $com->comment, ":comsort" => $com->comsort, ":comvalid" => $com->comvalid, 
             ":comid" => $com->comid
         );
-        return (new Entity())->Exec($str, $paras) > 0 ? 
-            new Message("修改成功", true, $com) : new Message("修改失败");
+        $en = (new Entity())->Querys($str, $paras);
+        return count($en) == 2 && count($en[1]) == 1 ? 
+            new Message("修改成功", true, new Comment($en[1][0], $deep)) : new Message("修改失败");
     }
 
     public static function Add_Update($com){
@@ -126,7 +129,7 @@ class Comment{
         return new Resaults($list, (int)$res[0][0]["count"], $search->page, $search->rows);
     }
 
-    public static function Get($id){
+    public static function Get($id, $deep = false){
         $id = is_int($id) ? $id : 0;
         if($id < 1) return null;
         $str = "select comid, comtype, comtypeid, compid, comname, comdate, comment, comsort, comvalid "
@@ -135,12 +138,12 @@ class Comment{
         $en = new Entity();
         $res = $en->First($str, $paras);
         if(!$res) return null;
-        return new Comments($res);
+        return new Comments($res, $deep);
     }
 
     public static function Valid($id, $valid = null){
         $id = is_int($id) ? $id : 0;
-        if($id < 1) return false;
+        if($id < 1) return new Message("修改失败");
         $valid = is_numeric($valid) ? (int)$valid : null;
         $str = "update Comments set ";
         $paras = array();

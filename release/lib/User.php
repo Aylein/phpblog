@@ -67,11 +67,14 @@ class User{
         if(User::Exists($user->username, $user->userid)) return new Message("要添加的用户名已存在");
         $str = "update Users set username = :username, userpass = :userpass, userimg = :userimg, usertype = :usertype, "
             ."usersort = :usersort, uservalid = :uservalid where userid = :userid;";
+        $str .= "select userid, username, userimg, usertype, usercreatetime, usersort, uservalid "
+            ."from Users where userid = :userid; ";
         $paras = array(":userid" => $user->userid, ":username" => $user->username, ":usertype" => $user->usertype,
             ":userpass" => $user->userpass, ":userimg" => $user->userimg, ":usersort" => $user->usersort,
             ":uservalid" => $user->uservalid);
-        return (new Entity())->Exec($str, $paras) > 0 ? 
-        new Message("修改成功", true, $user) : new Message("修改失败");
+        $en = (new Entity())->Querys($str, $paras);
+        return count($en) == 2 && count($en[1]) == 1 ? 
+            new Message("修改成功", true, new User($en[1][0], $deep)) : new Message("修改失败");
     }
 
     public static function Add_Update($user){
@@ -139,7 +142,7 @@ class User{
 
     public static function Valid($id, $valid = null){
         $id = is_int($id) ? $id : 0;
-        if($id < 1) return false;
+        if($id < 1) return new Message("修改失败");
         $valid = is_numeric($valid) ? (int)$valid : null;
         $str = "update Users set ";
         $paras = array();

@@ -82,12 +82,15 @@ class Document{
         if(Documents::Exists($doc->doctitle, $doc->docid)) return new Message("要添加的文章名称已存在");
         $str = "update Documents set typeid = :typeid, doctitle = :doctitle, docsubtitle = :docsubtitle, "
             ."docupdatetime = :docupdatetime, docsort = :docsort, docvalid = :docvalid where docid = :docid ";
+        $str .= "select docid, typeid, doctitle, docsubtitle, docstgnum, doccomnum, docview, doccreatetime, "
+            ."docupdatetime, docsort, docvalid from Documents where docid = :docid; ";
         $paras = array(
             ":typeid" => $doc->typeid, ":doctitle" => $doc->doctitle, ":docsubtitle" => $doc->docsubtitle, 
             ":docupdatetime" => time(), ":docsort" => $doc->docsort, ":docvalid" => $doc->docvalid, ":docid" => $doc->docid
         );
-        return (new Entity())->Exec($str, $paras) > 0 ? 
-            new Message("修改成功", true, $doc) : new Message("修改失败");
+        $en = (new Entity())->Querys($str, $paras);
+        return count($en) == 2 && count($en[1]) == 1 ? 
+            new Message("修改成功", true, new Documents($en[1][0], $deep)) : new Message("修改失败");
     }
 
     public static function Add_Update($doc){
@@ -172,7 +175,7 @@ class Document{
         return new Resaults($list, (int)$res[0][0]["count"], $search->page, $search->rows);
     }
 
-    public static function Get($id){
+    public static function Get($id, $deep = false){
         $id = is_int($id) ? $id : 0;
         if($id < 1) return null;
         $str = "select docid, typeid, doctitle, docsubtitle, docstgnum, doccomnum, docview, doccreatetime, "
@@ -186,7 +189,7 @@ class Document{
 
     public static function Valid($id, $valid = null){
         $id = is_int($id) ? $id : 0;
-        if($id < 1) return false;
+        if($id < 1) return new Message("修改失败");
         $valid = is_numeric($valid) ? (int)$valid : null;
         $str = "update Documents set ";
         $paras = array();
@@ -205,32 +208,32 @@ class Document{
 
     public static function StageAdd($id){
         $id = is_int($id) ? (int)$id : 0;
-        if($id < 1) return false;
+        if($id < 1) return new Message("修改失败");
         $str = "update Documents set docstgnum = docstgnum + 1 where docid = :docid; "
             ."select docstgnum from Documents where docid = :docid; ";
         $paras = array(":docid" => $id);
         return count($en) == 2 && count($en[1]) == 1 ? 
-            new Message("修改成功", true, (int)$obj[1][0]) : new Message("修改失败");
+            new Message("修改成功", true, (int)$en[1][0]) : new Message("修改失败");
     }
 
     public static function ViewAdd($id){
         $id = is_int($id) ? (int)$id : 0;
-        if($id < 1) return false;
+        if($id < 1) return new Message("修改失败");
         $str = "update Documents set docview = docview + 1 where docid = :docid; "
             ."select docview from Documents where docid = :docid; ";
         $paras = array(":docid" => $id);
         return count($en) == 2 && count($en[1]) == 1 ? 
-            new Message("修改成功", true, (int)$obj[1][0]) : new Message("修改失败");
+            new Message("修改成功", true, (int)$en[1][0]) : new Message("修改失败");
     }
 
     public static function CommAdd($id){
         $id = is_int($id) ? (int)$id : 0;
-        if($id < 1) return false;
+        if($id < 1) return new Message("修改失败");
         $str = "update Documents set doccomnum = doccomnum + 1 where docid = :docid; ";
             ."select doccomnum from Documents where docid = :docid; ";
         $paras = array(":docid" => $id);
         return count($en) == 2 && count($en[1]) == 1 ? 
-            new Message("修改成功", true, (int)$obj[1][0]) : new Message("修改失败");
+            new Message("修改成功", true, (int)$en[1][0]) : new Message("修改失败");
     }
 }
 ?>

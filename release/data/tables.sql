@@ -8,6 +8,7 @@ drop table if exists Types;
 drop table if exists Action;
 drop table if exists Main;
 drop table if exists Comments;
+drop table if exists SignOn;
 drop table if exists Signs;
 drop table if exists Users;
 
@@ -36,6 +37,19 @@ create table if not exists Signs(
     foreign key(userid) references Users(userid) on delete cascade on update cascade,
     signsort int default 0,
     signvalid int default 1
+)auto_increment = 1 charset = utf8;
+
+create table if not exists SignOn(
+    soid int primary key auto_increment,
+    signid int not null,
+    foreign key(signid) references Signs(signid) on delete cascade on update cascade,
+    userid int not null,
+    foreign key(userid) references Users(userid) on delete cascade on update cascade,
+    sotype nvarchar(20) not null,
+    sotypeid int default 0,
+    socreatetime timestamp default current_timestamp,
+    sosort int default 0,
+    sovalid int default 1
 )auto_increment = 1 charset = utf8;
 
 create table if not exists Types(
@@ -116,7 +130,7 @@ create table if not exists Main(
 insert into Main (_key, _value) values 
     ("name", "AyleinOter"),
     ("fullname", "The IVth AyleinOter"),
-    ("sign", "");
+    ("sign", "What a loser");
 
 create table if not exists Action(
     actid int primary key auto_increment,

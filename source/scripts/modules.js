@@ -14,14 +14,7 @@ app.config(function($routeProvider){
         controller: "urlController"
     }).otherwise({redirectTo: "/about"});
 });
-app.service("cache", function(){
-    var Cache = {};
-    this.exists = function(key){ return Cache[key] ? true : false; };
-    this.set = function(key, value){ Cache[key] = value; };
-    this.get = function(key){ return Cache[key] ? Cache[key] : undefined; };
-    this.all = function(){ return Cache; };
-});
-app.service("main", function(cache){
+app.service("main", function(){
     var re_typeof = /^\[object (\S+)\]$/;
     var rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g;
     this.trim = function(str){ return str == null ? "" : (str + "").replace(rtrim, ""); }; //from jquery
@@ -208,6 +201,19 @@ app.service("main", function(cache){
             callback.apply(src, _args);
         }
     };
+});
+app.service("cache", function(main){
+    var Cache = {};
+    this.exists = function(key){ return Cache[key] ? true : false; };
+    this.set = function(key, value, deep){ 
+        deep = deep || false;
+        if(!deep && this.exists(key)) return;
+        ache[key] = value;
+    };
+    this.get = function(key){ return Cache[key] ? Cache[key] : undefined; };
+    this.all = function(){ return main.copy(Cache); };
+});
+app.service("extra", function(main, cache){
     this.random = function(len){
         len = len && parseInt(len) > 5 ? len : 5;
         cache.__random = cache.__random || [];

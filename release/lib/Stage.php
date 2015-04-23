@@ -63,7 +63,7 @@ class Stage{
         return $num != 0;
     }
 
-    public static function Add($stage){
+    public static function Add($stage, $deep = false){
         if(!$stage instanceof Stage) return new Message("对象类型不正确");
         if(Stage::Exists($stage->stgtitle, $stage->docid)) return new Message("要添加的章节名称已存在");
         $str = "insert into Stages (docid, stgtitle, stgsubtitle, stgcontent, stgsort, stgvalid) values "
@@ -76,26 +76,29 @@ class Stage{
         );
         $en = (new Entity())->Querys($str, $paras);
         return count($en) == 2 && count($en[1]) == 1 ? 
-            new Message("添加成功", true, new Stage($en[1][0])) : new Message("添加失败");
+            new Message("添加成功", true, new Stage($en[1][0], $deep)) : new Message("添加失败");
     }
 
-    public static function Update($stage){
+    public static function Update($stage, $deep = false){
         if(!$stage instanceof Stage) return new Message("对象类型不正确");
         if(Stage::Exists($stage->stgtitle, $stage->docid, $stage->stgid)) return new Message("要添加的章节名称已存在");
         $str = "update Stages set docid = :docid, stgtitle = :stgtitle, stgsubtitle = :stgsubtitle, stgcontent = :stgcontent, "
             ."stgupdatetime = :stgupdatetime, stgsort = :stgsort, stgvalid = :stgvalid where stgid = :stgid ";
+        $str .= "select stgid, docid, stgtitle, stgsubtitle, stgcontent, stgview, stgcomnum, stgcreatetime, "
+            ."stgupdatetime, stgsort, stgvalid from Stages where stgid = :stgid; ";
         $paras = array(
             ":docid" => $stage->docid, ":stgtitle" => $stage->stgtitle, ":stgsubtitle" => $stage->stgsubtitle, 
             ":stgcontent" => $stage->stgcontent, ":stgupdatetime" => $stage->stgupdatetime, ":stgsort" => $stage->stgsort, 
             ":stgvalid" => $stage->stgvalid, ":stgid" => $stage->stgid
         );
-        return (new Entity())->Exec($str, $paras) > 0 ? 
-            new Message("修改成功", true, $stage) : new Message("修改失败");
+        $en = (new Entity())->Querys($str, $paras);
+        return count($en) == 2 && count($en[1]) == 1 ? 
+            new Message("修改成功", true, new Stage($en[1][0], $deep)) : new Message("修改失败");
     }
 
-    public static function Add_Update($stage){
+    public static function Add_Update($stage, $deep = false){
         if(!$stage instanceof Stage) return new Message("对象类型不正确");
-        return $stage->stgid > 0 ? Stage::Update($stage) : Stage::Add($stage);
+        return $stage->stgid > 0 ? Stage::Update($stage, $deep) : Stage::Add($stage, $deep);
     }
 
     public static function GetAll($search = null, $deep = false){
@@ -169,7 +172,7 @@ class Stage{
         return new Resaults($list, (int)$res[0][0]["count"], $search->page, $search->rows);
     }
 
-    public static function Get($id){
+    public static function Get($id, $deep = false){
         $id = is_int($id) ? $id : 0;
         if($id < 1) return null;
         $str = "select stgid, docid, stgtitle, stgsubtitle, stgcontent, stgview, stgcomnum, stgcreatetime, "
@@ -177,12 +180,12 @@ class Stage{
         $paras = array(":stgid" => $id);
         $res = (new Entity())->First($str, $paras);
         if(!$res) return null;
-        return new Stage($res);
+        return new Stage($res, $deep);
     }
 
     public static function Valid($id, $valid = null){
         $id = is_int($id) ? $id : 0;
-        if($id < 1) return false;
+        if($id < 1) return new Message("修改失败");
         $valid = is_numeric($valid) ? (int)$valid : null;
         $str = "update Stages set ";
         $paras = array();
@@ -200,22 +203,22 @@ class Stage{
 
     public static function ViewAdd($id){
         $id = is_int($id) ? (int)$id : 0;
-        if($id < 1) return false;
+        if($id < 1) return new Message("修改失败");
         $str = "update Stages set stgview = stgview + 1 where stgid = :stgid; "
             ."select stgview from Stages where stgid = :stgid; ";
         $paras = array(":stgid" => $id);
         return count($en) == 2 && count($en[1]) == 1 ? 
-            new Message("修改成功", true, (int)$obj[1][0]) : new Message("修改失败");
+            new Message("修改成功", true, (int)$en[1][0]) : new Message("修改失败");
     }
 
     public static function CommAdd($id){
         $id = is_int($id) ? (int)$id : 0;
-        if($id < 1) return false;
+        if($id < 1) return new Message("修改失败");
         $str = "update Stages set stgcomnum = stgcomnum + 1 where stgid = :stgid; ";
             ."select stgcomnum from Stages where stgid = :stgid; ";
         $paras = array(":stgid" => $id);
         return count($en) == 2 && count($en[1]) == 1 ? 
-            new Message("修改成功", true, (int)$obj[1][0]) : new Message("修改失败");
+            new Message("修改成功", true, (int)$en[1][0]) : new Message("修改失败");
     }
 }
 ?>

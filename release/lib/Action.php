@@ -49,12 +49,15 @@ class Action{
         if(!$action instanceof Action) return new Message("对象类型不正确");
         $str = "update Action set acttype = :acttype, acttypeid = :acttypeid, acttitle = :acttitle, "
             ."actlink = :actlink, actvalid = :actvalid where actid = :actid; ";
+        $str .= "select actid, acttype, acttypeid, acttitle, actlink, actdate, actvalid "
+            ."from Action where actid = :actid; ";
         $paras = array(
             ":acttype" => $action->acttype, ":acttypeid" => $action->acttypeid, ":acttitle" => $action->acttitle, 
             ":actlink" => $action->actlink, ":actvalid" => $action->actvalid, ":actid" => $action->actid
         );
-        return (new Entity())->Exec($str, $paras) > 0 ? 
-            new Message("修改成功", true, $action) : new Message("修改失败");
+        $en = (new Entity())->Querys($str, $paras);
+        return count($en) == 2 && count($en[1]) == 1 ? 
+            new Message("修改成功", true, new Action($en[1][0], $deep)) : new Message("修改失败");
     }
 
     public static function Add_Update($action){
@@ -62,7 +65,7 @@ class Action{
         return $action->actid > 0 ? Action::Update($action) : Action::Add($action);
     }
 
-    public static function GetAll($search){
+    public static function GetAll($search = null){
         $search = is_object($search) ? $search : new stdClass(); 
         $search->type = isset($search->type) ? strval($search->type) : "other";
         $search->typeid = isset($search->typeid) && is_numeric($search->typeid) ? (int)$search->typeid : 0;
@@ -115,7 +118,7 @@ class Action{
 
     public static function Valid($id, $valid = null){
         $id = is_int($id) ? $id : 0;
-        if($id < 1) return false;
+        if($id < 1) return new Message("修改失败");
         $valid = is_numeric($valid) ? (int)$valid : null;
         $str = "update Action set ";
         $paras = array();

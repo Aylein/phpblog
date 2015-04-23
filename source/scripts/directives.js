@@ -34,14 +34,13 @@ app.directive("ngPromp", function(dom, main){
         }
     };
 });
-app.directive("aoCs", function(dom, broswer, main, cache){
+app.directive("aoCs", function(dom, broswer, main, cache, extra){
     return {
         restrict: "E",
         replace: true,
         templateUrl: "/require/ngComment.html",
         link: function($scope, $elem, $attr){
-            var sign = "__aoSc_" + main.random(5) + "__";
-            console.log(sign);
+            var sign = "__aoSc_" + extra.random(5) + "__";
             var aoCs = $scope.aoSc = {
                 sc_ac_img: dom.get("sc_ac_img"),
                 sc_ac_content: dom.get("sc_content"),

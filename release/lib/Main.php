@@ -84,9 +84,11 @@ class Main{
         if(!$main instanceof Main) return new Message("对象类型不正确");
         if(Main::Exists($main->_key, $main->id)) return new Message("要添加的key值已存在");
         $str = "update Main set _key = :_key, _value = :_value where id = :id; ";
+        $str .= "select id, _key, _value from Main where id = :id; ";
         $paras = array(":_key" => $main->_key, ":_value" => $main->_value, ":id" => $main->id);
-        return (new Entity())->Exec($str, $paras) > 0 ? 
-            new Message("修改成功", true, $main) : new Message("修改失败");
+        $en = (new Entity())->Querys($str, $paras);
+        return count($en) == 2 && count($en[1]) == 1 ? 
+            new Message("修改成功", true, new Main($en[1][0], $deep)) : new Message("修改失败");
     }
 
     public static function Add_Update($main){

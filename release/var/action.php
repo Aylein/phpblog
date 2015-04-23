@@ -24,21 +24,7 @@
 
     $str = "";
     switch($action){
-        case "newcom":
-            $str = NewComment();
-            break;
-        case "getcomms":
-            $str = GetComments();
-            break;
         default: $str = new Message(false, "no_action", "你想干什么 0 0~"); break;
     }
     echo json_encode($str);
-
-    function NewComment(){
-        return Json::MakeJson(false);
-    }
-
-    function GetComments(){
-        return Json::MakeJson(false);
-    }
 ?>
