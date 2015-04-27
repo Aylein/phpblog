@@ -138,10 +138,6 @@ class Page{
     var $totalpage;
 
     public function __construct($count = null, $page = null, $rows = null){
-        $this->MakePage($count, $page, $rows);
-    }
-
-    public function MakePage($count, $page, $rows){
         $count = $count != null && is_numeric($count) ? (int)$count : 0;
         if($page == null || $rows == null || $page < 1 || $rows < 1) {
             $this->totalnum = $count;

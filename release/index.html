@@ -7,8 +7,8 @@
         <link rel="stylesheet" href="styles/index.min.css" />
         <link rel="stylesheet" href="styles/extra.min.css" />
     </head>
-    <body>
-        <section class="header" ng-controller="ngMainController">
+    <body ng-controller="ngMainController">
+        <section class="header">
             <div class="myname">
                 <div class="master"><img src="/images/master.jpg"/>&nbsp;&nbsp;</div>
                 <div class="master lh52" ng-bind="'The 4th AyleinOter@' + sign.sign"></div>
@@ -21,7 +21,7 @@
                 <div class="clear"></div>
             </div>
         </section>
-        <section class="topimg" ng-controller="ngMainController"><img src="{{sign.himg}}"/></section>
+        <section class="topimg"><img src="{{sign.himg}}"/></section>
         <section class="bodypano">
             <div class="pano_left" ng-view></div>
             <div class="pano_right">
