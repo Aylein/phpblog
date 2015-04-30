@@ -70,6 +70,32 @@ class Action{
         $search->type = isset($search->type) ? strval($search->type) : "other";
         $search->typeid = isset($search->typeid) && is_numeric($search->typeid) ? (int)$search->typeid : 0;
         $search->valid = isset($search->valid) && is_numeric($search->valid) ? (int)$search->valid : 1;
+        $count = "select count(*) as count ";
+        $where = "from Action where 1 = 1 ";
+        $paras = array();
+        if($search->type != "other"){
+            $where .= "and acttype = :acttype ";
+            $paras[":acttype"] = $search->type;
+        }
+        if($search->typeid > 0){
+            $where .= "and acttypeid = :acttypeid ";
+            $paras[":acttypeid"] = $search->typeid;
+        }
+        if($search->valid == 1 || $search->valid == 0){
+            $where .= "and actvalid = :actvalid ";
+            $paras[":actvalid"] = $search->valid;
+        }
+        $count .= $where.";";
+        $res = (new Entity())->Querys($count, $paras);
+        if(count($res) != 1 || count($res[0]) != 1) return 0;
+        return (int)$res[0][0]["count"];
+    }
+
+    public static function GetAll($search = null){
+        $search = is_object($search) ? $search : new stdClass(); 
+        $search->type = isset($search->type) ? strval($search->type) : "other";
+        $search->typeid = isset($search->typeid) && is_numeric($search->typeid) ? (int)$search->typeid : 0;
+        $search->valid = isset($search->valid) && is_numeric($search->valid) ? (int)$search->valid : 1;
         $search->page = isset($search->page) && is_numeric($search->page) ? (int)$search->page : 0;
         $search->rows = isset($search->rows) && is_numeric($search->rows) ? (int)$search->rows : 0;
         $count = "select count(*) as count ";

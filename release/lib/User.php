@@ -93,6 +93,39 @@ class User{
         return new User($res);
     }
 
+    public static function Count($search = null){
+        $search = is_object($search) ? $search : new stdClass(); 
+        $search->name = isset($search->name) ? strval($search->name) : "";
+        $search->type = isset($search->type) ? strval($search->type) : "";
+        $search->valid = isset($search->valid) && is_numeric($search->valid) ? (int)$search->valid : 1;
+        $count = "select count(*) as count ";
+        $where = "from Users where 1 = 1 ";
+        $paras = array();
+        if($search->name != ""){
+            $where .= "and ( ";
+            $arr = explode(" ", $search->name);
+            for($i = 0, $z = count($arr); $i < $z; $i++)
+            {
+                $where .= "username like concat(\"%\", :str_a_".$i.", \"%\") ";
+                if ($i < $z - 1) $where .="or ";
+                $paras[":str_a_".$i] = $arr[$i];
+            }
+            $where .= ") ";
+        }
+        if($search->type != ""){
+            $where .= "and usertype = :usertype ";
+            $paras[":usertype"] = $search->type;
+        }
+        if($search->valid == 1 || $search->valid == 0){
+            $where .= "and uservalid = :uservalid ";
+            $paras[":uservalid"] = $search->valid;
+        }
+        $count .= $where.";";
+        $res = (new Entity())->Querys($count, $paras);
+        if(count($res) != 1 || count($res[0]) != 1) return 0;
+        return (int)$res[0][0]["count"];
+    }
+
     public static function GetAll($search = null){
         $search = is_object($search) ? $search : new stdClass(); 
         $search->name = isset($search->name) ? strval($search->name) : "";
@@ -123,7 +156,7 @@ class User{
             $where .= "and uservalid = :uservalid ";
             $paras[":uservalid"] = $search->valid;
         }
-        $count .= $where.";";
+        $count .= $where."; ";
         $where .= "order by usersort desc, userid desc ";
         $select .= $where;
         if($search->page > 0 && $search->rows > 0){            

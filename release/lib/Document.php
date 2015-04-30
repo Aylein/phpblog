@@ -78,6 +78,27 @@ class Document{
         return $doc->docid > 0 ? Documents::Update($doc) : Documents::Add($doc);
     }
 
+    public static function Count($search = null){
+        $search = is_object($search) ? $search : new stdClass(); 
+        $search->stgid = isset($search->stgid) && is_numeric($search->stgid) ? (int)$search->stgid : 0;
+        $search->valid = isset($search->valid) && is_numeric($search->valid) ? (int)$search->valid : 1;
+        $count = "select count(*) as count ";
+        $where = "from Documents where 1 = 1 ";
+        $paras = array();
+        if($search->stgid > 0){ 
+            $where .= "and stgid = :stgid ";
+            $paras[":stgid"] = $search->stgid;
+        }
+        if($search->valid > 0){ 
+            $where .= "and docvalid = :valid ";
+            $paras[":valid"] = $search->valid;
+        }
+        $count .= $where.";";
+        $res = (new Entity())->Querys($count, $paras);
+        if(count($res) != 1 || count($res[0]) != 1) return 0;
+        return (int)$res[0][0]["count"];
+    }
+
     public static function GetAll($search = null, $deep = false){
         $search = is_object($search) ? $search : new stdClass(); 
         $search->stgid = isset($search->stgid) && is_numeric($search->stgid) ? (int)$search->stgid : 0;
@@ -88,15 +109,20 @@ class Document{
         $paras = array();
         if($search->stgid > 0){ 
             $where .= "and stgid = :stgid ";
-            $paras[":stgid"] = ($search->stgid;
+            $paras[":stgid"] = $search->stgid;
         }
         if($search->valid > 0){ 
             $where .= "and docvalid = :valid ";
-            $paras[":valid"] = ($search->valid;
+            $paras[":valid"] = $search->valid;
         }
         $count .= $where."; ";
         $where .= "order by docsort desc, docid desc ";
         $select .= $where;
+        if($search->page > 0 && $search->rows > 0){            
+            $select .= "limit :page, :rows; ";
+            $paras[":page"] = ($search->page - 1) * $search->rows;
+            $paras[":rows"] = $search->rows;
+        }
         else $select .= "; ";
         $count .= $select;
         $list = array();

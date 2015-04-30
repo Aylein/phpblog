@@ -114,6 +114,87 @@ class Stage{
         return $stage->stgid > 0 ? Stage::Update($stage, $deep) : Stage::Add($stage, $deep);
     }
 
+    public static function Count($search = null){
+        $search = is_object($search) ? $search : new stdClass(); 
+        $search->title = isset($search->title) ? strval($search->title) : "";
+        $search->subtitle = isset($search->subtitle) ? strval($search->subtitle) : "";
+        $search->stgpid = isset($search->stgpid) && is_numeric($search->stgpid) ? (int)$search->stgpid : 0;
+        $search->typeid = isset($search->typeid) && is_numeric($search->typeid) ? (int)$search->typeid : 0;
+        $search->valid = isset($search->valid) && is_numeric($search->valid) ? (int)$search->valid : 1;
+        $search->stagenim = isset($search->stagenim) && is_numeric($search->stagenim) ? (int)$search->stagenim : 0;
+        $search->stagemax = isset($search->stagemax) && is_numeric($search->stagemax) ? (int)$search->stagemax : 0;
+        $search->viewmin = isset($search->viewmin) && is_numeric($search->viewmin) ? (int)$search->viewmin : 0;
+        $search->viewmax = isset($search->viewmax) && is_numeric($search->viewmax) ? (int)$search->viewmax : 0;
+        $search->commmin = isset($search->commmin) && is_numeric($search->commmin) ? (int)$search->commmin : 0;
+        $search->commmax = isset($search->commmax) && is_numeric($search->commmax) ? (int)$search->commmax : 0;
+        $search->$order = isset($search->order) ? strval($search->order) : "";
+        $count = "select count(*) as count ";
+        $where = "from Stages where 1 = 1 ";
+        $paras = array();
+        if($search->title != ""){
+            $where .= "and ( ";
+            $arr = explode(" ", $search->title);
+            for($i = 0, $z = count($arr); $i < $z; $i++)
+            {
+                $where .= "stgtitle like concat(\"%\", :str_a_".$i.", \"%\") ";
+                if ($i < $z - 1) $where .="or ";
+                $paras[":str_a_".$i] = $arr[$i];
+            }
+            $where .= ") ";
+        }
+        if($search->subtitle != ""){
+            $where .= "and ( ";
+            $arr = explode(" ", $search->subtitle);
+            for($i = 0, $z = count($arr); $i < $z; $i++)
+            {
+                $where .= "stgsubtitle like concat(\"%\", :str_b_".$i.", \"%\") ";
+                if ($i < $z - 1) $where .="or ";
+                $paras[":str_b_".$i] = $arr[$i];
+            }
+            $where .= ") ";
+        }
+        if($search->stagenim > 0){ 
+            $where .= "and stgnum >= :stgnum ";
+            $paras[":stgnum"] = $search->stagenim;
+        }
+        if($search->stagemax > 0){ 
+            $where .= "and stgnum <= :stgnum ";
+            $paras[":stgnum"] = $search->stagemax;
+        }
+        if($search->viewmin > 0){ 
+            $where .= "and stgview >= :stgview ";
+            $paras[":stgview"] = $search->viewmin;
+        }
+        if($search->viewmax > 0){ 
+            $where .= "and stgview <= :stgview ";
+            $paras[":stgview"] = $search->viewmax;
+        }
+        if($search->commmin > 0){ 
+            $where .= "and stgcomnum >= :stgcomnum ";
+            $paras[":stgcomnum"] = $search->commmin;
+        }
+        if($search->commmax > 0){ 
+            $where .= "and stgcomnum <= :stgcomnum ";
+            $paras[":stgcomnum"] = $search->commmax;
+        }
+        if($search->typeid > 0){ 
+            $where .= "and typeid = :typeid ";
+            $paras[":typeid"] = $search->typeid;
+        }
+        if($search->stgpid > 0){ 
+            $where .= "and stgpid = :stgpid ";
+            $paras[":stgpid"] = $search->stgpid;
+        }
+        if($search->valid == 1 || $search->valid == 0){
+            $where .= "and stgvalid = :stgvalid ";
+            $paras[":stgvalid"] = $search->valid;
+        }
+        $count .= $where.";";
+        $res = (new Entity())->Querys($count, $paras);
+        if(count($res) != 1 || count($res[0]) != 1) return 0;
+        return (int)$res[0][0]["count"];
+    }
+
     public static function GetAll($search = null, $deep = false){
         $search = is_object($search) ? $search : new stdClass(); 
         $search->title = isset($search->title) ? strval($search->title) : "";
@@ -159,35 +240,35 @@ class Stage{
         }
         if($search->stagenim > 0){ 
             $where .= "and stgnum >= :stgnum ";
-            $paras[":stgnum"] = ($search->stagenim;
+            $paras[":stgnum"] = $search->stagenim;
         }
         if($search->stagemax > 0){ 
             $where .= "and stgnum <= :stgnum ";
-            $paras[":stgnum"] = ($search->stagemax;
+            $paras[":stgnum"] = $search->stagemax;
         }
         if($search->viewmin > 0){ 
             $where .= "and stgview >= :stgview ";
-            $paras[":stgview"] = ($search->viewmin;
+            $paras[":stgview"] = $search->viewmin;
         }
         if($search->viewmax > 0){ 
             $where .= "and stgview <= :stgview ";
-            $paras[":stgview"] = ($search->viewmax;
+            $paras[":stgview"] = $search->viewmax;
         }
         if($search->commmin > 0){ 
             $where .= "and stgcomnum >= :stgcomnum ";
-            $paras[":stgcomnum"] = ($search->commmin;
+            $paras[":stgcomnum"] = $search->commmin;
         }
         if($search->commmax > 0){ 
             $where .= "and stgcomnum <= :stgcomnum ";
-            $paras[":stgcomnum"] = ($search->commmax;
+            $paras[":stgcomnum"] = $search->commmax;
         }
         if($search->typeid > 0){ 
             $where .= "and typeid = :typeid ";
-            $paras[":typeid"] = ($search->typeid;
+            $paras[":typeid"] = $search->typeid;
         }
         if($search->stgpid > 0){ 
             $where .= "and stgpid = :stgpid ";
-            $paras[":stgpid"] = ($search->stgpid;
+            $paras[":stgpid"] = $search->stgpid;
         }
         if($search->valid == 1 || $search->valid == 0){
             $where .= "and stgvalid = :stgvalid ";

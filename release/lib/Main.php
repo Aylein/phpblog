@@ -96,6 +96,16 @@ class Main{
         return $main->id > 0 ? Main::Update($main) : Main::Add($main);
     }
 
+    public static function Count(){
+        $str = "select id, _key, _value ";
+        $where = "from Main ";
+        $paras = array();
+        $count .= $where.";";
+        $res = (new Entity())->Querys($count, $paras);
+        if(count($res) != 1 || count($res[0]) != 1) return 0;
+        return (int)$res[0][0]["count"];
+    }
+
     public static function GetAll($search = null){
         $search = is_object($search) ? $search : new stdClass(); 
         $search->page = isset($search->page) && is_numeric($search->page) ? (int)$search->page : 0;
@@ -104,7 +114,7 @@ class Main{
         $count = "select count(*) as count ";
         $where = "from Main ";
         $paras = array();
-        $count .= $where.";";
+        $count .= $where."; ";
         $where .= "order by typesort desc, typeid desc ";
         $select .= $where;
         if($search->page > 0 && $search->rows > 0){            

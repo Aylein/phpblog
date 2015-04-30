@@ -87,6 +87,33 @@ class Type{
         return $type->typeid > 0 ? Type::Update($type) : Type::Add($type);
     }
 
+    public static function Count($search = null){
+        $search = is_object($search) ? $search : new stdClass(); 
+        $search->typepid = isset($search->typepid) && is_numeric($search->typepid) ? (int)$search->typepid : -2;
+        $search->show = isset($search->show) && is_numeric($search->show) ? (int)$search->show : -1;
+        $search->valid = isset($search->valid) && is_numeric($search->valid) ? (int)$search->valid : 1;
+        $count = "select count(*) as count ";
+        $where = "from Types where 1 = 1 ";
+        $paras = array();
+        if($search->typepid == -1) $where .= "and typepid > 0 ";
+        else if($search->typepid > -1){
+            $where .= "and typepid = :typepid ";
+            $paras[":typepid"] = $search->typepid;
+        }
+        if($search->show == 1 || $search->show == 0){
+            $where .= "and typeshow = :typeshow ";
+            $paras[":typeshow"] = $search->show;
+        }
+        if($search->valid == 1 || $search->valid == 0){
+            $where .= "and typevalid = :typevalid ";
+            $paras[":typevalid"] = $search->valid;
+        }
+        $count .= $where.";";
+        $res = (new Entity())->Querys($count, $paras);
+        if(count($res) != 1 || count($res[0]) != 1) return 0;
+        return (int)$res[0][0]["count"];
+    }
+
     public static function GetAll($search = null){
         $search = is_object($search) ? $search : new stdClass(); 
         $search->typepid = isset($search->typepid) && is_numeric($search->typepid) ? (int)$search->typepid : -2;

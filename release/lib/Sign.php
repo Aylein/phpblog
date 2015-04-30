@@ -79,6 +79,39 @@ class Sign{
         return $sign->signid > 0 ? Sign::Update($sign) : Sign::Add($sign);
     }
 
+    public static function Count($search = null){
+        $search = is_object($search) ? $search : new stdClass(); 
+        $search->name = isset($search->name) ? strval($search->typepid) : "";
+        $search->userid = isset($search->userid) && is_numeric($search->userid) ? (int)$search->userid : 0;
+        $search->valid = isset($search->valid) && is_numeric($search->valid) ? (int)$search->valid : 1;
+        $count = "select count(*) as count ";
+        $where = "from Signs where 1 = 1 ";
+        $paras = array();
+        if($search->name != ""){
+            $where .= "and ( ";
+            $arr = explode(" ", $search->name);
+            for($i = 0, $z = count($arr); $i < $z; $i++)
+            {
+                $where .= "signname like concat(\"%\", :str_a_".$i.", \"%\") ";
+                if ($i < $z - 1) $where .="or ";
+                $paras[":str_a_".$i] = $arr[$i];
+            }
+            $where .= ") ";
+        }
+        if($search->userid > 0){
+            $where .= "and userid = :userid ";
+            $paras[":userid"] = $search->userid;
+        }
+        if($search->valid == 1 || $search->valid == 0){
+            $where .= "and signvalid = :signvalid ";
+            $paras[":signvalid"] = $search->valid;
+        }
+        $count .= $where.";";
+        $res = (new Entity())->Querys($count, $paras);
+        if(count($res) != 1 || count($res[0]) != 1) return 0;
+        return (int)$res[0][0]["count"];
+    }
+
     public static function GetAll($search = null, $deep = false){
         $search = is_object($search) ? $search : new stdClass(); 
         $search->name = isset($search->name) ? strval($search->typepid) : "";
@@ -110,7 +143,7 @@ class Sign{
             $where .= "and signvalid = :signvalid ";
             $paras[":signvalid"] = $search->valid;
         }
-        $count .= $where.";";
+        $count .= $where."; ";
         switch($search->$order){
             case "num":
                 $where .= "order by (select count(*) from SignOn where signid = signid) desc, signsort desc, signid desc ";

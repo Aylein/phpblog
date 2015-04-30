@@ -91,6 +91,42 @@ class SignOn{
         return $on->soid > 0 ? SignOn::Update($on, $deep) : SignOn::Add($on, $deep);
     }
 
+    public static function Count($search = null){
+        $search = is_object($search) ? $search : new stdClass();
+        $search->signid = isset($search->userid) && is_numeric($search->userid) ? (int)$search->userid : 0;
+        $search->userid = isset($search->userid) && is_numeric($search->userid) ? (int)$search->userid : 0;
+        $search->type = isset($search->name) ? strval($search->typepid) : "";
+        $search->typeid = isset($search->userid) && is_numeric($search->userid) ? (int)$search->userid : 0;
+        $search->valid = isset($search->valid) && is_numeric($search->valid) ? (int)$search->valid : 1;
+        $count = "select count(*) as count ";
+        $where = "from SignOn where 1 = 1 ";
+        $paras = array();
+        if($search->signid > 0){
+            $where .= "and signid = :signid ";
+            $paras[":signid"] = $search->signid;
+        }
+        if($search->userid > 0){
+            $where .= "and userid = :userid ";
+            $paras[":userid"] = $search->userid;
+        }
+        if($search->type != ""){
+            $where .= "and sotype = :sotype ";
+            $paras[":sotype"] = $search->type;
+        }
+        if($search->typeid > 0){
+            $where .= "and sotypeid = :sotypeid ";
+            $paras[":sotypeid"] = $search->typeid;
+        }
+        if($search->valid == 1 || $search->valid == 0){
+            $where .= "and sovalid = :sovalid ";
+            $paras[":sovalid"] = $search->valid;
+        }
+        $count .= $where.";";
+        $res = (new Entity())->Querys($count, $paras);
+        if(count($res) != 1 || count($res[0]) != 1) return 0;
+        return (int)$res[0][0]["count"];
+    }
+
     public static function GetAll($search = null, $deep = false){
         $search = is_object($search) ? $search : new stdClass();
         $search->signid = isset($search->userid) && is_numeric($search->userid) ? (int)$search->userid : 0;
@@ -125,6 +161,7 @@ class SignOn{
             $where .= "and sovalid = :sovalid ";
             $paras[":sovalid"] = $search->valid;
         }
+        $count .= $where."; ";
         $where .= "order by sosort desc, soid desc ";
         $select .= $where;
         if($search->page > 0 && $search->rows > 0){            

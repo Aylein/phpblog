@@ -9,6 +9,9 @@ app.config(function($routeProvider){
     }).when("/about", {
         templateUrl: "/view/ngAbout.html",
         controller: "urlController"
+    }).when("/admin", {
+        templateUrl: "/view/ngAdmin.php",
+        controller: "adminController"
     }).when("/found/:typeid", {
         templateUrl: "/view/ngFound.html",
         controller: "urlController"
@@ -19,31 +22,19 @@ app.service("main", function(){
     var rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g;
     this.trim = function(str){ return str == null ? "" : (str + "").replace(rtrim, ""); }; //from jquery
     this.obj = function(obj, deep){
-        deep = deep != undefined ? deep : true;
+        deep = deep || false;
         var i = 0;
         for(var name in obj){
             i++;
-            if(deep) return true;
+            if(!deep) return true;
         }
-        return deep ? false : i;
-    };
-    this.objc = function(obj, deep){
-        deep = deep != undefined ? false : true;
-        var i = 0;
-        for(var name in obj){
-            var type = this.typeof(obj[name]);
-            if(this.types._object.test(type)){
-                i++;
-                if(deep) return true;
-            }
-        }
-        return deep ? false : i;
+        return !deep ? false : i;
     };
     this.replace= function(src, target, rep){
         if(src == undefined || target == undefined || rep == undefined) return src;
         return src.toString().replace(new RegExp(target, "g"), rep.toString());
     };
-    this.cut = function(val, len) {
+    this.charcut = function(val, len) {
         var l = 0, z = "";
         for (var i = 0; i < val.length; i++) {
             z += val[i];
@@ -64,7 +55,7 @@ app.service("main", function(){
             if (length >= 0 && length <= 128) l += 1;
             else l += 2;
         }
-        return z;
+        return l;
     };
     this.types = {
         _undefined: /^undefined|Undefined|null$/, //["undefined", "Undefined", "null"],
@@ -80,9 +71,21 @@ app.service("main", function(){
         _boolen: /^[b|B]oolean$/, //["boolean", "Boolean"]
     };
     this.typeof = function(obj, deep){    
-        deep = deep || true;
+        deep = deep || false;
         if(obj == undefined) return "undefined";
-        return deep && re_typeof.test(Object.prototype.toString.call(obj)) ? RegExp.$1 : typeof obj;
+        return !deep && re_typeof.test(Object.prototype.toString.call(obj)) ? RegExp.$1 : typeof obj;
+    };
+    this.objc = function(obj, deep){
+        deep = deep || false;
+        var i = 0;
+        for(var name in obj){
+            var type = this.typeof(obj[name]);
+            if(this.types._object.test(type) || this.types._array.test(type)){
+                i++;
+                if(!deep) return true;
+            }
+        }
+        return !deep ? false : i;
     };
     this.isArrayLike = function(array){
         var type = this.typeof(array, 1);
@@ -143,15 +146,21 @@ app.service("main", function(){
         }
         return src;
     };
-    this.map = function(src, callback, args){
+    this.map = function(){
         var list = [];
+        var len = arguments.length;
+        if(len == 0) return list;
+        var i = 0, f = arguments[i++];
+        if(this.types._boolen.test(this.typeof(f))) i--;
+        else f = false;
+        var src = arguments[i++], callback = arguments[i++], args = arguments[i++];
         if(!this.types._function.test(this.typeof(callback))) return list;
         var type = this.typeof(src);
         if(this.isArrayLike(src)){
             for(var i = 0, z = src.length; i < z; i++){
                 var _this = src[i], _args = this.merge(true, [], args);
                 _args.push(i, _this);
-                if(callback.apply(_this, _args)) list.push(this.copy(_this));
+                if(callback.apply(_this, _args)) list.push(f ? this.copy(_this) : _this);
             }
         }
         else if(this.types._object.test(type)){
@@ -160,7 +169,7 @@ app.service("main", function(){
             for(var key in src){
                 var _this = src[key], _args = this.merge(true, [], args);
                 _args.push(i, key, _this);
-                if(callback.apply(_this, _args)) list[key] = this.copy(_this);
+                if(callback.apply(_this, _args)) list[key] = f ? this.copy(_this) : _this;
                 i++;
             }
         }
@@ -208,7 +217,7 @@ app.service("cache", function(main){
     this.set = function(key, value, deep){ 
         deep = deep || false;
         if(!deep && this.exists(key)) return;
-        ache[key] = value;
+        Cache[key] = value;
     };
     this.get = function(key){ return Cache[key] ? Cache[key] : undefined; };
     this.all = function(){ return main.copy(Cache); };
@@ -297,7 +306,7 @@ app.service("broswer", function(){
         else if(types.isTrident.test(ua)){
             na.en = "Trident";
             na.env = RegExp.$1;
-            na.bs = "IE"
+            na.bs = "IE";
             switch(na.env){
                 case "4.0": na.bsv = "8.0"; break;
                 case "5.0": na.bsv = "9.0"; break;

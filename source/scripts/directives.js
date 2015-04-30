@@ -82,13 +82,13 @@ app.directive("aoCs", function(dom, broswer, main, cache, extra){
             aoCs._send = function(){
                 //aoCs.sc_ac_show.innerHTML = aoCs.sc_ac_content.innerHTML;
             };
-            var sinit = function(){
+            var init = function(){
                 //console.log(broswer.toString());
                 $scope.press_callback = aoCs._keydown;
                 aoCs.sc_ac = [], src = "images/ac/ac_", p = ".png";
                 for(var i = 1; i <= 50; i++) aoCs.sc_ac.push(src + i + p);
             };
-            sinit();
+            init();
         }
     };
 });

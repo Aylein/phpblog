@@ -82,6 +82,39 @@ class Comment{
         return $com->comid > 0 ? Comment::Update($com) : Comment::Add($com);
     }
 
+    public static function Count($search = null){
+        $search = is_object($search) ? $search : new stdClass(); 
+        $search->type = isset($search->type) ? strval($search->type) : "other";
+        $search->typeid = isset($search->typeid) && is_numeric($search->typeid) ? (int)$search->typeid : 0;
+        $search->pid = isset($search->pid) && is_numeric($search->pid) ? (int)$search->pid : -2;
+        $search->userid = isset($search->userid) && is_numeric($search->userid) ? (int)$search->userid : 0;
+        $search->valid = isset($search->valid) && is_numeric($search->valid) ? (int)$search->valid : 1;
+        $count = "select count(*) as count ";
+        $where = "from Comments where 1 = 1 ";
+        $paras = array();
+        if($search->type != "other"){
+            $where .= "and comtype = :comtype ";
+            $paras[":comtype"] = $search->type;
+        }
+        if($search->typeid > 0){
+            $where .= "and comtypeid = :comtypeid ";
+            $paras[":comtypeid"] = $search->typeid;
+        }
+        if($search->pid = -1) $where .= "and compid > 0";
+        else if($search->pid > -1){
+            $where .= "and compid = :compid";
+            $paras[":compid"] = $search->pid;
+        }
+        if($search->valid == 1 || $search->valid == 0){
+            $where .= "and comvalid = :comvalid ";
+            $paras[":comvalid"] = $search->valid;
+        }
+        $count .= $where.";";
+        $res = (new Entity())->Querys($count, $paras);
+        if(count($res) != 1 || count($res[0]) != 1) return 0;
+        return (int)$res[0][0]["count"];
+    }
+
     public static function GetAll($search = null, $deep = false){
         $search = is_object($search) ? $search : new stdClass(); 
         $search->type = isset($search->type) ? strval($search->type) : "other";
