@@ -1,3 +1,4 @@
+/* global angular */
 var app = angular.module("app");
 app.directive("aoPress", function(){
     return {
@@ -34,13 +35,25 @@ app.directive("ngPromp", function(dom, main){
         }
     };
 });
+app.directive("aoInput", function(dom, cache){
+    return {
+        restrict: "A",
+        link: function($scope, $elem, $attr){
+            $elem.on("click", function(){
+                var list = cache.types || {};
+                var _tar = list[$attr.key] || {};
+                console.log(_tar);
+            });
+        }
+    };
+});
 app.directive("aoCs", function(dom, broswer, main, cache, extra){
     return {
         restrict: "E",
         replace: true,
         templateUrl: "/require/ngComment.html",
         link: function($scope, $elem, $attr){
-            var sign = "__aoSc_" + extra.random(5) + "__";
+            //var sign = "__aoSc_" + extra.random(5) + "__";
             var aoCs = $scope.aoSc = {
                 sc_ac_img: dom.get("sc_ac_img"),
                 sc_ac_content: dom.get("sc_content"),
@@ -85,10 +98,89 @@ app.directive("aoCs", function(dom, broswer, main, cache, extra){
             var init = function(){
                 //console.log(broswer.toString());
                 $scope.press_callback = aoCs._keydown;
-                aoCs.sc_ac = [], src = "images/ac/ac_", p = ".png";
+                var src = "images/ac/ac_", p = ".png";
+                aoCs.sc_ac = [];
                 for(var i = 1; i <= 50; i++) aoCs.sc_ac.push(src + i + p);
             };
             init();
+        }
+    };
+});
+app.directive("aoNodes", function(main, cache){
+    return {
+        restrict: "E",
+        replace: true,
+        templateUrl: "/require/ngAdminHeader.html",
+        link: function($scope, $elem, $attrs){
+            $scope.admin = cache.get("admin_nodes") || {
+                nodes: {
+                    contents: {
+                        name: "Contents",
+                        url: "#/admincont",
+                        width: "w120",
+                        cur: 0,
+                        list: {
+                            types: {cur: 0, name: "Types", url: "#/admintype"},
+                            stages: {cur: 0, name: "Stages", url: "#/adminstage"},
+                            documents: {cur: 0, name: "Documents", url: "#/admindoc"},
+                            comments: {cur: 0, name: "Comments", url: "#/admincomm"}
+                        }
+                    },
+                    admins: {
+                        name: "Admins",
+                        url: "#/admin",
+                        width: "w80",
+                        cur: 0,
+                        list: {
+                            mains: {cur: 0, name: "Mains", url: "#/adminmain"},
+                            signs: {cur: 0, name: "Signs", url: "#/adminsign"},
+                            signOns: {cur: 0, name: "SignOns", url: "#/adminsignon"}
+                        }
+                    },
+                    members: {
+                        name: "Users",
+                        url: "#/adminmem",
+                        width: "w80",
+                        cur: 0,
+                        list: {
+                            users: {cur: 0, name: "Users", url: "#/adminuser"},
+                            actions: {cur: 0, name: "Actions", url: "#/adminaction"}
+                        }
+                    }
+                },
+                cur: function(name, n, deep){
+                    n = n || 1;
+                    deep = deep || false;
+                    var _i = n == 1 ? 0 : 1;
+                    for(var i in this.nodes){
+                        var o = this.nodes[i];
+                        if(i != name){
+                            if(deep) o.list[j].cur = _i;
+                        }
+                        else o.cur = n;
+                        for(var j in o.list){
+                            if(j != name){
+                                if(deep) o.list[j].cur = _i;
+                                continue;
+                            }
+                            o.list[j].cur = n;
+                        }
+                    }   
+                },
+                clear: function(){
+                    for(var i in this.nodes){
+                        var o = this.nodes[i];
+                        o.cur = 0;
+                        for(var j in o.list)
+                            o.list[j].cur = 0;
+                    }   
+                }
+            };
+            if(!cache.exists("admin_nodes")) cache.set("admin_nodes", $scope.admin);
+            if($scope.path){
+                $scope.admin.clear();
+                $scope.admin.cur($scope.path);
+            }
         }
     };
 });

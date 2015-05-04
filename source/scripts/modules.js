@@ -9,17 +9,71 @@ app.config(function($routeProvider){
     }).when("/about", {
         templateUrl: "/view/ngAbout.html",
         controller: "urlController"
-    }).when("/admin", {
-        templateUrl: "/view/ngAdmin.php",
-        controller: "adminController"
     }).when("/found/:typeid", {
         templateUrl: "/view/ngFound.html",
         controller: "urlController"
+    }).when("/admin", {
+        templateUrl: "/view/ngAdmin.php",
+        controller: "adminController"
+    }).when("/admintype", {
+        templateUrl: "/view/ngAdminType.php",
+        controller: "typeController"
     }).otherwise({redirectTo: "/about"});
 });
 app.service("main", function(){
     var re_typeof = /^\[object (\S+)\]$/;
     var rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g;
+    this.regex = {
+        selector: {
+            _select: /()(:)\[()\]/g,
+            _tag: /^<([a-z]+)([^<>]*)>([^<>]*)/,
+            _id: /^#(\S+)$/,
+            _class: /^.(\S+)$/,
+            _type: /\(([\S\s]+)\)/,
+            _attr: /^([\S]*)=([\S]*)|([\S]*)="([\S]*)"$/,
+            _attrs: /([\S]*="[\s\S]*")|(\S)*[^\s]|([\S]*=[\s]*)[^\s]/g
+        },
+        navi: {
+            isWinNT: /Windows NT (\d+.\d+)[\.\d+]*/,
+            isMac: /Mac OS X (\S+)/,
+            isLikeMac: /Mac OS X/,
+            isIPhone: /iPhone OS (\S+)/,
+            isIpad: /iPad; CPU OS (\S+)/,
+            isGecko: /Gecko\/(\d+.\d+)[\.\d+]*/,
+            isAWK: /AppleWebKit\/(\d+.\d+)[\.\d+]*/,
+            isTrident: /Trident\/(\d+.\d+)[\.\d+]*/,
+            isFireFox: /Firefox\/(\d+.\d+)[\.\d+]*/,
+            isIE: /MSIE (\d+.\d+)[\.\d+]*/,
+            isChrome: /Chrome\/(\d+.\d+)[\.\d+]*/,
+            isSafari: /Safari\/(\d+.\d+)[\.\d+]*/,
+            isOpera: /OPR\/(\d+.\d+)[\.\d+]*/
+        },
+        extra: {
+            isNumber: /^\d+$/,
+            isInt: /^[\-1-9][0-9]{0,11}$/,
+            isFloat: /^[\-1-9][0-9]{0,11}(\.[0-9]{0,3}[1-9])?$/,
+            isEmail: /^[\w\-_\.]+@[\w]+(\.[a-z\d]+)+$/,
+            isMobile: /^[1][3|5|7|8][\d]{9}$/,
+            isTelephone: /^(\d{3,4}[\-|\s])?\d{7,8}$/,
+            isChinese: /^[\u4E00-\u9FA5]+$/,
+            _byte: /[^\x00-\xff]/ig,
+            blank: /\s+/
+        },
+        types: {
+            _undefined: /^undefined|Undefined|null$/, //["undefined", "Undefined", "null"],
+            _object: /^[o|O]bject$/, //["object", "Object"],
+            _array: /^Array$/, //["Array"],
+            _window: /^Window$/,
+            _document: /^NodeList|HTMLCollection|HTMLAllCollection|HTMLDocument$/, //["HTMLCollection", "HTMLAllCollection", "HTMLDocument"],
+            _element: /^HTML\S+Element$/, //["HTMLImageElement", "HTMLDivElement"],
+            _domtoken: /^DOMTokenList$/,
+            _function: /^[f|F]unction$/, //["function", "Function"],
+            _number: /^[n|N]unction$/, //["number", "Number"],
+            _string: /^[s|S]tring$/, //["string", "String"],
+            _boolen: /^[b|B]oolean$/, //["boolean", "Boolean"]
+        }
+    };
+    this.types = this.regex.types;
     this.trim = function(str){ return str == null ? "" : (str + "").replace(rtrim, ""); }; //from jquery
     this.obj = function(obj, deep){
         deep = deep || false;
@@ -56,19 +110,6 @@ app.service("main", function(){
             else l += 2;
         }
         return l;
-    };
-    this.types = {
-        _undefined: /^undefined|Undefined|null$/, //["undefined", "Undefined", "null"],
-        _object: /^[o|O]bject$/, //["object", "Object"],
-        _array: /^Array$/, //["Array"],
-        _window: /^Window$/,
-        _document: /^NodeList|HTMLCollection|HTMLAllCollection|HTMLDocument$/, //["HTMLCollection", "HTMLAllCollection", "HTMLDocument"],
-        _element: /^HTML\S+Element$/, //["HTMLImageElement", "HTMLDivElement"],
-        _domtoken: /^DOMTokenList$/,
-        _function: /^[f|F]unction$/, //["function", "Function"],
-        _number: /^[n|N]unction$/, //["number", "Number"],
-        _string: /^[s|S]tring$/, //["string", "String"],
-        _boolen: /^[b|B]oolean$/, //["boolean", "Boolean"]
     };
     this.typeof = function(obj, deep){    
         deep = deep || false;
@@ -238,23 +279,9 @@ app.service("extra", function(main, cache){
         return str;
     };
 });
-app.service("broswer", function(){
+app.service("broswer", function(main){
     var ua = window.navigator.userAgent;
-    var types = {
-        isWinNT: /Windows NT (\d+.\d+)[\.\d+]*/,
-        isMac: /Mac OS X (\S+)/,
-        isLikeMac: /Mac OS X/,
-        isIPhone: /iPhone OS (\S+)/,
-        isIpad: /iPad; CPU OS (\S+)/,
-        isGecko: /Gecko\/(\d+.\d+)[\.\d+]*/,
-        isAWK: /AppleWebKit\/(\d+.\d+)[\.\d+]*/,
-        isTrident: /Trident\/(\d+.\d+)[\.\d+]*/,
-        isFireFox: /Firefox\/(\d+.\d+)[\.\d+]*/,
-        isIE: /MSIE (\d+.\d+)[\.\d+]*/,
-        isChrome: /Chrome\/(\d+.\d+)[\.\d+]*/,
-        isSafari: /Safari\/(\d+.\d+)[\.\d+]*/,
-        isOpera: /OPR\/(\d+.\d+)[\.\d+]*/
-    };
+    var types = main.regex.navi;
     var navi = function(){
         this.en = undefined;
         this.env = undefined;
@@ -264,7 +291,9 @@ app.service("broswer", function(){
     };
     navi.prototype = {
         toString: function(){
-            return "Rendering Engine : " + (this.en||"") + " " + (this.env||"") + ", Browser : " +  (this.bs||"") + " " + (this.bsv||"")  + ", Operating System : " + (this.os||"");
+            return "Rendering Engine : " + (this.en||"") + " " + (this.env||"") + 
+                ", Browser : " +  (this.bs||"") + " " + (this.bsv||"")  + 
+                ", Operating System : " + (this.os||"");
         }
     };
     var na = new navi();
@@ -341,20 +370,109 @@ app.service("broswer", function(){
     this.os = na.os;
     this.toString = na.toString;
 });
-app.service("dom", function(){
+app.service("dom", function(main){
+    var tags = ("a abbr acronym address applet area article aside audio b base basefont bdi bdo " +
+        "big blockquote body br button canvas caption center cite code col colgroup command datalist " +
+        "dd del details dfn dialog dir div dl dt em embed fieldset figcaption figure font fomain form frame " +
+        "frameset h1 h2 h3 h4 h5 h6 head header hr html i iframe img input ins kbd keygen label legend li link main map mark " +
+        "menu menuitem meta meter nav noframes noscript object ol optgroup option output p param pre progress q rp " +
+        "rt ruby s samp script section select small source span strike strong style sub summary sup table tbody td " +
+        "textarea tfoot th thead time title tr track tt u ul var video wbr").split(" ");
+    var attrs = ("class id name style type rows cols width height require checked selected readonly contenteditable " + 
+        "placehoder").split(" ");
+    var eventType = ("click dblclick mousedown mouseup mouseover mouseout mousemove ouseenter mouseleave keypress keydown keyup" +
+        "blur focus change reset submit").split(" ");
+    /*
+    this.Element = function(tag, opt){
+            tag = tag || undefined, opt = opt || undefined;
+            var element;
+            if(tags.indexOf(tag) > -1) element = document.createElement(tag);
+            else if(regex.selector._tag.test(tag)){
+                var no = {
+                    tag: RegExp.$1,
+                    attr: RegExp.$2,
+                    text: RegExp.$3
+                };
+                element = this.Element(no.tag, {text: no.text});
+                var ar = no.attr.match(regex.selector._attrs);
+                if(ar != undefined && ar.length > 0){
+                    for(var i = 0, z = ar.length; i < z; i++)
+                    {
+                        if(ar[i].indexOf("=") > -1){
+                            attr(element, ar[i].split("=")[0], ar[i].split("=")[1].replace(/"/g, ""));
+                        }
+                        else
+                            attr(element, ar[i], true);
+                    }
+                }
+            }
+            if(element != undefined && types._object.test(typeof(opt, 1))){
+                for(var name in opt) {
+                    if(opt[name] != undefined) {
+                        if(name == "text") {
+                            if(element.innerText != undefined) element.innerText = opt[name].toString();
+                            else if(element.textContent != undefined) element.textContent = opt[name];
+                        }
+                        else element.setAttribute(name, opt[name]);
+                    }
+                }
+            }
+            return element;
+        }
+        */
     this.get = function(id){
         return document.getElementById(id);
     };
-    this.on = function(type, elem, callback){
+    this.on = function(event, elem, callback, bs){
+        if(arguments.length < 3) return elem;
+        var type = main.typeof(elem);
+        if(!main.types._element.test(type) || eventType.indexOf(event) <= -1 ||
+            main.types._function.test(main.typeof(callback))) return elem;
+        bs = bs || false;
         if(elem.addEventListener)
-            elem.addEventListener(type, callback, false);
+            elem.addEventListener(event, callback, bs);
         else if(elem.attachEvent)
-            elem.attachEvent("on" + type, callback);
-        else elem["on" + type] = callback;
+            elem.attachEvent("on" + event, callback);
+        else elem["on" + event] = callback;
+        return elem;
     };
     this.no = function(e){
         if(e.preventDefault) e.preventDefault();
         else window.event.returnValue = false;
+    };
+    this.html = function(elem, html){
+            var type = main.typeof(elem);
+            if(!main.types._element.test(type)) return false;
+            if(html != undefined){
+                this.clear(elem);
+                type = main.typeof(html);
+                if(main.types._element.test(type)) {
+                    if(elem.innerHTML != undefined) elem.innerHTML = html.toString();
+                    else return false;
+                }
+                else if(main.isArrayLike(html)){
+                    main.each(html, function(){
+                        if(main.types._element.test(main.typeof(this, 1)))
+                            elem.append(this);
+                    });
+                }
+                else if(main.types._string.test(type)){
+
+                }
+                else return false;
+            }
+            else{
+                if(elem.innerHTML != undefined) return main.text(elem);
+                else return false;
+            }
+        var bo = html == undefined;
+        return bo ? elem.innerHTML : elem.innerHTML = html.toString();
+    };
+    this.text = function(elem, text){
+        var bo = text == undefined;
+        var fun = elem.innerText != undefined ? "innerText" : undefined;
+        fun = fun == undefined && elem.textContent ? "textContent" : undefined;
+        return fun != undefined ? (bo ? elem[fun] : elem[fun] = text.toString()) : "";
     };
     this.hide = function(elem){
         elem.style.display = "none";
@@ -366,16 +484,6 @@ app.service("dom", function(){
         if(elem.style.display && elem.style.display == "none")
             elem.style.display = "block";
         else elem.style.display = "none";
-    };
-    this.html = function(elem, html){
-        var bo = html == undefined;
-        return bo ? elem.innerHTML : elem.innerHTML = html.toString();
-    };
-    this.text = function(elem, text){
-        var bo = text == undefined;
-        var fun = elem.innerText != undefined ? "innerText" : undefined;
-        fun = fun == undefined && elem.textContent ? "textContent" : undefined;
-        return fun != undefined ? (bo ? elem[fun] : elem[fun] = text.toString()) : "";
     };
 });
 app.service("cookie", function(){

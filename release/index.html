@@ -11,8 +11,8 @@
     <body ng-controller="ngMainController">
         <section class="header">
             <div class="myname">
-                <div class="master"><img src="/images/master.jpg"/>&nbsp;&nbsp;</div>
-                <div class="master lh52" ng-bind="'The 4th AyleinOter@' + sign.sign"></div>
+                <div class="master"><img src="/images/master.jpg"/></div>
+                <div class="master lh52" ng-bind="'&nbsp;The 4th AyleinOter@' + sign.sign"></div>
                 <div class="menu lh52">
                     <a ng-click="click(sign.all.typeid)" href="javascript: void(0);" ng-bind="sign.all.typename" class="ml5 {{sign.all.cur == 1 ? 'c000' :'c666'}}"></a>
                     <a ng-repeat="type in sign.types" ng-click="click(type.typeid)" href="javascript: void(0);" ng-bind="type.typename" class="ml5 {{type.cur == 1 ? 'c000' :'c666'}}"></a>
@@ -22,7 +22,7 @@
                 <div class="clear"></div>
             </div>
         </section>
-        <section class="topimg"><img src="{{sign.himg}}"/></section>
+        <section class="topimg"><img ng-src="{{sign.himg}}"/></section>
         <section class="bodypano">
             <div class="pano_left" ng-view></div>
             <div class="pano_right">

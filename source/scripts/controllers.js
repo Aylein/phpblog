@@ -1,43 +1,5 @@
 ﻿var app = angular.module("app");
 app.controller("ngMainController", function($scope, $location, $route, web, cache){
-    $scope.init_admin_nodes = function(){
-        $scope.nodes = {
-            contents: {
-                name: "Contents",
-                url: "",
-                width: "w120",
-                cur: 0,
-                list: [
-                    {cur: 0, name: "Types", url: ""},
-                    {cur: 0, name: "Stages", url: ""},
-                    {cur: 0, name: "Documents", url: ""},
-                    {cur: 0, name: "Comments", url: ""}
-                ]
-            },
-            admins: {
-                name: "Admins",
-                url: "",
-                width: "w80",
-                cur: 0,
-                list: [
-                    {cur: 0, name: "Mains", url: ""},
-                    {cur: 0, name: "Signs", url: ""},
-                    {cur: 0, name: "SignOns", url: ""}
-                ]
-            },
-            users: {
-                name: "Users",
-                url: "",
-                width: "w80",
-                cur: 0,
-                list: [
-                    {cur: 0, name: "Users", url: ""},
-                    {cur: 0, name: "Actions", url: ""}
-                ]
-            }
-        };
-        cache.set("admin_nodes", $scope.nodes);
-    };
     $scope.clearCur = function(){
         $scope.sign.all.cur = 0;
         $scope.sign.say.cur = 0;
@@ -85,9 +47,18 @@ app.controller("ngMainController", function($scope, $location, $route, web, cach
             $scope.$on("$locationChangeSuccess", $scope.makeCur);
         });
     };
+    $scope.flush = function(){
+        web.post("/var/ajax.php", {"action": "getall", "type": "type", "typepid": 0, "show": 1}, function(data){
+            if(data.err == false) return;
+            for(var i = 0, z = data.list.length; i < z; i++){
+                data.list[i].cur = 0;
+                $scope.sign.types["t_" + data.list[i].typeid] = data.list[i];
+            }
+            $scope.makeCur();
+        });
+    };
     $scope.sign = cache.sign = {};
     init();
-    $scope.init_admin_nodes();
 });
 app.controller("urlController", function($scope, web, $location, $routeParams){
     var path = $location.path(), typeid = $routeParams.typeid;
@@ -95,9 +66,55 @@ app.controller("urlController", function($scope, web, $location, $routeParams){
 app.controller("saysController", function($scope, main, broswer, cache){
 });
 app.controller("adminController", function($scope, main, broswer, cache){
+    $scope.path = "admins";
+});
+app.controller("typeController", function($scope, main, broswer, cache){
+    $scope.path = "types";
+    $scope.types = {};
+    var _types;
+    var makeTypes = function(list){
+        _types = _types || {};
+        main.each(list, function(i, v){
+            v.key = "t_" + v.typeid;
+            v.show = 1;
+            _types[v.key] = v;
+            if(v.typepid == 0){ 
+                v.list = v.list || {};
+                $scope.types[v.key] = v;
+            }
+        });
+        cache.types = _types || {};
+    };
+    var makeList = function(){
+        main.each(_types, function(i, k, v){
+            if(v.typepid != 0){
+                var s = _types["t_" + v.typepid];
+                s.list = s.list || [];
+                s.list[v.key] = v;
+            }
+        });
+    };
     var init = function(){
-        $scope.nodes = cache.get("admin_nodes");
-        $scope.nodes.admins.cur = 1;
+        var data = [
+            {typeid: 1, typepid: 0, typeshow: 0, typename: "all1", typesort: 0, typevalid: 1},
+            {typeid: 2, typepid: 1, typeshow: 0, typename: "all2", typesort: 0, typevalid: 1},
+            {typeid: 3, typepid: 1, typeshow: 0, typename: "all3", typesort: 0, typevalid: 1},
+            {typeid: 4, typepid: 0, typeshow: 0, typename: "all4", typesort: 0, typevalid: 1},
+            {typeid: 5, typepid: 4, typeshow: 0, typename: "all5", typesort: 0, typevalid: 1},
+            {typeid: 6, typepid: 4, typeshow: 0, typename: "all6", typesort: 0, typevalid: 1},
+            {typeid: 7, typepid: 0, typeshow: 0, typename: "all7", typesort: 0, typevalid: 1},
+            {typeid: 8, typepid: 7, typeshow: 0, typename: "all8", typesort: 0, typevalid: 1},
+            {typeid: 9, typepid: 7, typeshow: 0, typename: "all9", typesort: 0, typevalid: 1}
+        ];
+        data.sort(function(a, b){ return a.typesort > b.typesort; });
+        makeTypes(data);
+        makeList();
+        _types["t_2"].name = "name";
+    };
+    $scope.show = function(key){
+        var s = _types[key] || undefined;
+        if(s == undefined) return;
+        s.show = s.show == 1 ? 0 : 1;
     };
     init();
 });

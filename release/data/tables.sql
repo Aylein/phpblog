@@ -19,6 +19,7 @@ create table if not exists Users(
     userimg nvarchar(150),
     usertype char(5) default "visit", #visit guest admin
     usercreatetime datetime default now(),
+    #userlastaction datetime default now(),
     usersort int default 0,
     uservalid int default 1
 )auto_increment = 10086 charset = utf8;

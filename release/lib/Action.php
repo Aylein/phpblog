@@ -65,7 +65,7 @@ class Action{
         return $action->actid > 0 ? Action::Update($action) : Action::Add($action);
     }
 
-    public static function GetAll($search = null){
+    public static function Count($search = null){
         $search = is_object($search) ? $search : new stdClass(); 
         $search->type = isset($search->type) ? strval($search->type) : "other";
         $search->typeid = isset($search->typeid) && is_numeric($search->typeid) ? (int)$search->typeid : 0;
