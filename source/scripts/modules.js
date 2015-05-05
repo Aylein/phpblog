@@ -382,46 +382,53 @@ app.service("dom", function(main){
         "placehoder").split(" ");
     var eventType = ("click dblclick mousedown mouseup mouseover mouseout mousemove ouseenter mouseleave keypress keydown keyup" +
         "blur focus change reset submit").split(" ");
-    /*
     this.Element = function(tag, opt){
-            tag = tag || undefined, opt = opt || undefined;
-            var element;
-            if(tags.indexOf(tag) > -1) element = document.createElement(tag);
-            else if(regex.selector._tag.test(tag)){
-                var no = {
-                    tag: RegExp.$1,
-                    attr: RegExp.$2,
-                    text: RegExp.$3
-                };
-                element = this.Element(no.tag, {text: no.text});
-                var ar = no.attr.match(regex.selector._attrs);
-                if(ar != undefined && ar.length > 0){
-                    for(var i = 0, z = ar.length; i < z; i++)
-                    {
-                        if(ar[i].indexOf("=") > -1){
-                            attr(element, ar[i].split("=")[0], ar[i].split("=")[1].replace(/"/g, ""));
-                        }
-                        else
-                            attr(element, ar[i], true);
-                    }
+        tag = tag || undefined, opt = opt || undefined;
+        var element;
+        if(tags.indexOf(tag) > -1) element = document.createElement(tag);
+        else if(main.regex.selector._tag.test(tag)){
+            var no = {
+                tag: RegExp.$1,
+                attr: RegExp.$2,
+                text: RegExp.$3
+            };
+            element = this.Element(no.tag, {text: no.text});
+            var ar = no.attr.match(main.regex.selector._attrs);
+            if(ar != undefined && ar.length > 0){
+                for(var i = 0, z = ar.length; i < z; i++)
+                {
+                    if(ar[i].indexOf("=") > -1)
+                        this.attr(element, ar[i].split("=")[0], ar[i].split("=")[1].replace(/"/g, ""));
+                    else this.attr(element, ar[i], true);
                 }
             }
-            if(element != undefined && types._object.test(typeof(opt, 1))){
-                for(var name in opt) {
-                    if(opt[name] != undefined) {
-                        if(name == "text") {
-                            if(element.innerText != undefined) element.innerText = opt[name].toString();
-                            else if(element.textContent != undefined) element.textContent = opt[name];
-                        }
-                        else element.setAttribute(name, opt[name]);
-                    }
-                }
-            }
-            return element;
         }
-        */
+        if(element != undefined && main.types._object.test(main.typeof(opt))){
+            for(var name in opt) {
+                if(opt[name] != undefined) {
+                    if(name == "text") this.text(element, opt.text);
+                    else this.attr(element, name, opt[name]);
+                }
+            }
+        }
+        return element;
+    };
     this.get = function(id){
         return document.getElementById(id);
+    };
+    this.clear = function(elem){
+        while(elem.lastChild) elem.removeChild(elem.lastChild);
+        return elem;
+    };
+    this.append = function(elem, _elem, deep){
+        deep = deep || false;
+        var type = main.typeof(elem);
+        if(!main.types._element.test(type)) return elem;
+        type = main.typeof(_elem);
+        if(!main.types._element.test(type)) return elem;
+        if(elem.appendChild == undefined) return elem;
+        elem.appendChild(deep ? _elem.cloneNode(1) : _elem);
+        return elem;
     };
     this.on = function(event, elem, callback, bs){
         if(arguments.length < 3) return elem;
@@ -441,38 +448,49 @@ app.service("dom", function(main){
         else window.event.returnValue = false;
     };
     this.html = function(elem, html){
-            var type = main.typeof(elem);
-            if(!main.types._element.test(type)) return false;
-            if(html != undefined){
-                this.clear(elem);
-                type = main.typeof(html);
-                if(main.types._element.test(type)) {
-                    if(elem.innerHTML != undefined) elem.innerHTML = html.toString();
-                    else return false;
-                }
-                else if(main.isArrayLike(html)){
-                    main.each(html, function(){
-                        if(main.types._element.test(main.typeof(this, 1)))
-                            elem.append(this);
-                    });
-                }
-                else if(main.types._string.test(type)){
+        var type = main.typeof(elem), _this = this;
+        if(!main.types._element.test(type)) return false;
+        if(html != undefined){
+            this.clear(elem);
+            type = main.typeof(html);
+            if(main.types._element.test(type)) {
+                if(elem.innerHTML != undefined) elem.innerHTML = html.toString();
+                else return false;
+            }
+            else if(main.isArrayLike(html)){
+                main.each(html, function(){
+                    if(main.types._element.test(main.typeof(this)))
+                        _this.append(elem, this);
+                });
+            }
+            else if(main.types._string.test(type)){
 
-                }
-                else return false;
             }
-            else{
-                if(elem.innerHTML != undefined) return main.text(elem);
-                else return false;
-            }
-        var bo = html == undefined;
-        return bo ? elem.innerHTML : elem.innerHTML = html.toString();
+            return elem;
+        }
+        else return elem.innerHTML != undefined ? elem.innerHTML.toString() : "";
     };
     this.text = function(elem, text){
+        elem = elem || {};
         var bo = text == undefined;
         var fun = elem.innerText != undefined ? "innerText" : undefined;
-        fun = fun == undefined && elem.textContent ? "textContent" : undefined;
-        return fun != undefined ? (bo ? elem[fun] : elem[fun] = text.toString()) : "";
+        fun = fun == undefined && elem.textContent ? "textContent" : fun;
+        return fun != undefined ? (bo ? elem[fun] : elem[fun] = text.toString(), elem) : undefined;
+    };
+    this.attr = function(elem, key, value){
+        elem = elem || {};
+        if(key == undefined || !elem.getAttribute) return elem;
+        if(value == undefined) return elem.getAttribute(key.toString());
+        else main.types._boolen.test(main.typeof(value)) ?
+            (value ? elem.setAttribute(key.toString(), key.toString()) : this.removeAttr(elem, key)) :
+            elem.setAttribute(key.toString(), value.toString());
+        return elem;
+    };
+    this.removeAttr = function(elem, key){
+        elem = elem || {};
+        if(key == undefined || !elem.removeAttribute) throw elem;
+        elem.removeAttribute(key.toString());
+        return elem;
     };
     this.hide = function(elem){
         elem.style.display = "none";

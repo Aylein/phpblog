@@ -68,32 +68,52 @@ app.controller("saysController", function($scope, main, broswer, cache){
 app.controller("adminController", function($scope, main, broswer, cache){
     $scope.path = "admins";
 });
-app.controller("typeController", function($scope, main, broswer, cache){
+app.controller("typeController", function($scope, main, broswer, cache, dom){
+    //var s = dom.Element("a", {href: "http://www.baidu.com/", text: "百度", target: "_blank"});
+    //console.log(s);
     $scope.path = "types";
     $scope.types = {};
     var _types;
     var makeTypes = function(list){
         _types = _types || {};
         main.each(list, function(i, v){
-            v.key = "t_" + v.typeid;
-            v.show = 1;
-            _types[v.key] = v;
+            var s = {
+                key: "t_" + v.typeid,
+                show: true,
+                update: false,
+                node: v,
+                unode: main.copy(v)
+            };
+            _types[s.key] = s;
             if(v.typepid == 0){ 
-                v.list = v.list || {};
-                $scope.types[v.key] = v;
+                s.list = s.list || {};
+                $scope.types[s.key] = s;
             }
         });
         cache.types = _types || {};
     };
     var makeList = function(){
         main.each(_types, function(i, k, v){
-            if(v.typepid != 0){
-                var s = _types["t_" + v.typepid];
-                s.list = s.list || [];
+            if(v.node.typepid != 0){
+                var s = _types["t_" + v.node.typepid];
+                s.list = s.list || {};
                 s.list[v.key] = v;
             }
         });
     };
+    $scope.show = function(key){
+        var s = _types[key] || undefined;
+        if(s == undefined) return;
+        s.show = s.show ? false : true;
+    };
+    $scope.showupdate = function(key){
+        var s = _types[key] || undefined;
+        if(s == undefined) return;
+        s.update = s.update ? false : true;
+    };
+    $scope.update = function(key){};
+    $scope.drop = function(key){};
+    $scope.shown = function(key){};
     var init = function(){
         var data = [
             {typeid: 1, typepid: 0, typeshow: 0, typename: "all1", typesort: 0, typevalid: 1},
@@ -110,11 +130,6 @@ app.controller("typeController", function($scope, main, broswer, cache){
         makeTypes(data);
         makeList();
         _types["t_2"].name = "name";
-    };
-    $scope.show = function(key){
-        var s = _types[key] || undefined;
-        if(s == undefined) return;
-        s.show = s.show == 1 ? 0 : 1;
     };
     init();
 });

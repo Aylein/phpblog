@@ -40,9 +40,10 @@ app.directive("aoInput", function(dom, cache){
         restrict: "A",
         link: function($scope, $elem, $attr){
             $elem.on("click", function(){
-                var list = cache.types || {};
-                var _tar = list[$attr.key] || {};
-                console.log(_tar);
+                var list = cache.types || {}, _tar = list[$attr.key] || {}, _this = $elem[0];
+                dom.clear(_this);
+                dom.append(_this, dom.Element("input", {type: "text", value: _tar.typename, id: "it_" + _tar.key}));
+                dom.append(_this, dom.Element("input", {type: "button", value: "确定", id: "tb_" + _tar.key}));
             });
         }
     };
