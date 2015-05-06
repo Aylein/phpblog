@@ -150,7 +150,7 @@ app.service("main", function(){
             if(!target) continue;
             _type = this.typeof(target);
             if(this.types._object.test(_type)){
-                this.each(target, function(i, k, v){
+                this.each(target, function(i, v, k){
                     src[k] = f ? main.copy(v) : v;
                 });
             }
@@ -241,7 +241,7 @@ app.service("main", function(){
             var i = 0;
             for(var key in src){
                 var _this = src[key], _args = this.merge(true, [], args);
-                _args.push(i, key, _this);
+                _args.push(i, _this, key);
                 if(callback.apply(_this, _args)) break;
                 i++;
             }

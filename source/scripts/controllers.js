@@ -37,7 +37,7 @@ app.controller("ngMainController", function($scope, $location, $route, web, cach
         $scope.sign.all = {cur: 0, typeid: "all", typename: "全部"};
         $scope.sign.say = {cur: 0, typeid: "say", typename: "Says"};
         $scope.sign.about = {cur: 0, typeid: "about", typename: "About"};
-        web.post("/var/ajax.php", {"action": "getall", "type": "type", "typepid": 0, "show": 1}, function(data){
+        web.post("/var/ajax.php", {"action": "getall", "type": "type", "typepid": 0, "show": 1, valid: 1}, function(data){
             if(data.err == false) return;
             for(var i = 0, z = data.list.length; i < z; i++){
                 data.list[i].cur = 0;
@@ -48,7 +48,8 @@ app.controller("ngMainController", function($scope, $location, $route, web, cach
         });
     };
     $scope.flush = function(){
-        web.post("/var/ajax.php", {"action": "getall", "type": "type", "typepid": 0, "show": 1}, function(data){
+        $scope.sign.types = {};
+        web.post("/var/ajax.php", {"action": "getall", "type": "type", "typepid": 0, "show": 1, valid: 1}, function(data){
             if(data.err == false) return;
             for(var i = 0, z = data.list.length; i < z; i++){
                 data.list[i].cur = 0;
@@ -68,38 +69,46 @@ app.controller("saysController", function($scope, main, broswer, cache){
 app.controller("adminController", function($scope, main, broswer, cache){
     $scope.path = "admins";
 });
-app.controller("typeController", function($scope, main, broswer, cache, dom){
-    //var s = dom.Element("a", {href: "http://www.baidu.com/", text: "百度", target: "_blank"});
-    //console.log(s);
+app.controller("typeController", function($scope, main, broswer, cache, web){
     $scope.path = "types";
     $scope.types = {};
+    var makeNew = function(){
+        return {key: "new", typeid: 0, typepid: 0, typeshow: 0, typename: "", typesort: 0, typevalid: 1};
+    };
     var _types;
+    $scope.newtype = makeNew();
+    var makeType = function(v){
+        var s = {
+            key: "t_" + v.typeid,
+            show: true,
+            update: false,
+            node: v,
+            unode: main.copy(v),
+            list: {}
+        };
+        _types[s.key] = _types[s.key] ? main.extend(_types[s.key], s) : s;
+    };
     var makeTypes = function(list){
         _types = _types || {};
-        main.each(list, function(i, v){
-            var s = {
-                key: "t_" + v.typeid,
-                show: true,
-                update: false,
-                node: v,
-                unode: main.copy(v)
-            };
-            _types[s.key] = s;
-            if(v.typepid == 0){ 
-                s.list = s.list || {};
-                $scope.types[s.key] = s;
-            }
+        if(main.types._object.test(main.typeof(list))) list = [list];
+        main.each(list, function(i, v){ 
+            makeType(v);
         });
-        cache.types = _types || {};
+        $scope.types = {};
+        main.each(_types, function(i, v){ 
+            v.list = {};
+            if(v.node.typepid == 0) $scope.types[v.key] = v; 
+        });
+        main.each($scope.types, function(i, v){ 
+            var f = v;
+            main.each(_types, function(i, v){
+                if(v.node.typepid == f.node.typeid)
+                    f.list[v.key] = v;
+            });
+        });
     };
-    var makeList = function(){
-        main.each(_types, function(i, k, v){
-            if(v.node.typepid != 0){
-                var s = _types["t_" + v.node.typepid];
-                s.list = s.list || {};
-                s.list[v.key] = v;
-            }
-        });
+    var getTypes = function(callback){
+        web.post("/var/admin.php", {_action: "getall", _type: "type"}, callback);
     };
     $scope.show = function(key){
         var s = _types[key] || undefined;
@@ -107,29 +116,57 @@ app.controller("typeController", function($scope, main, broswer, cache, dom){
         s.show = s.show ? false : true;
     };
     $scope.showupdate = function(key){
-        var s = _types[key] || undefined;
-        if(s == undefined) return;
-        s.update = s.update ? false : true;
+        var tar = key == "new" ? $scope.newtype : _types[key];
+        if(key == "new") $scope.newtype = makeNew();
+        else tar.update = tar.update ? false : true;
     };
-    $scope.update = function(key){};
-    $scope.drop = function(key){};
-    $scope.shown = function(key){};
+    $scope.update = function(key){
+        var tar = key == "new" ? $scope.newtype : _types[key].unode;
+        if(tar == undefined) return false;
+        var data = main.copy(tar);
+        data._action = "post";
+        data._type = "type";
+        web.post("/var/admin.php", data, function(data){
+            if(!data.res) {
+                alert(data.msg);
+                return;
+            }
+            makeTypes(data.obj);
+            if(key == "new") $scope.newtype = makeNew();
+        });
+    };
+    $scope.drop = function(key){
+        var tar = _types[key].unode || undefined;
+        if(tar == undefined) return false;
+        tar.typevalid = tar.typevalid == 1 ? 0 : 1;
+        $scope.update(key);
+        /*
+        if(tar == undefined) return;
+        var data = {_action: "valid", _type: "type", _id: tar.typeid};
+        web.post("/var/admin.php", data, function(data){
+            if(!data.res) {
+                alert(data.msg);
+                return;
+            }
+            makeTypes(data.obj);
+        });
+        */
+    };
+    $scope.shown = function(key){
+        var tar = key == "new" ? $scope.newtype : _types[key].unode;
+        if(tar == undefined) return false;
+        tar.typeshow = tar.typeshow == 1 ? 0 : 1;
+        if(key == "new") return;
+        $scope.update(key);
+    };
+    $scope.flush = $scope.$parent.flush;
     var init = function(){
-        var data = [
-            {typeid: 1, typepid: 0, typeshow: 0, typename: "all1", typesort: 0, typevalid: 1},
-            {typeid: 2, typepid: 1, typeshow: 0, typename: "all2", typesort: 0, typevalid: 1},
-            {typeid: 3, typepid: 1, typeshow: 0, typename: "all3", typesort: 0, typevalid: 1},
-            {typeid: 4, typepid: 0, typeshow: 0, typename: "all4", typesort: 0, typevalid: 1},
-            {typeid: 5, typepid: 4, typeshow: 0, typename: "all5", typesort: 0, typevalid: 1},
-            {typeid: 6, typepid: 4, typeshow: 0, typename: "all6", typesort: 0, typevalid: 1},
-            {typeid: 7, typepid: 0, typeshow: 0, typename: "all7", typesort: 0, typevalid: 1},
-            {typeid: 8, typepid: 7, typeshow: 0, typename: "all8", typesort: 0, typevalid: 1},
-            {typeid: 9, typepid: 7, typeshow: 0, typename: "all9", typesort: 0, typevalid: 1}
-        ];
-        data.sort(function(a, b){ return a.typesort > b.typesort; });
-        makeTypes(data);
-        makeList();
-        _types["t_2"].name = "name";
+        getTypes(function(data){
+            data = data.list;
+            data.sort(function(a, b){ return a.typesort > b.typesort; });
+            makeTypes(data);
+            cache.types = _types || {};
+        });
     };
     init();
 });

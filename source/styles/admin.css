@@ -1,3 +1,5 @@
 @charset "utf-8";
 .l_s { width: 950px; margin: 0 auto; }
 .l_urlpano { float: left; }
+.a_button { border: 0px; margin: 0px; margin: 0px; padding: 0px; background-color: #ffffff; }
+.a_button { cursor: pointer; }

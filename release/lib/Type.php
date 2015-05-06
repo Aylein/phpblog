@@ -74,12 +74,12 @@ class Type{
         if(Type::Exists($type->typename, $type->typeid)) return new Message("要添加的类型名称已存在");
         $str = "update Types set typepid = :typepid, typeshow = :typeshow, typename = :typename, typesort = :typesort, "
             ."typevalid = :typevalid where typeid = :typeid; ";
-        $str .= "select typeid, typepid, typename, typecreatetime, typesort, typevalid from Types where typeid = :typeid; ";
+        $str .= "select typeid, typepid, typeshow, typename, typecreatetime, typesort, typevalid from Types where typeid = :typeid; ";
         $paras = array(":typepid" => $type->typepid, ":typeshow" => $type->typeshow, ":typename" => $type->typename,
             ":typesort" => $type->typesort, ":typevalid" => $type->typevalid, ":typeid" => $type->typeid);
         $en = (new Entity())->Querys($str, $paras);
         return count($en) == 2 && count($en[1]) == 1 ? 
-            new Message("修改成功", true, new Type($en[1][0], $deep)) : new Message("修改失败");
+            new Message("修改成功", true, new Type($en[1][0])) : new Message("修改失败");
     }
 
     public static function Add_Update($type){
@@ -171,16 +171,18 @@ class Type{
         $valid = is_numeric($valid) ? (int)$valid : null;
         $str = "update Types set ";
         $paras = array();
-        if(!$valid){
-            $str .= "typevalid = case when typevalid = 0 then 1 else 1 end where typeid = :typeid; ";
-            $paras = array(":typeid" => $id);
-        }
+        if(!$valid)
+            $str .= "typevalid = case when typevalid = 0 then 1 else 0 end where typeid = :typeid; ";
         else {
             $str .= "typevalid = :typevalid where typeid = :typeid; ";
             $paras = array(":typeid" => $id, ":typevalid" => $valid);
         }
-        return (new Entity())->Exec($str, $paras) > 0 ? 
-            new Message("修改成功", true) : new Message("修改失败");
+        $str .= "select typeid, typepid, typeshow, typename, typecreatetime, typesort, typevalid "
+            ."from Types where typeid = :typeid; ";
+        $paras = array(":typeid" => $id);
+        $en = (new Entity())->Querys($str, $paras);
+        return count($en) == 2 && count($en[1]) == 1 ? 
+            new Message("修改成功", true, new Type($en[1][0])) : new Message("修改失败");
     }
 }
 ?>

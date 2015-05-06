@@ -9,22 +9,26 @@
     include_once("../lib/Stage.php");
     include_once("../lib/Type.php");
     include_once("../lib/User.php");
-
+    
+    /*
     if(!isset($_SESSION["admin"])){
         echo json_encode(new Message("请先登录", false, null, "no_login"));
         die();
     }
-    if(!isset($_POST["action"])){
+    */
+    if(!isset($_POST["_action"])){
         echo json_encode(new Message("你想干什么 0 0~", false, null, "no_action"));
         die();
     }
-    $action = $_POST["action"];
+    $action = $_POST["_action"];
 
     $str = "";
     try{
         switch($action){
+            case "getall": $str = json_encode(GetAll()); break;
             case "newtype": $str = json_encode(PostType()); break;
             case "post": $str = json_encode(Post()); break;
+            case "valid": $str = json_encode(Valid()); break;
             default: $str = json_encode(new Message(false, "no_action", "你想干什么 0 0~")); break;
         }
     }catch(Exception $e){
@@ -33,9 +37,9 @@
     echo $str;
 
     function Get(){
-        $type = isset($_POST["type"]) ? $_POST["type"] : "";
-        $id = isset($_POST["id"]) && is_numeric($_POST["id"]) ? (int)$_POST["id"] : 0;
-        $deep = isset($_POST["deep"]) && is_bool($_POST["deep"]) ? (bool)$_POST["deep"] : false;
+        $type = isset($_POST["_type"]) ? $_POST["_type"] : "";
+        $id = isset($_POST["_id"]) && is_numeric($_POST["_id"]) ? (int)$_POST["_id"] : 0;
+        $deep = isset($_POST["_deep"]) && is_bool($_POST["_deep"]) ? (bool)$_POST["_deep"] : false;
         $value = null;
         switch($type){
             case "type": $value = Type::Get($id, $deep);
@@ -52,20 +56,20 @@
     }
 
     function GetAll(){
-        $type = isset($_POST["type"]) ? $_POST["type"] : "";
-        $deep = isset($_POST["deep"]) && is_bool($_POST["deep"]) ? (bool)$_POST["deep"] : false;
+        $type = isset($_POST["_type"]) ? $_POST["_type"] : "";
+        $deep = isset($_POST["_deep"]) && is_bool($_POST["_deep"]) ? (bool)$_POST["_deep"] : false;
         $search = new stdClass();
         switch($type){
             case "type":
-                $search->typepid = isset($_POST["typepid"]) && is_numeric($_POST["typepid"]) ? (int)$_POST["typepid"] : -1;
+                $search->typepid = isset($_POST["typepid"]) && is_numeric($_POST["typepid"]) ? (int)$_POST["typepid"] : -2;
                 $search->show = isset($_POST["show"]) && is_numeric($_POST["show"]) ? (int)$_POST["show"] : -1;
                 $search->valid = isset($_POST["valid"]) && is_numeric($_POST["valid"]) ? (int)$_POST["valid"] : -1;
                 $search->page = isset($_POST["page"]) && is_numeric($_POST["page"]) ? (int)$_POST["page"] : 0;
                 $search->rows = isset($_POST["rows"]) && is_numeric($_POST["rows"]) ? (int)$_POST["rows"] : 0;
                 return Type::GetAll($search, $deep);
             case "user": 
-                $search->name = isset($_POST["name"]) ? strval($_POST["name)"] : "";
-                $search->type = isset($_POST["type"]) ? strval($_POST["type)"] : "";
+                $search->name = isset($_POST["name"]) ? strval($_POST["name"]) : "";
+                $search->type = isset($_POST["type"]) ? strval($_POST["type"]) : "";
                 $search->valid = isset($_POST["valid"]) && is_numeric($_POST["valid"]) ? (int)$_POST["valid"] : 1;
                 $search->page = isset($_POST["page"]) && is_numeric($_POST["page"]) ? (int)$_POST["page"] : 0;
                 $search->rows = isset($_POST["rows"]) && is_numeric($_POST["rows"]) ? (int)$_POST["rows"] : 0;
@@ -134,7 +138,7 @@
     }
 
     function Post(){
-        $type = isset($_POST["type"]) ? $_POST["type"] : "";
+        $type = isset($_POST["_type"]) ? $_POST["_type"] : "";
         switch ($type) {
             case 'type':
                 $obj = new Type($_POST);
@@ -191,9 +195,9 @@
     }
 
     function Valid(){
-        $type = isset($_POST["type"]) ? $_POST["type"] : "";
-        $id = isset($_POST["id"]) && is_numeric($_POST["id"]) ? (int)$_POST["id"] : 0;
-        $valid = isset($_POST["valid"]) && is_numeric($_POST["valid"]) ? (int)$_POST["valid"] : null;
+        $type = isset($_POST["_type"]) ? $_POST["_type"] : "";
+        $id = isset($_POST["_id"]) && is_numeric($_POST["_id"]) ? (int)$_POST["_id"] : 0;
+        $valid = isset($_POST["_valid"]) && is_numeric($_POST["_valid"]) ? (int)$_POST["_valid"] : null;
         switch($type){
             case "type": return Type::Valid($id, $valid);
             case "user": return User::Valid($id, $valid);
