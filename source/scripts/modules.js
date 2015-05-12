@@ -18,6 +18,12 @@ app.config(function($routeProvider){
     }).when("/admintype", {
         templateUrl: "/view/ngAdminType.php",
         controller: "typeController"
+    }).when("/adminstage", {
+        templateUrl: "/view/ngAdminStage.php",
+        controller: "stageController"
+    }).when("/adminuser", {
+        templateUrl: "/view/ngAdminUser.php",
+        controller: "userController"
     }).otherwise({redirectTo: "/about"});
 });
 app.service("main", function(){

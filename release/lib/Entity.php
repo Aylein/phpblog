@@ -56,7 +56,7 @@ class Entity {
             $cn = $this->conn->prepare($query)->execute($paras);
             $this->conn->commit();
             return $cn;
-        } catch(Exception $e){
+        }catch(Exception $e){
             $this->conn->rollback();
             return null;
         }

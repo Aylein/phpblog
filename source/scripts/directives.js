@@ -139,7 +139,7 @@ app.directive("aoNodes", function(main, cache){
                         }
                     },
                     members: {
-                        name: "Users",
+                        name: "Members",
                         url: "#/adminmem",
                         width: "w80",
                         cur: 0,

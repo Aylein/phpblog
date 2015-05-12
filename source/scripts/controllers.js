@@ -64,12 +64,12 @@ app.controller("ngMainController", function($scope, $location, $route, web, cach
 app.controller("urlController", function($scope, web, $location, $routeParams){
     var path = $location.path(), typeid = $routeParams.typeid;
 });
-app.controller("saysController", function($scope, main, broswer, cache){
+app.controller("saysController", function($scope, main, cache){
 });
-app.controller("adminController", function($scope, main, broswer, cache){
+app.controller("adminController", function($scope, main, cache){
     $scope.path = "admins";
 });
-app.controller("typeController", function($scope, main, broswer, cache, web){
+app.controller("typeController", function($scope, main, cache, web){
     $scope.path = "types";
     $scope.types = {};
     var makeNew = function(){
@@ -123,6 +123,10 @@ app.controller("typeController", function($scope, main, broswer, cache, web){
     $scope.update = function(key){
         var tar = key == "new" ? $scope.newtype : _types[key].unode;
         if(tar == undefined) return false;
+        if(tar.typename == ""){
+            alert("请填写分类名称");
+            return false;
+        }
         var data = main.copy(tar);
         data._action = "post";
         data._type = "type";
@@ -167,6 +171,87 @@ app.controller("typeController", function($scope, main, broswer, cache, web){
             makeTypes(data);
             cache.types = _types || {};
         });
+    };
+    init();
+});
+app.controller("stageController", function($scope, main, cache, web){
+    $scope.path = "stages";
+});
+app.controller("userController", function($scope, main, cache, web){
+    $scope.path = "users";
+    $scope.new = {
+        userid: 0,
+        username: "", 
+        userpass: "", 
+        userimg: "", 
+        usertype: "visit", 
+        usercreatetime: "", 
+        userlastaction: "", 
+        usersort: 0, 
+        uservalid: 1
+    };
+    var makeList = function(list){
+        $scope.list = $scope.list || {};
+        main.each(list, function(i, v){
+            $scope.list["u_" + v.userid] = {n: v, u: main.copy(v)};
+        });
+    };
+    var init = function(){
+        var data = [
+            {
+                userid: 1, 
+                username: "sYs#tsdfet.Aa", 
+                userpass: "safsafsdfsdfsfsafsafsdafsa", 
+                userimg: "/images/ac/ac_1.png", 
+                usertype: "visit", 
+                usercreatetime: "2014-01-01 00:00:00", 
+                userlastaction: "2014-01-01 00:00:00", 
+                usersort: 0, 
+                uservalid: 1
+            },{
+                userid: 2, 
+                username: "sYs#sceedf.Aa", 
+                userpass: "asdfasfsdafsdafeaearwerqrew", 
+                userimg: "/images/ac/ac_2.png", 
+                usertype: "visit", 
+                usercreatetime: "2014-01-01 00:00:00", 
+                userlastaction: "2014-01-01 00:00:00", 
+                usersort: 0, 
+                uservalid: 1
+            },{
+                userid: 3, 
+                username: "sYs#teftgd.Aa", 
+                userpass: "twetrgsffewrwetregdgfswfaewr", 
+                userimg: "/images/ac/ac_3.png", 
+                usertype: "visit", 
+                usercreatetime: "2014-01-01 00:00:00", 
+                userlastaction: "2014-01-01 00:00:00", 
+                usersort: 0, 
+                uservalid: 1
+            },{
+                userid: 4, 
+                username: "sYs#ewdcge.Aa", 
+                userpass: "fgewtwerewrdsfewrwefggerewr", 
+                userimg: "/images/ac/ac_4.png", 
+                usertype: "visit", 
+                usercreatetime: "2014-01-01 00:00:00", 
+                userlastaction: "2014-01-01 00:00:00", 
+                usersort: 0, 
+                uservalid: 1
+            },{
+                userid: 5, 
+                username: "sYs#ertgfc.Aa", 
+                userpass: "hdfshrhrtwewrwefewr", 
+                userimg: "/images/ac/ac_5.png", 
+                usertype: "visit", 
+                usercreatetime: "2014-01-01 00:00:00", 
+                userlastaction: "2014-01-01 00:00:00", 
+                usersort: 0, 
+                uservalid: 1
+            }
+        ];
+        makeList(data);
+        console.log($scope.list);
     };
     init();
 });

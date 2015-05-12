@@ -3,21 +3,29 @@ module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON("package.json"),
         uglify: {
-            options:{
+            options: {
                 banner: "/*!<%=pkg.author%>(<%=grunt.template.today('dd-mm-yyyy')%>)*/"
             },
-            main:{
-                options:{
+            main: {
+                options: {
                     mangle: false
                 },
-                files:[{
+                files: [{
                     expand: true,
                     cwd: "source/scripts",
                     src: "*.js",
                     dest: "release/scripts",
                     ext: ".min.js"
                 }]
-            }
+            },
+            other: {
+                files: [{
+                    expand: true,
+                    cwd: "source/scripts/others",
+                    src: "*.js",
+                    dest: "release/scripts",
+                    ext: ".min.js"
+                }]}
         },
         cssmin: {
             options:{
@@ -58,5 +66,5 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks("grunt-contrib-cssmin");
     grunt.loadNpmTasks("grunt-contrib-copy");
     grunt.loadNpmTasks("grunt-contrib-watch");
-    grunt.registerTask("default", ["uglify:main", "cssmin:main", "copy:main"]);
+    grunt.registerTask("default", ["uglify:main", "uglify:other", "cssmin:main", "copy:main"]);
 };
