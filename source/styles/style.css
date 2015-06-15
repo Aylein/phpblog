@@ -6,13 +6,20 @@ a:hover { color: #000000; }
 html { overflow-y: scroll; }
 body { background-color: #F5F5F5; }
 
-.header { width: 100%; height: 40px; z-index: 1; background-color: #E7E7E7; border-bottom:1px solid #CCC; }
+.header { width: 100%; height: 42px; z-index: 1; background-color: #E7E7E7; }
 .header { position: fixed; top: 0px; _position: abselute; }
 .myname { width: 1280px; margin: 0 auto; }
+.sunview { width: 100%; height: 2px; }
+.sunview {
+	background: -webkit-linear-gradient(left, red, orange, yellow, green, lawngreen, blue, purple);
+	background: -moz-linear-gradient(right, red, orange, yellow, green, lawngreen, blue, purple);
+	background: -o-linear-gradient(right, red, orange, yellow, green, lawngreen, blue, purple);
+	background: linear-gradient(to right, red, orange, yellow, green, lawngreen, blue, purple);
+}
 .master { float: left; height: 40px; }
 .master img { width: 40px; vertical-align: middle; }
 .menu { float: right; height: 40px; }
-.topimg { width: 1280px; height: 100px; background-color: #ffffff; margin: 0 auto; margin-top: 45px; }
+.topimg { width: 1280px; height: 100px; background-color: #ffffff; margin: 0 auto; margin-top: 47px; }
 .bodypano { width: 1280px; margin: 0 auto; margin-top: 5px; }
 .footer { height: 250px; background-color: #494949; }
 .bigfun { width: 1280px; margin: 0 auto; }
