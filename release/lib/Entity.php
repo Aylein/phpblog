@@ -3,8 +3,11 @@ class Entity {
     var $conn;
 
     public function __construct(){
+        $host = defined("SAE_MYSQL_HOST_M") ? SAE_MYSQL_HOST_M.":".SAE_MYSQL_PORT : "localhost";
+        $name = defined("SAE_MYSQL_USER") ? SAE_MYSQL_USER : "section";
+        $pass = defined("SAE_MYSQL_PASS") ? SAE_MYSQL_PASS : "mm19880209";
         try{
-            $this->conn = new PDO("mysql:host=localhost;dbname=phpMyBlog;charset=utf8", "section", "mm19880209");
+            $this->conn = new PDO("mysql:host=".$host.";dbname=app_aylein;charset=utf8", $name, $pass);
             //$this->conn->setAttribute(PDO::ATTR_PERSISTENT, true); //mysql 长链接
             //$this->conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false); //关闭php注入模拟 使用mysql参数注入 //加上报错
         } catch (Exception $e) {

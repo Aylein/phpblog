@@ -1,6 +1,6 @@
-create database if not exists phpMyBlog;
+create database if not exists app_aylein;
 
-use phpMyBlog;
+use app_aylein;
 
 drop table if exists Documents;
 drop table if exists Stages;
@@ -18,8 +18,8 @@ create table if not exists Users(
     userpass char(32) unique not null,
     userimg nvarchar(150),
     usertype char(5) default "visit", #visit guest admin
-    usercreatetime datetime default now(),
-    #userlastaction datetime default now(),
+    usercreatetime datetime, # default CURRENT_TIMESTAMP,
+    #userlastaction datetime, # default CURRENT_TIMESTAMP,
     usersort int default 0,
     uservalid int default 1
 )auto_increment = 10086 charset = utf8;
@@ -33,7 +33,7 @@ insert into Users(username, userpass, userimg, usertype) values
 create table if not exists Signs(
     signid int primary key auto_increment,
     signname nvarchar(20) not null,
-    signcreatetime datetime default now(),
+    signcreatetime datetime, # default CURRENT_TIMESTAMP,
     userid int not null,
     foreign key(userid) references Users(userid) on delete cascade on update cascade,
     signsort int default 0,
@@ -48,7 +48,7 @@ create table if not exists SignOn(
     foreign key(userid) references Users(userid) on delete cascade on update cascade,
     sotype char(5) not null, #stage comme
     sotypeid int default 0,
-    socreatetime datetime default now(),
+    socreatetime datetime, # default CURRENT_TIMESTAMP,
     sosort int default 0,
     sovalid int default 1
 )auto_increment = 1 charset = utf8;
@@ -58,7 +58,7 @@ create table if not exists Types(
     typepid int default 0,
     typeshow int default 0,
     typename nvarchar(15) not null,
-    typecreatetime datetime default now(),
+    typecreatetime datetime, # default CURRENT_TIMESTAMP,
     typesort int default 0,
     typevalid int default 1
 )auto_increment = 12580 charset = utf8;
@@ -79,8 +79,8 @@ create table if not exists Stages(
     stgnum int default 0,
     stgview int default 0,
     stgcomnum int default 0,
-    stgcreatetime datetime default now(),
-    stgupdatetime datetime default now() on update now(),
+    stgcreatetime datetime, # default CURRENT_TIMESTAMP,
+    stgupdatetime datetime, # default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
     stgsort int default 0,
     stgvalid int default 1
 )auto_increment = 12110 charset = utf8;
@@ -106,7 +106,7 @@ create table if not exists Comments(
     foreign key(userid) references Users(userid) on delete cascade on update cascade,
     repeatid int default 0,
     repeatname nvarchar(12) default "",
-    comdate datetime default now(),
+    comdate datetime, # default CURRENT_TIMESTAMP,
     comment nvarchar(450) not null,
     comsort int default 0,
     comvalid int default 1
@@ -119,7 +119,7 @@ create index com_pid on Comments(compid);
 create table if not exists Main(
     id int primary key auto_increment,
     _key nvarchar(15) unique not null,
-    _value nvarchar(15)
+    _value nvarchar(125)
 )auto_increment = 1 charset = utf8;
 
 insert into Main (_key, _value) values 
@@ -133,6 +133,6 @@ create table if not exists Action(
     acttypeid int default 0,
     acttitle nvarchar(25) not null,
     actlink nvarchar(50),
-    actdate datetime default now(),
+    actdate datetime, # default CURRENT_TIMESTAMP,
     actvalid int default 1
 )auto_increment = 1  charset = utf8;

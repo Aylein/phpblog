@@ -49,6 +49,22 @@ module.exports = function(grunt) {
                     {src: "source/bower_components/angular-route/angular-route.min.js", dest: "release/scripts/angular-route.min.js"},
                     {src: "source/bower_components/angular-route/angular-route.min.js.map", dest: "release/scripts/angular-route.min.js.map"}
                 ]
+            },
+            release: {
+                files: [
+                    {expand: true, cwd: "release", src: [
+                        "images/**", 
+                        "lib/**", 
+                        "require/**", 
+                        "scripts/**", 
+                        "sounds/**", 
+                        "styles/**", 
+                        "styles/**", 
+                        "view/**", 
+                        "var/**", 
+                        "index.html"
+                    ], dest: "C:/SinaSae/aylein/2"}
+                ]
             }
         },
         watch: {
@@ -66,5 +82,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks("grunt-contrib-cssmin");
     grunt.loadNpmTasks("grunt-contrib-copy");
     grunt.loadNpmTasks("grunt-contrib-watch");
+    grunt.registerTask("release", ["copy:release"]);
     grunt.registerTask("default", ["uglify:main", "uglify:other", "cssmin:main", "copy:main"]);
 };

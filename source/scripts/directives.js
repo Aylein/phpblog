@@ -48,9 +48,18 @@ app.directive("aoInput", function(dom, cache){
         }
     };
 });
+/*
+app.directive("aoCn", function(dom, main, cache, extra){
+    return {
+        restrict: "AE",
+        replace: true,
+        template: 
+    };
+});
+*/
 app.directive("aoCs", function(dom, broswer, main, cache, extra){
     return {
-        restrict: "E",
+        restrict: "AE",
         replace: true,
         templateUrl: "/require/ngComment.html",
         link: function($scope, $elem, $attr){

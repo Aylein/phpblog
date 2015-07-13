@@ -64,7 +64,12 @@ app.controller("ngMainController", function($scope, $location, $route, web, cach
 app.controller("urlController", function($scope, web, $location, $routeParams){
     var path = $location.path(), typeid = $routeParams.typeid;
 });
-app.controller("saysController", function($scope, main, cache){
+app.controller("saysController", function($scope, main, cache, web){
+    var init = function(){
+        $scope = $scope || {};
+        $scope.saiys = "1234566";
+    };
+    init();
 });
 app.controller("adminController", function($scope, main, cache){
     $scope.path = "admins";
