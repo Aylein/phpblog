@@ -35,3 +35,6 @@
 .says_p_ch { width: 850px; margin-top: 10px; }
 .says_c_left { width: 100px; float: left; }
 .says_c_right { width: 750px; min-height: 100px; float: right; }
+
+.res_name {float: left; font-size: 70px; font-weight: bold;}
+.res_info {float: left; margin-left: 15px; margin-top: 28px;}

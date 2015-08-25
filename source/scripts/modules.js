@@ -12,6 +12,8 @@ app.config(function($routeProvider){
     }).when("/found/:typeid", {
         templateUrl: "/view/ngFound.html",
         controller: "urlController"
+    }).when("/resume", {
+        templateUrl: "/view/ngResume.html"
     }).when("/admin", {
         templateUrl: "/view/ngAdmin.php",
         controller: "adminController"
@@ -387,7 +389,7 @@ app.service("dom", function(main){
     var attrs = ("class id name style type rows cols width height require checked selected readonly contenteditable " + 
         "placehoder").split(" ");
     var eventType = ("click dblclick mousedown mouseup mouseover mouseout mousemove ouseenter mouseleave keypress keydown keyup" +
-        "blur focus change reset submit").split(" ");
+        "blur focus change reset submit touchstart touchmove touchend touchcancel").split(" ");
     this.Element = function(tag, opt){
         tag = tag || undefined, opt = opt || undefined;
         var element;
