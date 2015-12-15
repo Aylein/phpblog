@@ -62,7 +62,7 @@
 
     function GetAll(){
         $type = isset($_POST["type"]) ? $_POST["type"] : "";
-        $deep = isset($_POST["deep"]) && is_bool($_POST["deep"]) ? (bool)$_POST["deep"] : false;
+        $deep = isset($_POST["deep"]) ? (bool)$_POST["deep"] : false;
         $search = new stdClass();
         switch($type){
             case "type":
@@ -97,7 +97,7 @@
                 $search->order = isset($_POST["order"]) ? strval($_POST["order"]) : "";
                 return Sign::GetAll($search, $deep);
             case "comment": 
-                $search->type = isset($_POST["type"]) ? strval($_POST["type"]) : "other";
+                $search->type = isset($_POST["mtype"]) ? strval($_POST["mtype"]) : "other";
                 $search->typeid = isset($_POST["typeid"]) && is_numeric($_POST["typeid"]) ? (int)$_POST["typeid"] : 0;
                 $search->pid = isset($_POST["pid"]) && is_numeric($_POST["pid"]) ? (int)$_POST["pid"] : -2;
                 $search->userid = isset($_POST["userid"]) && is_numeric($_POST["userid"]) ? (int)$_POST["userid"] : 0;
@@ -107,7 +107,7 @@
                 $search->order = isset($_POST["name"]) ? strval($_POST["name"]) : "sort";
                 return Comment::GetAll($search, $deep);
             case "action": 
-                $search->type = isset($_POST["type"]) ? strval($_POST["type"]) : "other";
+                $search->type = isset($_POST["mtype"]) ? strval($_POST["mtype"]) : "other";
                 $search->typeid = isset($_POST["typeid"]) && is_numeric($_POST["typeid"]) ? (int)$_POST["typeid"] : 0;
                 $search->valid = isset($_POST["valid"]) && is_numeric($_POST["valid"]) ? (int)$_POST["valid"] : 1;
                 $search->page = isset($_POST["page"]) && is_numeric($_POST["page"]) ? (int)$_POST["page"] : 0;

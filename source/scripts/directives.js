@@ -1,5 +1,28 @@
 /* global angular */
 var app = angular.module("app");
+/* 可编辑div的双向绑定 https://www.zhihu.com/question/27156225 @机智的布鲁斯 */
+app.directive("contenteditable", function(){
+    return {
+        restrict: "A",
+        require: "?ngModel",
+        link: function(scope, element, attrs, ngModel){
+            if(!ngModel) return;
+            ngModel.$render = function(){
+                element.html(ngModel.$viewValue || "");
+            };
+            element.on("blur keyup change", function(){
+                scope.$apply(readViewText);
+            });
+            function readViewText() {
+                var html = element.html();
+                if (attrs.stripBr && html === "<br>"){
+                    html = "";
+                }
+                ngModel.$setViewValue(html);
+            }
+        }
+    }
+});
 app.directive("aoPress", function(){
     return {
         restrict: "A",
@@ -27,7 +50,6 @@ app.directive("ngPromp", function(dom, main){
             $scope.showPromp = function(op){
                 dom.text($elem[0], "this is the updated promp div");
                 op = main.extend(true, config, op);
-                console.log(op);
             };
             $scope.tangoPromp = function(){
                 dom.tango($elem[0]);
@@ -48,51 +70,43 @@ app.directive("aoInput", function(dom, cache){
         }
     };
 });
-/*
-app.directive("aoCn", function(dom, main, cache, extra){
+app.directive("aoCs", function(dom, main){
     return {
         restrict: "AE",
         replace: true,
-        template: 
-    };
-});
-*/
-app.directive("aoCs", function(dom, broswer, main, cache, extra){
-    return {
-        restrict: "AE",
-        replace: true,
+        scope: {model: "="},
         templateUrl: "/require/ngComment.html",
         link: function($scope, $elem, $attr){
-            //var sign = "__aoSc_" + extra.random(5) + "__";
             var aoCs = $scope.aoSc = {
-                sc_ac_img: dom.get("sc_ac_img"),
-                sc_ac_content: dom.get("sc_content"),
-                sc_ac_show: dom.get("show")
-            }, range = {};
+                key: $scope.model.comid,
+                show: $scope.model.show || false,
+                showHide: $scope.model.showHide === false ? false : true
+            };
+            aoCs._hide = function(){
+                this.show = !this.show;
+            };
             aoCs._tango = function(){
-                if(aoCs.sc_ac_img.style.display == "block")
-                    aoCs.sc_ac_img.style.display = "none";
-                else aoCs.sc_ac_img.style.display = "block";
+                dom.get("sc_content_" + this.key).focus();
+                var elem = dom.get("sc_ac_img_" + this.key);
+                if(elem.style.display == "block")
+                    elem.style.display = "none";
+                else elem.style.display = "block";
             };
             aoCs._img = function(src){
                 document.execCommand('InsertImage', false, src);
-                aoCs.sc_ac_img.style.display = "none";
+                dom.get("sc_ac_img_" + this.key).style.display = "none";
             };
-            aoCs._bold = function(){ document.execCommand("Bold"); };
-            aoCs._italic = function(){ document.execCommand("Italic"); };
-            aoCs._range = function(){
-                if(window.getSelection) range = {s: window.getSelection(), f: "window"};
-                else if(document.selection) range = {s: document.selection.createRange(), f: "document"};
-                else if(aoCs.sc_ac_content.createTextRange) range = {s: aoCs.sc_ac_content.createTextRange(), f: "node"};
-                if(range.s && range.s.getRangeAt) range.r = range.s.getRangeAt(0);
-                else if(document.createRange){range.r = document.createRange(); range.f = "document";}
-                range.sw = range.s.toString();
-                //console.log(broswer.bs);
-                //console.log(range);
+            aoCs._bold = function(){
+                dom.get("sc_content_" + this.key).focus();
+                document.execCommand("Bold");
             };
-            aoCs._keydown = function(e){     
-                console.log(e);
-                if(aoCs.sc_ac_content.contentEditable != "true") return;
+            aoCs._italic = function(){
+                dom.get("sc_content_" + this.key).focus();
+                document.execCommand("Italic");
+            };
+            aoCs._keyup = function(e){
+                var _content = dom.get("sc_content_" + this.key);
+                if(_content.contentEditable != "true") return;
                 if(e.repeat) return;
                 else if(e.keyCode == 27) document.execCommand("undo"); //撤销
                 else if(e.keyCode == 9){
@@ -100,14 +114,20 @@ app.directive("aoCs", function(dom, broswer, main, cache, extra){
                     dom.no(e);
                 }
                 else if(e.keyCode == 13 && e.ctrlKey) aoCs._send(); //control + enter
-                else if(e.keyCode == 8 && e.ctrlKey) aoCs.sc_ac_content.innerHTML = ""; //control + backspace
+                else if(e.keyCode == 8 && e.ctrlKey) this.innerHTML = ""; //control + backspace
             };
             aoCs._send = function(){
-                //aoCs.sc_ac_show.innerHTML = aoCs.sc_ac_content.innerHTML;
+                var _content = dom.get("sc_content_" + this.key), send = dom.get("sub_coin_" + this.key);
+                _content.blur();
+                _content.focus();
+            };
+            aoCs._clear = function(){
+                var _content = dom.get("sc_content_" + this.key);
+                _content.innerHTML = "";
+                _content.blur();
+                _content.focus();
             };
             var init = function(){
-                //console.log(broswer.toString());
-                $scope.press_callback = aoCs._keydown;
                 var src = "images/ac/ac_", p = ".png";
                 aoCs.sc_ac = [];
                 for(var i = 1; i <= 50; i++) aoCs.sc_ac.push(src + i + p);

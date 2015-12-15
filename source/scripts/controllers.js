@@ -67,7 +67,14 @@ app.controller("urlController", function($scope, web, $location, $routeParams){
 app.controller("saysController", function($scope, main, cache, web){
     var init = function(){
         $scope = $scope || {};
-        $scope.saiys = "1234566";
+        $scope.comment = {comid: 0, comment: "", show: true, showHide: false};        
+        web.post("/var/ajax.php", {
+            action: "getall", 
+            type: "comment", 
+            "deep": true
+        }, function(data){
+            $scope.list = data.list;
+        });
     };
     init();
 });
@@ -256,7 +263,6 @@ app.controller("userController", function($scope, main, cache, web){
             }
         ];
         makeList(data);
-        console.log($scope.list);
     };
     init();
 });

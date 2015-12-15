@@ -1,71 +1,28 @@
             <div class="l_title">This is the Says page</div>
-            <ng-promp></ng-promp>
-            <ao-cs></ao-cs>
             <br />
+            <div class="says" style="margin-top: 15px;">
+                <div class="says_left bc666"></div>
+                <div class="says_right">
+                    <div>
+                        <div class="say_title">填充 :</div>
+                        <div class="say_item"><ao-cs model="comment" /></div>
+                        <div class="clear"></div>
+                    </div>
+                </div>
+                <div class="clear"></div>
+            </div>
             <br />
-            <div class="says_pano">
-                <div class="says_p_left">
-                    <div class="says_p_head" style="background: url(images/ac/ac_7.png) 4px 8px no-repeat;"></div>
+            <div class="says_pano" ng-repeat="com in list">
+                <div class="says_p_left"><!--{{com.user.userimg}}-->
+                    <div class="says_p_head" style="background: url(/images/ac/ac_1.png) no-repeat 100% 100%;"></div>
                 </div>
                 <div class="says_p_right">
                     <div>
                         <div class="says_p_hov">
-                            <div class="c666"><a href="javascript: void(0);" title="raply">eYe#jdiug.Ii</a> - 2015/3/23 7:25:13</div>
-                            <div>诶诶？在哪里碰到的妹纸 我怎么碰不到</div>
+                            <div class="c666"><a href="javascript: void(0);" title="raply" ng-bind="com.user.username"></a> - <span ng-bind="com.comdate"></span></div>
+                            <div ng-bind="com.comment"></div>
                         </div>
-                        <div></div>
-                        <div class="says_p_ch">
-                            <div>
-                                <div class="says_c_left">
-                                    <div class="says_p_head" style="background: url('images/ac/ac_25.png') 4px 8px no-repeat;"></div>
-                                </div>
-                                <div class="says_c_right">
-                                    <div class="c666"><a href="javascript: void(0);" title="raply">uTu#kdise.Tt</a> - 2015/3/23 7:28:57</div>
-                                    <div>碰什么碰。。碰坏了怎么办。。一定要抱怀里保护起来</div>
-                                </div>
-                                <div class="clear"></div>
-                            </div>
-                            <div>
-                                <div class="says_c_left">
-                                    <div class="says_p_head" style="background: url('images/ac/ac_9.png') 4px 8px no-repeat;"></div>
-                                </div>
-                                <div class="says_c_right">
-                                    <div class="c666"><a href="javascript: void(0);" title="raply">oIo#ewkam.Kk</a> - 2015/3/23 7:31:31</div>
-                                    <div>去的不是地方 去基佬去的地方能碰到妹纸吗 ？</div>
-                                </div>
-                                <div class="clear"></div>
-                            </div>
-                            <div>
-                                <div class="says_c_left">
-                                    <div class="says_p_head" style="background: url('images/ac/ac_37.png') 4px 8px no-repeat;"></div>
-                                </div>
-                                <div class="says_c_right">
-                                    <div class="c666"><a href="javascript: void(0);" title="raply">wEw#eikfg.Ii</a> - 2015/3/23 7:40:29</div>
-                                    <div>估计碰到被妹纸绕道了吧 。。</div>
-                                </div>
-                                <div class="clear"></div>
-                            </div>
-                            <div>
-                                <div class="says_c_left">
-                                    <div class="says_p_head" style="background: url('images/ac/ac_27.png') 4px 8px no-repeat;"></div>
-                                </div>
-                                <div class="says_c_right">
-                                    <div class="c666"><a href="javascript: void(0);" title="raply">rQr#dfjek.Hh</a> - 2015/3/23 7:55:08</div>
-                                    <div>我是妹纸</div>
-                                </div>
-                                <div class="clear"></div>
-                            </div>
-                            <div>
-                                <div class="says_c_left">
-                                    <div class="says_p_head" style="background: url('images/ac/ac_17.png') 4px 8px no-repeat;"></div>
-                                </div>
-                                <div class="says_c_right">
-                                    <div class="c666"><a href="javascript: void(0);" title="raply">pOp#dkues.Gg</a> - 2015/3/23 8:11:13</div>
-                                    <div>我去楼上求交往</div>
-                                </div>
-                                <div class="clear"></div>
-                            </div>
-                        </div>
+                        <div><ao-cs model="com"></ao-cs></div>
                     </div>
                 </div>
                 <div class="clear"></div>

@@ -360,6 +360,7 @@ app.service("broswer", function(main){
                 case "6.1": na.os = "Windows 7"; break;
                 case "6.2": na.os = "Windows 8"; break;
                 case "6.3": na.os = "Windows 8.1"; break;
+                case "10.0": na.os = "Windows 10"; break;
                 default: na.os = "Windows NT " + RegExp["$2"]; break;
             }
         } 

@@ -15,6 +15,7 @@ class Comment{
     var $comvalid; // int default 1
 
     var $user;
+    var $repeat;
 
     public function __construct($array = null, $bo = false){
         if($array == null || !is_array($array)){
@@ -38,12 +39,13 @@ class Comment{
             $this->userid = isset($array["userid"]) && is_numeric($array["userid"]) ? (int)$array["userid"] : 0;
             $this->repeatid = isset($array["repeatid"]) && is_numeric($array["repeatid"]) ? (int)$array["repeatid"] : 0;
             $this->repeatname = isset($array["repeatname"]) ? $array["repeatname"] : "";
-            $this->comdate = isset($array["comdate"])  ? strtotime($array["comdate"]) : -1;
+            $this->comdate = isset($array["comdate"])  ? $array["comdate"] : "";
             $this->comment = isset($array["comment"]) ? $array["comment"] : "";
             $this->comsort = isset($array["comsort"]) && is_numeric($array["comsort"]) ? (int)$array["comsort"] : 0;
             $this->comvalid = isset($array["comvalid"]) && is_numeric($array["comvalid"]) ? (int)$array["comvalid"] : 0;
         }
         $this->user = $bo && $this->userid > 0 ? User::Get($this->userid) : null;
+        $this->repeat = $bo && $this->repeatid > 0 ? User::Get($this->repeatid) : null;
     }
 
     public static function Add($com){
@@ -126,7 +128,7 @@ class Comment{
         $search->rows = isset($search->rows) && is_numeric($search->rows) ? (int)$search->rows : 0;
         $search->order = isset($search->name) ? strval($search->name) : "sort";
         $count = "select count(*) as count ";
-        $select = "select comid, comtype, comtypeid, compid, comname, comdate, comment, comsort, comvalid ";
+        $select = "select comid, comtype, comtypeid, compid, userid, comdate, comment, comsort, comvalid ";
         $where = "from Comments where 1 = 1 ";
         $paras = array();
         if($search->type != "other"){
@@ -137,9 +139,9 @@ class Comment{
             $where .= "and comtypeid = :comtypeid ";
             $paras[":comtypeid"] = $search->typeid;
         }
-        if($search->pid = -1) $where .= "and compid > 0";
+        if($search->pid == -1) $where .= "and compid > 0 ";
         else if($search->pid > -1){
-            $where .= "and compid = :compid";
+            $where .= "and compid = :compid ";
             $paras[":compid"] = $search->pid;
         }
         if($search->valid == 1 || $search->valid == 0){
@@ -149,12 +151,13 @@ class Comment{
         $count .= $where."; ";
         $where .= "order by comid desc ";
         $select .= $where;
-        if($pagenum > 0 && $pagesize > 0){
+        if($search->page > 0 && $search->rows > 0){
             $select .= "limit :page, :rows; ";
             $paras[":page"] = ($search->page - 1) * $search->rows;
             $paras[":rows"] = $search->rows;
         }
         else $select .= "; ";
+        $count .= $select;
         $list = array();
         $res = (new Entity())->Querys($count, $paras);
         if(count($res) != 2 || count($res[0]) != 1) return new Resaults();
