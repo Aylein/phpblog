@@ -1,5 +1,6 @@
-﻿var app = angular.module("app");
-app.controller("ngMainController", function($scope, $location, $route, web, cache){
+﻿/* global angular */
+var app = angular.module("app");
+app.controller("ngMainController", function($scope, $location, $route, web, cache, cv){
     $scope.clearCur = function(){
         $scope.sign.all.cur = 0;
         $scope.sign.say.cur = 0;
@@ -22,7 +23,7 @@ app.controller("ngMainController", function($scope, $location, $route, web, cach
     $scope.makeCur = function(){
         $scope.clearCur();
         var path = $location.path(), typeid = $route.current.params.typeid;
-        if(path.match(/^\/found\/\d+$/)) {
+        if(path.match(/^\/found\/\d+$/)){
             if($scope.sign.types["t_" + typeid])
                 $scope.sign.types["t_" + typeid].cur = 1;
         }
@@ -46,6 +47,22 @@ app.controller("ngMainController", function($scope, $location, $route, web, cach
             $scope.makeCur("all");
             $scope.$on("$locationChangeSuccess", $scope.makeCur);
         });
+        cache.set("cv", cv.init({
+            cover: {clsname: "apt", style: {position: "fixed", top: "0", left: "0", right: "0", bottom: "0", background: "#ff00ff"}},
+            dialog: {clsname: "col-xs-10 col-xs-offset-1 col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4", style: {"top": "24px"}},
+            title: {text: "title"},
+            content: {text: "message", style: {"min-height": "40px", "font-size": "18px", "line-height": "40px"}},
+            close: {click: function(){ if(!close || close(this) !== false) this.hide(); }, ppp: "ppppp", style: {key: "key", key1: "key1"}},
+            button: [{
+                key: "yes",
+                clsname: "btn btn-primary",
+                html: "确定",
+                click: function(){ if(!callback || callback(this) !== false) this.hide(); }
+            }]
+        }));
+        var cvm = cache.get("cv");
+        cvm.show();
+        console.log(cache.all(), cvm);
     };
     $scope.flush = function(){
         $scope.sign.types = {};
@@ -75,6 +92,7 @@ app.controller("saysController", function($scope, main, cache, web){
         }, function(data){
             $scope.list = data.list;
         });
+        console.log($scope);
     };
     init();
 });

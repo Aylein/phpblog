@@ -512,6 +512,139 @@ app.service("dom", function(main){
             elem.style.display = "block";
         else elem.style.display = "none";
     };
+    this.tangoClass = function(elem, clsName){
+        if(!clsName) return;
+        if(elem.classList){
+            elem.classList.toggle(clsName);
+            return;
+        }
+        if(elem.className.indexOf(clsName) < 0) elem.className += " " + clsName;
+        else elem.className = elem.className.replace(clsName, "");
+    };
+    this.addClass = function(elem, clsName){
+        if(!clsName) return;
+        if(elem.classList){
+            clsName = clsName.split(" ");
+            for(var i = 0, z = clsName.length; i < z; i++)
+                elem.classList.add(clsName[i]);
+            return;
+        }
+        if(elem.className.indexOf(clsName) < 0) elem.className += " " + clsName;
+    };
+    this.removeClass = function(elem, clsName){
+        if(!clsName) return;
+        if(elem.classList && elem.classList.contains(clsName)){
+            clsName = clsName.split(" ");
+            for(var i = 0, z = clsName.length; i < z; i++)
+                elem.classList.remove(clsName[i]);
+            return;
+        }
+        if(elem.className.indexOf(clsName) > 0) 
+            elem.className = elem.className.replace(clsName, "");
+    };
+    this.classExsits = function(elem, clsName){
+        if(!clsName) return false;
+        return elem.className.indexOf(clsName) > -1;
+    };
+    this.style = function(elem, key, value){
+        if(main.types._object.test(main.typeof(key)))
+            for(var i in key)
+                this.style(elem, i, key[i]);
+        else if(value) elem.style[key] = value;
+        else return elem.style[key];
+    };
+    this.styleText = function(elem, value){
+        elem.style.cssText = value.toString();
+    };
+});
+app.service("cv", function(main, dom){
+    var Default = function(){
+        this.sign = "ao",
+		this.cover = {clsname: "", style: {}, click: false};
+		this.dialog = {clsname: "", style: {}, callback: function(){}, show: function(){}};
+		this.header = {clsname: "", style: {}}
+		this.title = {text: "", clsname: "", style: {}};
+		this.close = {text: "×", clsname: "", style: {}, click: false};
+		this.content = {id: "", text: "", html: "", clsname: "", style: {}, load: function(){}};
+		this.footer = {clsname: "", style: {}};
+		this.button = [];
+    };
+    var CV = function(opt){
+		opt = opt || {};
+		var def = new Default();
+		for(var key in opt)
+			if(def[key] && main.types._object.test(main.typeof(def[key])) && main.types._object.test(main.typeof(opt[key])))
+				opt[key] = main.extend(def[key], opt[key]);
+		opt = main.extend(def, opt);
+        return this.init(opt);
+    };
+    CV.prototype = {
+        init: function(opt){
+			var _this = this;
+            this.opt = opt;
+            this._main = dom.Element("div");
+            dom.style(this._main, "display", "none");
+            
+            if(this.opt.cover){
+                this._cover = dom.Element("div");
+                dom.addClass(this._cover, this.opt.sign + "_cover " + this.opt.cover.clsname);
+				if(this.opt.cover.style && main.obj(opt.cover.style))
+					for(var key in this.opt.cover.style)
+						dom.style(this._cover, key, this.opt.cover.style[key]);
+                dom.style(this._cover, "z-index", "2");
+				if(this.opt.cover.click && main.types._function.test(main.typeof(opt.cover.click)))
+					dom.on("click", this._cover, function(){ opt.cover.click.call(_this); });
+				dom.append(this._main, this._cover);
+            }
+            else this._cover = undefined;
+            
+            if(this.opt.dialog){
+                this._dialog = dom.Element("div");
+                dom.addClass(this._dialog, this.opt.sign + "_dialog " + this.opt.dialog.clsname);
+				if(this.opt.dialog.style && main.obj(opt.dialog.style))
+					for(var key in this.opt.dialog.style)
+						dom.style(this._dialog, key, this.opt.dialog.style[key]);
+                dom.append(this._main, this._dialog);
+            }
+            else return;
+            
+            if(this.opt.header){
+                this._header = dom.Element("div");
+                dom.addClass(this._header, this.opt.sign + "_header " + this.opt.header.clsname);
+				if(this.opt.header.style && main.obj(opt.header.style))
+					for(var key in this.opt.header.style)
+						dom.style(this._header, key, this.opt.header.style[key]);
+                        
+                if(this.opt.title){
+                    this._title = dom.ELement("span");
+                    dom.addClass(this._title, this.opt.sign + "_title " + this.opt.title.clsname);
+                    if(this.opt.title.style && main.obj(opt.title.style))
+                        for(var key in this.opt.title.style)
+                            dom.style(this._title, key, this.opt.title.style[key]);
+                    dom.html(this.title, this.opt.title.text);
+                    dom.append(this._header, this._title);
+                }
+                else this._title = undefined;
+                
+                if(this.opt.close){
+                    this._close = dom.Element("button");
+                    dom.addClass(this._title, this.opt.sign + "_close " + this.opt.close.clsname);
+                }
+                else this._close = undefined;
+            }
+            else this._header = undefined;
+            
+            
+            document.body.appendChild(this._main);
+        },
+        show: function(){
+            dom.show(this._cover);
+            dom.show(this._main);
+        }
+    };
+    this.init = function(opt){
+        return new CV(opt);
+    };
 });
 app.service("cookie", function(){
 
