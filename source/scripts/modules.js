@@ -43,6 +43,7 @@ app.service("main", function(){
         },
         navi: {
             isWinNT: /Windows NT (\d+.\d+)[\.\d+]*/,
+            isLinux: /Linux (\S+)/,
             isMac: /Mac OS X (\S+)/,
             isLikeMac: /Mac OS X/,
             isIPhone: /iPhone OS (\S+)/,
@@ -440,11 +441,14 @@ app.service("dom", function(main){
         elem.appendChild(deep ? _elem.cloneNode(1) : _elem);
         return elem;
     };
+    this.remove = function(elem, _elem){
+        elem.removeChild(_elem);
+    }
     this.on = function(event, elem, callback, bs){
         if(arguments.length < 3) return elem;
         var type = main.typeof(elem);
         if(!main.types._element.test(type) || eventType.indexOf(event) <= -1 ||
-            main.types._function.test(main.typeof(callback))) return elem;
+            !main.types._function.test(main.typeof(callback))) return elem;
         bs = bs || false;
         if(elem.addEventListener)
             elem.addEventListener(event, callback, bs);
@@ -474,7 +478,7 @@ app.service("dom", function(main){
                 });
             }
             else if(main.types._string.test(type)){
-
+                elem.innerHTML = html;
             }
             return elem;
         }
@@ -573,7 +577,7 @@ app.service("cv", function(main, dom){
 			if(def[key] && main.types._object.test(main.typeof(def[key])) && main.types._object.test(main.typeof(opt[key])))
 				opt[key] = main.extend(def[key], opt[key]);
 		opt = main.extend(def, opt);
-        return this.init(opt);
+        return new this.init(opt);
     };
     CV.prototype = {
         init: function(opt){
@@ -633,9 +637,7 @@ app.service("cv", function(main, dom){
                             dom.style(this._close, key, this.opt.close.style[key]);
                     if(this.opt.close.text) dom.text(this._close, this.opt.close.text);
                     if(this.opt.close.html) dom.html(this._close, this.opt.close.html);
-                        console.log("dddddddddddddd");
                     dom.on("click", this._close, function(){
-                        console.log("dddddddddddddd");
                         if(!_this.opt.close.click || !main.types._function.test(main.typeof(_this.opt.close.click)) || _this.opt.close.click(_this) !== false) _this.hide();
                     });
                     dom.append(this._header, this._close);
@@ -695,19 +697,76 @@ app.service("cv", function(main, dom){
             dom.append(document.body, this._main);
         },
         show: function(){
-            dom.style(document.body, "overflow-y", "hidden");
+            dom.style(document.body, "overflow", "hidden");
             dom.show(this._cover);
             dom.show(this._main);
+            return this;
         },
         hide: function(){
-            dom.style(document.body, "overflow-y", "auto");
+            dom.style(document.body, "overflow", "auto");
             dom.hide(this._main);
             dom.hide(this._cover);
+            dom.remove(document.body, this._main);
+            return this;
         }
-        //CV.prototype.init.prototype = CV.prototype;
     };
+    CV.prototype.init.prototype = CV.prototype;
     this.init = function(opt){
-        return new CV(opt);
+        return new CV(opt).show();
+    };
+    this.prop = function(title, message, type, callback){
+        return new CV({
+            title: {text: title},
+            content: {html: message + "<input type=\"" + type + "\" id=\"cv_input\">"},
+            button: [{
+                key: "no",
+                text: "取消",
+                click: function(v){
+                    var cv_input = dom.get("cv_input");
+                    if(!callback || main.types._function.test(main.typeof(callback)) && callback(false, main.trim(cv_input.value), v) !== false) v.hide(); 
+                }
+            },
+            {
+                key: "yes",
+                text: "确定",
+                click: function(v){
+                    if(!callback || main.types._function.test(main.typeof(callback)) && callback(true, main.trim(cv_input.value), v) !== false) v.hide(); 
+                }
+            }]
+        }).show();
+    };
+    this.alert = function(title, message, callback){
+        return new CV({
+            title: {text: title},
+            content: {html: message},
+            button: [{
+                key: "yes",
+                text: "确定",
+                click: function(v){
+                    if(!callback || main.types._function.test(main.typeof(callback)) && callback(v) !== false) v.hide(); 
+                }
+            }]
+        }).show();
+    };
+    this.confirm = function(title, message, callback){
+        return new CV({
+            title: {text: title},
+            content: {html: message},
+            button: [{
+                key: "no",
+                text: "取消",
+                click: function(v){
+                    if(!callback || main.types._function.test(main.typeof(callback)) && callback(false, v) !== false) v.hide(); 
+                }
+            },
+            {
+                key: "yes",
+                text: "确定",
+                click: function(v){
+                    if(!callback || main.types._function.test(main.typeof(callback)) && callback(true, v) !== false) v.hide(); 
+                }
+            }]
+        }).show();
     };
 });
 app.service("cookie", function(){

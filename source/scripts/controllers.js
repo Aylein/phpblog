@@ -47,21 +47,6 @@ app.controller("ngMainController", function($scope, $location, $route, web, cach
             $scope.makeCur("all");
             $scope.$on("$locationChangeSuccess", $scope.makeCur);
         });
-        cache.set("cv", cv.init({
-            title: {text: "title"},
-            content: {text: "message"},
-            button: [{
-                key: "yes",
-                text: "确定"
-            }]
-        }));
-        var cvm = cache.get("cv");
-        cvm.show();
-        //console.log(cache.all(), cvm);
-        
-        console.log(cookie.cookieObj());
-        cookie.clear();
-        console.log(cookie.cookieObj());
     };
     $scope.flush = function(){
         $scope.sign.types = {};
@@ -172,17 +157,6 @@ app.controller("typeController", function($scope, main, cache, web){
         if(tar == undefined) return false;
         tar.typevalid = tar.typevalid == 1 ? 0 : 1;
         $scope.update(key);
-        /*
-        if(tar == undefined) return;
-        var data = {_action: "valid", _type: "type", _id: tar.typeid};
-        web.post("/var/admin.php", data, function(data){
-            if(!data.res) {
-                alert(data.msg);
-                return;
-            }
-            makeTypes(data.obj);
-        });
-        */
     };
     $scope.shown = function(key){
         var tar = key == "new" ? $scope.newtype : _types[key].unode;
