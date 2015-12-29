@@ -299,9 +299,9 @@ app.service("broswer", function(main){
     };
     navi.prototype = {
         toString: function(){
-            return "Rendering Engine : " + (this.en||"") + " " + (this.env||"") + 
-                ", Browser : " +  (this.bs||"") + " " + (this.bsv||"")  + 
-                ", Operating System : " + (this.os||"");
+            return "Rendering Engine : " + (this.en || "") + " " + (this.env || "") + 
+                ", Browser : " +  (this.bs || "") + " " + (this.bsv || "")  + 
+                ", Operating System : " + (this.os || "");
         }
     };
     var na = new navi();
@@ -391,6 +391,7 @@ app.service("dom", function(main){
         "placehoder").split(" ");
     var eventType = ("click dblclick mousedown mouseup mouseover mouseout mousemove ouseenter mouseleave keypress keydown keyup" +
         "blur focus change reset submit touchstart touchmove touchend touchcancel").split(" ");
+    this.noUrl = "javascript: void(0);";
     this.Element = function(tag, opt){
         tag = tag || undefined, opt = opt || undefined;
         var element;
@@ -513,7 +514,6 @@ app.service("dom", function(main){
         else elem.style.display = "none";
     };
     this.tangoClass = function(elem, clsName){
-        if(!clsName) return;
         if(elem.classList){
             elem.classList.toggle(clsName);
             return;
@@ -522,17 +522,15 @@ app.service("dom", function(main){
         else elem.className = elem.className.replace(clsName, "");
     };
     this.addClass = function(elem, clsName){
-        if(!clsName) return;
         if(elem.classList){
             clsName = clsName.split(" ");
             for(var i = 0, z = clsName.length; i < z; i++)
-                elem.classList.add(clsName[i]);
+                if(clsName[i]) elem.classList.add(clsName[i]);
             return;
         }
         if(elem.className.indexOf(clsName) < 0) elem.className += " " + clsName;
     };
     this.removeClass = function(elem, clsName){
-        if(!clsName) return;
         if(elem.classList && elem.classList.contains(clsName)){
             clsName = clsName.split(" ");
             for(var i = 0, z = clsName.length; i < z; i++)
@@ -543,7 +541,6 @@ app.service("dom", function(main){
             elem.className = elem.className.replace(clsName, "");
     };
     this.classExsits = function(elem, clsName){
-        if(!clsName) return false;
         return elem.className.indexOf(clsName) > -1;
     };
     this.style = function(elem, key, value){
@@ -563,9 +560,9 @@ app.service("cv", function(main, dom){
 		this.cover = {clsname: "", style: {}, click: false};
 		this.dialog = {clsname: "", style: {}, callback: function(){}, show: function(){}};
 		this.header = {clsname: "", style: {}}
-		this.title = {text: "", clsname: "", style: {}};
-		this.close = {text: "×", clsname: "", style: {}, click: false};
-		this.content = {id: "", text: "", html: "", clsname: "", style: {}, load: function(){}};
+		this.title = {text: "", html: "", clsname: "", style: {}};
+		this.close = {text: "×", html: "", clsname: "", style: {}, click: false};
+		this.content = {id: "", html: "", text: "", clsname: "", style: {}};
 		this.footer = {clsname: "", style: {}};
 		this.button = [];
     };
@@ -604,7 +601,7 @@ app.service("cv", function(main, dom){
 				if(this.opt.dialog.style && main.obj(opt.dialog.style))
 					for(var key in this.opt.dialog.style)
 						dom.style(this._dialog, key, this.opt.dialog.style[key]);
-                dom.append(this._main, this._dialog);
+                dom.style(this._dialog, "z-index", "3");
             }
             else return;
             
@@ -616,38 +613,141 @@ app.service("cv", function(main, dom){
 						dom.style(this._header, key, this.opt.header.style[key]);
                         
                 if(this.opt.title){
-                    this._title = dom.ELement("span");
+                    this._title = dom.Element("span");
                     dom.addClass(this._title, this.opt.sign + "_title " + this.opt.title.clsname);
                     if(this.opt.title.style && main.obj(opt.title.style))
                         for(var key in this.opt.title.style)
                             dom.style(this._title, key, this.opt.title.style[key]);
-                    dom.html(this.title, this.opt.title.text);
+                    if(this.opt.title.text) dom.text(this._title, this.opt.title.text);
+                    if(this.opt.title.html) dom.html(this._title, this.opt.title.html);
                     dom.append(this._header, this._title);
                 }
                 else this._title = undefined;
                 
                 if(this.opt.close){
-                    this._close = dom.Element("button");
-                    dom.addClass(this._title, this.opt.sign + "_close " + this.opt.close.clsname);
+                    this._close = dom.Element("a");
+                    dom.attr(this._close, "href", dom.noUrl);
+                    dom.addClass(this._close, this.opt.sign + "_close " + this.opt.close.clsname);
+                    if(this.opt.close.style && main.obj(opt.close.style))
+                        for(var key in this.opt.close.style)
+                            dom.style(this._close, key, this.opt.close.style[key]);
+                    if(this.opt.close.text) dom.text(this._close, this.opt.close.text);
+                    if(this.opt.close.html) dom.html(this._close, this.opt.close.html);
+                        console.log("dddddddddddddd");
+                    dom.on("click", this._close, function(){
+                        console.log("dddddddddddddd");
+                        if(!_this.opt.close.click || !main.types._function.test(main.typeof(_this.opt.close.click)) || _this.opt.close.click(_this) !== false) _this.hide();
+                    });
+                    dom.append(this._header, this._close);
                 }
                 else this._close = undefined;
+                dom.append(this._dialog, this._header);
             }
             else this._header = undefined;
             
+            if(this.opt.content){
+                this._content = dom.Element("div");
+                dom.addClass(this._content, this.opt.sign + "_content " + this.opt.content.clsname);
+				if(this.opt.content.style && main.obj(opt.content.style))
+					for(var key in this.opt.content.style)
+						dom.style(this._content, key, this.opt.content.style[key]);
+                if(this.opt.content.text) dom.text(this._content, this.opt.content.text);
+                if(this.opt.content.html) dom.html(this._content, this.opt.content.html);
+                if(this.opt.content.id){
+                    this._content_c = dom.get(this.opt.content.id);
+                    dom.show(this._content_c);
+                    dom.append(this._content, this._content_c);
+                }
+                dom.append(this._dialog, this._content);
+            }
+            else this._content = undefined;
             
-            document.body.appendChild(this._main);
+            this._button = {};
+            if(this.opt.footer){
+                this._footer = dom.Element("div");
+                dom.addClass(this._footer, this.opt.sign + "_footer " + this.opt.footer.clsname);
+				if(this.opt.footer.style && main.obj(opt.footer.style))
+					for(var key in this.opt.footer.style)
+						dom.style(this._footer, key, this.opt.footer.style[key]);
+                dom.append(this.dialog, this._footer);
+                
+                if(this.opt.button.length > 0){
+                    main.each(this.opt.button, function(index){
+                        var that = this, key = this.key ? this.key : "key_" + index, o = dom.Element("a");
+                        dom.attr(o, "href", dom.noUrl);
+                        dom.addClass(o, _this.opt.sign + "_button " + this.clsname);
+                        if(this.style && main.obj(this.style))
+                            for(var key in this.style)
+                                dom.style(o, key, this.style[key]);
+                        if(this.text) dom.text(o, this.text);
+                        if(this.html) dom.html(o, this.html);
+                        if(this.click && main.types._function.test(main.typeof(this.click))) 
+                            dom.on("click", o, function(){ that.click(_this); });
+                        _this._button[key] = o;
+                        dom.append(_this._footer, o);
+                    });
+                }
+                dom.append(this._dialog, this._footer);
+            }
+            else this._footer = undefined;
+            dom.append(this._main, this._dialog);
+            
+            dom.append(document.body, this._main);
         },
         show: function(){
+            dom.style(document.body, "overflow-y", "hidden");
             dom.show(this._cover);
             dom.show(this._main);
+        },
+        hide: function(){
+            dom.style(document.body, "overflow-y", "auto");
+            dom.hide(this._main);
+            dom.hide(this._cover);
         }
+        //CV.prototype.init.prototype = CV.prototype;
     };
     this.init = function(opt){
         return new CV(opt);
     };
 });
 app.service("cookie", function(){
-
+    var reg_trim = /^(\s+)|(\s+)$/g;
+    this.trim = function(str){
+        return str.replace(reg_trim, function($1){ return ""; });
+    };
+    this.cookieText = function(){
+        return document.cookie;
+    };
+    this.cookieObj = function(){
+        var _cookie = this.cookieText().split(";"), obj = {};
+        for(var i = 0, z = _cookie.length; i < z; i++){
+            var _kv = _cookie[i].split("=");
+            obj[_kv[0]] = _kv[1];
+        }
+        return obj;
+    };
+    this.get = function(key){
+        return this.cookieObj()[key];
+    };
+    this.set = function(key, value, domain, path, expires){
+        var str = key + "=" + value + ";";
+        if(domain) str += "domain=" + domain + ";";
+        if(path) str += "patch=" + path + ";";
+        if(expires) str += "expires=" + expires + ";";
+        document.cookie = str;
+    };
+    this.delete = function(key){
+        var date = new Date();
+        date.setTime(date.getTime() - 600000);
+        var str = key + "=v; expires=" + date.getTime();
+        document.cookie = str;
+    };
+    this.clear = function(){
+        var date = new Date(), _cookie = this.cookieText().split(";");
+        date.setTime(date.getTime() - 600000);
+        for(var i = 0, z = _cookie.length; i < z; i++)
+            document.cookie = _cookie[i] + "; expires=" + date.getTime();
+    };
 });
 app.service("web", function($http, main){
     var config = {
