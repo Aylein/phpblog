@@ -39,3 +39,5 @@ body { background-color: #F5F5F5; overflow-y: scroll; }
 .ao_footer { height: 36px; border-top-style: solid; border-top-width: 1px; border-top-color: #CCC; text-align: right; }
 .ao_button { height: 26px; margin: 5px; display: inline-block; width: 100px; text-align: center; color: #000000; line-height: 26px; background: #DDD; }
 .ao_button:hover { opacity: .8; }
+
+.ao_debug { z-index:100; position: fixed; bottom: 20px; background: #ffffff; color: #000000; }

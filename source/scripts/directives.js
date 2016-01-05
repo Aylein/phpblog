@@ -1,3 +1,4 @@
+"use strict";
 /* global angular */
 var app = angular.module("app");
 /* 可编辑div的双向绑定 https://www.zhihu.com/question/27156225 @机智的布鲁斯 */
@@ -5,70 +6,23 @@ app.directive("contenteditable", function(){
     return {
         restrict: "A",
         require: "?ngModel",
-        link: function(scope, element, attrs, ngModel){
+        link: function($scope, $element, $attrs, ngModel){
             if(!ngModel) return;
             ngModel.$render = function(){
-                element.html(ngModel.$viewValue || "");
+                $element.html(ngModel.$viewValue || "");
             };
-            element.on("blur keyup change", function(){
-                scope.$apply(readViewText);
+            $element.on("blur keyup change", function(){
+                $scope.$apply(readViewText);
             });
             function readViewText() {
-                var html = element.html();
-                if (attrs.stripBr && html === "<br>"){
+                var html = $element.html();
+                if ($attrs.stripBr && html === "<br>"){
                     html = "";
                 }
                 ngModel.$setViewValue(html);
             }
         }
     }
-});
-app.directive("aoPress", function(){
-    return {
-        restrict: "A",
-        link: function($scope, $elem){
-            $elem.on("keydown", function(event){
-                var $e = event || window.event;
-                if($scope.press_callback)
-                    $scope.press_callback($e, $elem);
-            });
-        }
-    };
-});
-app.directive("ngPromp", function(dom, main){
-    return {
-        restrict: "E",
-        replace: true,
-        templateUrl: "/require/ngPromp.html",
-        link: function($scope, $elem, $attrs){
-            var config = {
-                width: 200,
-                height: 150,
-                title: "提示",
-                discript: "",
-            };
-            $scope.showPromp = function(op){
-                dom.text($elem[0], "this is the updated promp div");
-                op = main.extend(true, config, op);
-            };
-            $scope.tangoPromp = function(){
-                dom.tango($elem[0]);
-            };
-        }
-    };
-});
-app.directive("aoInput", function(dom, cache){
-    return {
-        restrict: "A",
-        link: function($scope, $elem, $attr){
-            $elem.on("click", function(){
-                var list = cache.types || {}, _tar = list[$attr.key] || {}, _this = $elem[0];
-                dom.clear(_this);
-                dom.append(_this, dom.Element("input", {type: "text", value: _tar.typename, id: "it_" + _tar.key}));
-                dom.append(_this, dom.Element("input", {type: "button", value: "确定", id: "tb_" + _tar.key}));
-            });
-        }
-    };
 });
 app.directive("aoCs", function(dom, main){
     return {

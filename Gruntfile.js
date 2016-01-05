@@ -51,23 +51,12 @@ module.exports = function(grunt) {
                 ]
             },
             release: {
-                files: [
-                    {expand: true, cwd: "release", src: "**", dest: "C:/SinaSae/aylein/2"}
-                    /*
-                    {expand: true, cwd: "release", src: [
-                        "images/**", 
-                        "lib/**", 
-                        "require/**", 
-                        "scripts/**", 
-                        "sounds/**", 
-                        "styles/**", 
-                        "styles/**", 
-                        "view/**", 
-                        "var/**", 
-                        "index.html"
-                    ], dest: "C:/SinaSae/aylein/2"}
-                    * */
-                ]
+                files: [{
+                    expand: true, 
+                    cwd: "release", 
+                    src: "**", 
+                    dest: "C:/SinaSae/aylein/2"
+                }]
             }
         },
         watch: {

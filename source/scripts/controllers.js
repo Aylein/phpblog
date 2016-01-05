@@ -1,6 +1,7 @@
-﻿/* global angular */
+﻿"use strict";
+/* global angular */
 var app = angular.module("app");
-app.controller("ngMainController", function($scope, $location, $route, web, cache, cookie, cv){
+app.controller("ngMainController", function($scope, $location, $route, web, cache, cookie, cv, debug){
     $scope.clearCur = function(){
         $scope.sign.all.cur = 0;
         $scope.sign.say.cur = 0;
@@ -47,6 +48,8 @@ app.controller("ngMainController", function($scope, $location, $route, web, cach
             $scope.makeCur("all");
             $scope.$on("$locationChangeSuccess", $scope.makeCur);
         });
+        $scope.cv = cv;
+        $scope.debug = debug;
     };
     $scope.flush = function(){
         $scope.sign.types = {};
@@ -137,7 +140,7 @@ app.controller("typeController", function($scope, main, cache, web){
         var tar = key == "new" ? $scope.newtype : _types[key].unode;
         if(tar == undefined) return false;
         if(tar.typename == ""){
-            alert("请填写分类名称");
+            $scope.debug("warnning", "请填写分类名称");
             return false;
         }
         var data = main.copy(tar);
@@ -145,7 +148,7 @@ app.controller("typeController", function($scope, main, cache, web){
         data._type = "type";
         web.post("/var/admin.php", data, function(data){
             if(!data.res) {
-                alert(data.msg);
+                $scope.debug("error", data.msg);
                 return;
             }
             makeTypes(data.obj);

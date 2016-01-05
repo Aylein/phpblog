@@ -1,3 +1,4 @@
+"use strict";
 var app = angular.module("app", ["ngRoute"]);
 app.config(function($routeProvider){
     $routeProvider.when("/index", {
@@ -74,7 +75,7 @@ app.service("main", function(){
             _array: /^Array$/, //["Array"],
             _window: /^Window$/,
             _document: /^NodeList|HTMLCollection|HTMLAllCollection|HTMLDocument$/, //["HTMLCollection", "HTMLAllCollection", "HTMLDocument"],
-            _element: /^HTML\S+Element$/, //["HTMLImageElement", "HTMLDivElement"],
+            _element: /^HTML\S*Element$/, //["HTMLImageElement", "HTMLDivElement"],
             _domtoken: /^DOMTokenList$/,
             _function: /^[f|F]unction$/, //["function", "Function"],
             _number: /^[n|N]unction$/, //["number", "Number"],
@@ -443,7 +444,7 @@ app.service("dom", function(main){
     };
     this.remove = function(elem, _elem){
         elem.removeChild(_elem);
-    }
+    };
     this.on = function(event, elem, callback, bs){
         if(arguments.length < 3) return elem;
         var type = main.typeof(elem);
@@ -558,6 +559,34 @@ app.service("dom", function(main){
         elem.style.cssText = value.toString();
     };
 });
+app.service("debug", function(dom){
+    var DV = dom.Element("section");
+    dom.addClass(DV, "ao_debug");
+    dom.append(document.body, DV);
+    this.add = function(type, str){
+        var div = dom.Element("div");
+        switch(type){
+            case "success": dom.addClass(div, "ao_debug_success"); break;
+            case "warnning": dom.addClass(div, "ao_debug_warnning"); break;
+            case "error": dom.addClass(div, "ao_debug_error"); break;
+            case "working": dom.addClass(div, "ao_debug_working"); break;
+            default: dom.addClass(div, "ao_debug_default"); break;
+        };
+        dom.text(div, str);
+        dom.append(DV, div);
+        setTimeout(function(){
+            dom.remove(DV, div);
+        }, (function(){
+            switch(type){
+                case "warnning": 
+                case "error": return 15000;
+                case "success":
+                case "working":
+                default: return 5000;
+            };
+        })());
+    };
+});
 app.service("cv", function(main, dom){
     var Default = function(){
         this.sign = "ao",
@@ -583,7 +612,7 @@ app.service("cv", function(main, dom){
         init: function(opt){
 			var _this = this;
             this.opt = opt;
-            this._main = dom.Element("div");
+            this._main = dom.Element("section");
             dom.style(this._main, "display", "none");
             
             if(this.opt.cover){
@@ -693,7 +722,6 @@ app.service("cv", function(main, dom){
             }
             else this._footer = undefined;
             dom.append(this._main, this._dialog);
-            
             dom.append(document.body, this._main);
         },
         show: function(){
@@ -730,6 +758,7 @@ app.service("cv", function(main, dom){
                 key: "yes",
                 text: "确定",
                 click: function(v){
+                    var cv_input = dom.get("cv_input");
                     if(!callback || main.types._function.test(main.typeof(callback)) && callback(true, main.trim(cv_input.value), v) !== false) v.hide(); 
                 }
             }]
