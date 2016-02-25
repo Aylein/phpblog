@@ -3,7 +3,6 @@
 a { color: #666; }
 a:hover { color: #000000; }
 /*a:visited { color: #666; }*/
-html { }
 body { background-color: #F5F5F5; overflow-y: scroll; }
 
 .header { width: 100%; height: 42px; z-index: 1; background-color: #E7E7E7; }
@@ -40,4 +39,5 @@ body { background-color: #F5F5F5; overflow-y: scroll; }
 .ao_button { height: 26px; margin: 5px; display: inline-block; width: 100px; text-align: center; color: #000000; line-height: 26px; background: #DDD; }
 .ao_button:hover { opacity: .8; }
 
-.ao_debug { z-index:100; position: fixed; bottom: 20px; background: #ffffff; color: #000000; }
+.ao_debug { z-index:100; position: fixed; bottom: 20px; color: #ffffff; }
+.ao_debug_line { margin: 20px; max-width: 250px; padding-left: 80px; }

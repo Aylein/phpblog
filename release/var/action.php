@@ -17,7 +17,7 @@
     $user = User::MakeUser($pass, $name)->obj;
 
     if($user == null){
-        echo json_encode(new Message("获取用户或注册失败，如要更换用户，请清空当前cookie并在此输入密码。", false, null, "no_user"));
+        echo json_encode(new Message("获取用户或注册失败，如要更换用户，请清空当前cookie并输入一个新密码。", false, null, "no_user"));
         exit();
     }
     else setCookie("ao", $user->username, strtotime(date('Y-m-d H:i:s',strtotime("+ 1 year"))));

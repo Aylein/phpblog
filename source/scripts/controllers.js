@@ -71,7 +71,10 @@ app.controller("urlController", function($scope, web, $location, $routeParams){
 app.controller("saysController", function($scope, main, cache, web){
     var init = function(){
         $scope = $scope || {};
-        $scope.comment = {comid: 0, comment: "", show: true, showHide: false};        
+        $scope.comment = {comid: 0, comment: "", show: true, showHide: false};
+        $scope.send = function(model){
+            console.log(model);
+        };  
         web.post("/var/ajax.php", {
             action: "getall", 
             type: "comment", 

@@ -88,7 +88,7 @@
                 $search->commmax = isset($_POST["commmax"]) && is_numeric($_POST["commmax"]) ? (int)$_POST["commmax"] : 0;
                 $search->page = isset($_POST["page"]) && is_numeric($_POST["page"]) ? (int)$_POST["page"] : 0;
                 $search->rows = isset($_POST["rows"]) && is_numeric($_POST["rows"]) ? (int)$_POST["rows"] : 0;
-                $search->$order = isset($_POST["order"]) ? strval($_POST["order"]) : "";
+                $search->order = isset($_POST["order"]) ? strval($_POST["order"]) : "";
                 return Stage::GetAll($search, $deep);
             case "signon": 
                 $search->signid = isset($_POST["userid"]) && is_numeric($_POST["userid"]) ? (int)$_POST["userid"] : 0;

@@ -74,6 +74,7 @@ app.directive("aoCs", function(dom, main){
                 var _content = dom.get("sc_content_" + this.key), send = dom.get("sub_coin_" + this.key);
                 _content.blur();
                 _content.focus();
+                if(main.types._function.test(main.typeof($scope.$parent.send))) $scope.$parent.send($scope.model);
             };
             aoCs._clear = function(){
                 var _content = dom.get("sc_content_" + this.key);
