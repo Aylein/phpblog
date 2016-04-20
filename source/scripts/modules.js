@@ -559,7 +559,7 @@ app.service("dom", function(main){
         elem.style.cssText = value.toString();
     };
 });
-app.service("debug", function(dom){
+app.service("debug", function(dom, main){
     var DV = dom.Element("section");
     dom.addClass(DV, "ao_debug");
     dom.append(document.body, DV);
@@ -574,8 +574,11 @@ app.service("debug", function(dom){
         };
         dom.text(div, str);
         dom.append(DV, div);
+        var br = dom.Element("br");
+        dom.append(DV, br);
         setTimeout(function(){
             dom.remove(DV, div);
+            dom.remove(DV, br);
         }, (function(){
             switch(type){
                 case "warnning": 
@@ -586,6 +589,13 @@ app.service("debug", function(dom){
             };
         })());
     };
+    var _this = this;
+    main.each(["success", "warnning", "error", "working"], function(){
+        var type = this;
+        _this[this] = function(msg){
+          _this.add(type, msg);  
+        };
+    });
 });
 app.service("cv", function(main, dom){
     var Default = function(){

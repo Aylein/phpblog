@@ -33,11 +33,17 @@ body { background-color: #F5F5F5; overflow-y: scroll; }
 .ao_header { height: 41px; border-bottom-style: dashed; border-bottom-width: 1px; border-bottom-color: #CCC; }
 .ao_header:after { clear: both; }
 .ao_title { float: left; margin: 10px; }
-.ao_close { float: right; margin: 10px; }
+.ao_close { float: right; margin: 10px 15px 10px 10px; }
 .ao_content { min-height: 40px; font-size: 18px; line-height: 40px; padding: 10px; }
 .ao_footer { height: 36px; border-top-style: solid; border-top-width: 1px; border-top-color: #CCC; text-align: right; }
 .ao_button { height: 26px; margin: 5px; display: inline-block; width: 100px; text-align: center; color: #000000; line-height: 26px; background: #DDD; }
 .ao_button:hover { opacity: .8; }
 
-.ao_debug { z-index:100; position: fixed; bottom: 20px; color: #ffffff; }
+.ao_debug { z-index:100; position: fixed; bottom: 50px; left: 20px; right: 20px; color: #ffffff; }
 .ao_debug_line { margin: 20px; max-width: 250px; padding-left: 80px; }
+.ao_debug div { display: inline-block; margin: 10px 0; padding: 3px 40px; }
+.ao_debug_success { border: 2px solid #004401; background: #006E02; }
+.ao_debug_warnning { border: 2px solid #514A00; background: #767600; }
+.ao_debug_error { border: 2px solid #510000; background: #A50000; }
+.ao_debug_working { border: 2px solid #000074; background: #000095; }
+.ao_debug_default { border: 2px solid #000000; background: #424242; }
