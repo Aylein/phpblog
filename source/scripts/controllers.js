@@ -186,13 +186,6 @@ app.controller("stageController", function($scope, main, cache, web){
     $scope.path = "stages";
 });
 app.controller("userController", function($scope, main, cache, web, debug, cv){
-    console.log(debug);
-    debug.success("一米七的伊尔山");
-    debug.error("一米七的伊尔山");
-    debug.working("一米七的伊尔山");
-    debug.warnning("一米七的伊尔山");
-    console.log(cv);
-    cv.alert("aaaaaaaaaaa", "bbbbbbbbbbbbbbbbb", function(){ alert("aaaaaaaaaaaa"); });
     $scope.path = "users";
     $scope.new = {
         userid: 0,

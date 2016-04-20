@@ -1,10 +1,12 @@
 @charset "utf-8";
-* { margin: 0; padding: 0; text-decoration: none; list-style: none; font-family: "微软雅黑"; outline:none; }
-a { color: #666; }
+/*main*/
+* { margin: 0; padding: 0; text-decoration: none; list-style: none; font-family: "微软雅黑"; outline: none; }
+a { color: #444444; }
 a:hover { color: #000000; }
 /*a:visited { color: #666; }*/
 body { background-color: #F5F5F5; overflow-y: scroll; }
 
+/*index*/
 .header { width: 100%; height: 42px; z-index: 1; background-color: #E7E7E7; }
 .header { position: fixed; top: 0px; _position: abselute; }
 .myname { width: 1280px; margin: 0 auto; }
@@ -28,6 +30,7 @@ body { background-color: #F5F5F5; overflow-y: scroll; }
 .face_r img { width: 250px; vertical-align: middle; }
 .audio_main { width: 300px; height: 30px; }
 
+/*ca dialog*/
 .ao_cover { position: fixed; top: 0px; left: 0px; right: 0px; bottom: 0px; background: #CCC; opacity: .4; }
 .ao_dialog { top: 24px; position: absolute; margin-left: -300px; left: 50%; width: 600px; border: 1px solid #CCC; background: #ffffff; }
 .ao_header { height: 41px; border-bottom-style: dashed; border-bottom-width: 1px; border-bottom-color: #CCC; }
@@ -39,6 +42,7 @@ body { background-color: #F5F5F5; overflow-y: scroll; }
 .ao_button { height: 26px; margin: 5px; display: inline-block; width: 100px; text-align: center; color: #000000; line-height: 26px; background: #DDD; }
 .ao_button:hover { opacity: .8; }
 
+/*cd debug*/
 .ao_debug { z-index:100; position: fixed; bottom: 50px; left: 20px; right: 20px; color: #ffffff; }
 .ao_debug_line { margin: 20px; max-width: 250px; padding-left: 80px; }
 .ao_debug div { display: inline-block; margin: 10px 0; padding: 3px 40px; }

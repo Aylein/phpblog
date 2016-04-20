@@ -38,6 +38,20 @@ print_r(User::GetAll($obj));
             <ao-nodes></ao-nodes>
             <div class="l_title">Users</div>
             <div class="l_s">
+                <div>
+                    <div>展开 添加新会员</div>
+                    <div class="l_new">
+                        <div class="l_new_img" style="background: url(./images/ac/ac_13.png) no-repeat 100%; background-size: 100%"></div>
+                        <div style="height: 100px;">
+                            
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+                </div>
+                <br>
+                <div class="list">
+                    
+                </div>
             </div>
         </div>
     </body>
