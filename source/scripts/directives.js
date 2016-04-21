@@ -24,6 +24,36 @@ app.directive("contenteditable", function(){
         }
     }
 });
+app.directive("aoPg", function(dom, main){
+    return {
+        restrict: "AE",
+        replace: true,
+        scope: {model: "="},
+        templateUrl: "/require/ngPager.html",
+        link: function($scope, $elem, $attr){
+            var pgc = $scope.pager = {
+                url: $scope.model.url || "javascript: void(0);", //{page}
+                page: $scope.model.page,
+                total: $scope.model.total,
+                show: $scope.model.show,
+                first: 1,
+                pref: $scope.model.page <= 1 ? 1 : $scope.model.page - 1,
+                next: $scope.model.page >= $scope.model.total ? $scope.model.total : $scope.model.page + 1,
+                pages: [],
+                middle: parseInt($scope.model.show / 2) + 1,
+                _middle: parseInt($scope.model.show / 2),
+                begin: 1
+            };
+            if(pgc.page < 1) pgc.page = 1;
+            if(pgc.page > pgc.total) pgc.page = pgc.total;
+            if(pgc.total <= pgc.show || pgc.page <= pgc.middle) pgc.begin = 1;
+            else if(pgc.page >= (pgc.show % 2 == 0 ? pgc.total - pgc._middle + 1 : pgc.total - pgc._middle)) pgc.begin = pgc.total - pgc.show + 1;
+            else pgc.begin = pgc.page - pgc._middle;
+            for(var i = 1; i <= pgc.show; i++) pgc.pages.push(pgc.begin + i - 1);
+            console.log(pgc.pages);
+        }
+    };
+});
 app.directive("aoCs", function(dom, main){
     return {
         restrict: "AE",

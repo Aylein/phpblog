@@ -24,7 +24,7 @@ app.config(function($routeProvider){
     }).when("/adminstage", {
         templateUrl: "/view/ngAdminStage.php",
         controller: "stageController"
-    }).when("/adminuser", {
+    }).when("/adminuser/:page", {
         templateUrl: "/view/ngAdminUser.php",
         controller: "userController"
     }).otherwise({redirectTo: "/about"});
@@ -231,7 +231,7 @@ app.service("main", function(){
         return list;
     };
     this.copy = function(target){
-        if(!target) return undefined;
+        if(!target) return target;
         var type = this.typeof(target);
         if(this.isArrayLike(target)) return this.merge(true, target);
         else if(this.types._object.test(type)) return this.extend(true, target);

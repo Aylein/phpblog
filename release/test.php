@@ -35,6 +35,7 @@ print_r(User::GetAll($obj));
     </head>
     <body ng-controller="ngMainController">          
         <div ng-controller="userController">
+            <ao-pg model="pager"></ao-pg>
             <ao-nodes></ao-nodes>
             <div class="l_title">Users</div>
             <div class="l_s">
@@ -42,15 +43,29 @@ print_r(User::GetAll($obj));
                     <div>展开 添加新会员</div>
                     <div class="l_new">
                         <div class="l_new_img" style="background: url(./images/ac/ac_13.png) no-repeat 100%; background-size: 100%"></div>
-                        <div style="height: 100px;">
-                            
+                        <div class="l_new_info">
+                            <form name="new_user" ng-submit="newTest.submit()">
+                                <input type="text" ng-class="{'bA50000': newTest.usernameRes == 'error'}" name="username" ng-model="new.username" ng-blur="newTest.usernameTest()">
+                                <span class="cA50000" ng-bind="newTest.usernameText"></span><br>
+                                <input type="password" ng-class="{'bA50000': newTest.userpassRes == 'error'}" name="userpass" ng-model="new.userpass" ng-blur="newTest.userpassTest()">
+                                <span class="cA50000" ng-bind="newTest.userpassText"></span><br>
+                                <select name="usertype" ng-model="new.usertype" ng-options="type as type for type in newTest.usertypes"></select>
+                                <input type="submit" value="确定">
+                                <input type="reset" ng-click="newTest.reset()" value="重置">
+                            </form>
                         </div>
                         <div class="clear"></div>
                     </div>
                 </div>
                 <br>
                 <div class="list">
-                    
+                    <div ng-repeat="item in list" class="mt15">
+                        <div class="l_new_img" style="background: url({{item.n.userimg}}) no-repeat 100%; background-size: 100%"></div>
+                        <div class="l_new_info">
+                            <span ng-bind="item.n.username"></span> - <span ng-bind="item.n.usercreatetime"></span> ~ <span ng-bind="item.n.userlastaction"></span>
+                        </div>
+                        <div class="clear"></div>
+                    </div>
                 </div>
             </div>
         </div>

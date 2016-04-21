@@ -1,0 +1,7 @@
+<div class="ng_pager">
+    <a ng-href="{{pager.url.replace(pager.cover, pager.first)}}" class="ng_pager_first" ng-bind="pager.first"></a>
+    <a ng-href="{{pager.url.replace(pager.cover, pager.pref)}}" class="ng_pager_pref" ng-bind="pager.pref"></a>
+    <a ng-repeat="page in pager.pages" ng-href="{{pager.url.replace(pager.cover, page)}}" class="ng_pager_page" ng-bind="page"></a>
+    <a ng-href="{{pager.url.replace(pager.cover, pager.next)}}" class="ng_pager_next" ng-bind="pager.next"></a>
+    <a ng-href="{{pager.url.replace(pager.cover, pager.total)}}" class="ng_pager_last" ng-bind="pager.total"></a>
+</div>

@@ -186,6 +186,7 @@ app.controller("stageController", function($scope, main, cache, web){
     $scope.path = "stages";
 });
 app.controller("userController", function($scope, main, cache, web, debug, cv){
+    $scope.pager = {page: 7, total: 15, show: 10};
     $scope.path = "users";
     $scope.new = {
         userid: 0,
@@ -198,6 +199,65 @@ app.controller("userController", function($scope, main, cache, web, debug, cv){
         usersort: 0, 
         uservalid: 1
     };
+    $scope.newTest = {
+        usertypes: ["visit", "guest", "admin"],
+        usernameRes: "init",
+        usernameText: "",
+        usernameTest: function(){
+            var va = main.trim($scope.new.username);
+            if(va.length < 1){
+                this.usernameRes = "error";
+                this.usernameText = "登录名不能为空";
+            }
+            else if(va.length < 6){
+                this.usernameRes = "error";
+                this.usernameText = "登录名不能小于6位";
+            }
+            else if(va.length > 18){
+                this.usernameRes = "error";
+                this.usernameText = "登录名不能大于18位";
+            }
+            else{
+                this.usernameRes = "ok";
+                this.usernameText = ""; 
+            }
+        },
+        userpassRes: "init",
+        userpassText: "",
+        userpassTest: function(){
+            var va = main.trim($scope.new.userpass);
+            if(va.length < 1){
+                this.userpassRes = "error";
+                this.userpassText = "登录密码不能为空";
+            }
+            else if(va.length < 6){
+                this.userpassRes = "error";
+                this.userpassText = "登录密码不能小于6位";
+            }
+            else if(va.length > 25){
+                this.userpassRes = "error";
+                this.userpassText = "登录密码不能大于25位";
+            }
+            else{
+                this.userpassRes = "ok";
+                this.userpassText = ""; 
+            }
+        },
+        submit: function(){
+            if(this.usernameRes == "init") this.usernameTest();
+            if(this.userpassRes == "init") this.userpassTest();
+            if(this.usernameRes == "ok" && this.userpassRes == "ok"){
+                
+            }
+            return false;
+        },
+        reset: function(){
+            this.usernameRes = "init";
+            this.usernameText = "";
+            this.userpassRes = "init";
+            this.userpassText = "";
+        }
+    }
     var makeList = function(list){
         $scope.list = $scope.list || {};
         main.each(list, function(i, v){
