@@ -186,7 +186,15 @@ app.controller("stageController", function($scope, main, cache, web){
     $scope.path = "stages";
 });
 app.controller("userController", function($scope, main, cache, web, debug, cv){
-    $scope.pager = {page: 7, total: 15, show: 10};
+    $scope.pager = {
+        page: 1, 
+        total: 15, 
+        show: 10, 
+        callback: function(page, event){
+            $scope.pager.page = page;
+            event.preventDefault();
+        }
+    };
     $scope.path = "users";
     $scope.new = {
         userid: 0,

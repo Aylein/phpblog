@@ -51,3 +51,9 @@ body { background-color: #F5F5F5; overflow-y: scroll; }
 .ao_debug_error { border: 2px solid #510000; background: #A50000; }
 .ao_debug_working { border: 2px solid #000074; background: #000095; }
 .ao_debug_default { border: 2px solid #000000; background: #424242; }
+
+/*pager*/
+.ng_pager { text-align: left; margin: 10px 0; }
+.ng_pager::after { content: ""; clear: both; display: block; }
+.ng_pager a { display: block; float: left; margin-left: 5px; text-align: center; min-width:25px; padding: 3px 5px; border: 1px solid #aaaaaa; }
+.ng_pager a.ng_pager_cur { background: #aaaaaa; color: #ffffff; }

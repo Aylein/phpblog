@@ -31,26 +31,40 @@ app.directive("aoPg", function(dom, main){
         scope: {model: "="},
         templateUrl: "/require/ngPager.html",
         link: function($scope, $elem, $attr){
-            var pgc = $scope.pager = {
-                url: $scope.model.url || "javascript: void(0);", //{page}
-                page: $scope.model.page,
-                total: $scope.model.total,
-                show: $scope.model.show,
-                first: 1,
-                pref: $scope.model.page <= 1 ? 1 : $scope.model.page - 1,
-                next: $scope.model.page >= $scope.model.total ? $scope.model.total : $scope.model.page + 1,
-                pages: [],
-                middle: parseInt($scope.model.show / 2) + 1,
-                _middle: parseInt($scope.model.show / 2),
-                begin: 1
+            var init = function(){
+                return {
+                    url: $scope.model.url || "javascript: void(0);", //{page}
+                    curLink: $scope.model.curLink || false,
+                    page: $scope.model.page,
+                    total: $scope.model.total,
+                    show: $scope.model.show,
+                    pref: $scope.model.page <= 1 ? 1 : $scope.model.page - 1,
+                    next: $scope.model.page >= $scope.model.total ? $scope.model.total : $scope.model.page + 1,
+                    fn: function($event, index){
+                        if(!pgc.curLink && (index > pgc.total || index < pgc.first || index == pgc.page)) return;
+                        if($scope.model.callback && main.types._function.test(main.typeof($scope.model.callback))) $scope.model.callback.call($scope.$parent, index, $event);
+                    },
+                    first: 1,
+                    pages: [],
+                    middle: parseInt($scope.model.show / 2) + 1,
+                    _middle: parseInt($scope.model.show / 2),
+                    begin: 1
+                }
             };
-            if(pgc.page < 1) pgc.page = 1;
-            if(pgc.page > pgc.total) pgc.page = pgc.total;
-            if(pgc.total <= pgc.show || pgc.page <= pgc.middle) pgc.begin = 1;
-            else if(pgc.page >= (pgc.show % 2 == 0 ? pgc.total - pgc._middle + 1 : pgc.total - pgc._middle)) pgc.begin = pgc.total - pgc.show + 1;
-            else pgc.begin = pgc.page - pgc._middle;
-            for(var i = 1; i <= pgc.show; i++) pgc.pages.push(pgc.begin + i - 1);
-            console.log(pgc.pages);
+            var getPages = function(){
+                if(pgc.page < 1) pgc.page = 1;
+                if(pgc.page > pgc.total) pgc.page = pgc.total;
+                if(pgc.total <= pgc.show || pgc.page <= pgc.middle) pgc.begin = 1;
+                else if(pgc.page >= (pgc.show % 2 == 0 ? pgc.total - pgc._middle + 1 : pgc.total - pgc._middle)) pgc.begin = pgc.total - pgc.show + 1;
+                else pgc.begin = pgc.page - pgc._middle;
+                for(var i = 1; i <= pgc.show; i++) pgc.pages.push(pgc.begin + i - 1);
+            };
+            var pgc = $scope.pager = init();
+            getPages();
+            $scope.$watchCollection("model", function(model){ 
+                pgc = $scope.pager = init();
+                getPages();
+            });
         }
     };
 });

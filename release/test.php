@@ -35,7 +35,6 @@ print_r(User::GetAll($obj));
     </head>
     <body ng-controller="ngMainController">          
         <div ng-controller="userController">
-            <ao-pg model="pager"></ao-pg>
             <ao-nodes></ao-nodes>
             <div class="l_title">Users</div>
             <div class="l_s">
@@ -66,6 +65,7 @@ print_r(User::GetAll($obj));
                         </div>
                         <div class="clear"></div>
                     </div>
+                    <ao-pg model="pager"></ao-pg>
                 </div>
             </div>
         </div>
