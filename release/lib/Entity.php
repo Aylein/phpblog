@@ -19,12 +19,27 @@ class Entity {
     public function EntityState(){
         return $this->conn;
     }
+    
+    //解决 limit 无法绑定参数的错误
+    //http://blog.csdn.net/jinbiao520/article/details/7469264@站住借个吻
+    private function getType($val) {
+        if (is_bool($val)) return PDO::PARAM_BOOL;
+        else if (is_int($val)) return PDO::PARAM_INT;
+        else if (is_null($val)) return PDO::PARAM_NULL;
+        else return PDO::PARAM_STR;
+    }
+    
+    private function bindParam($qu, $para){
+        foreach($para as $key => $value)
+            $qu->bindValue($key, $value, $this->getType($value));
+    }
 
     public function Query($query, $paras = null){
         if(!$this->EntityState()) return null;
         if($paras && !is_array($paras)) $paras = null;
         $qu = $this->conn->prepare($query);
-        if($qu->execute($paras))
+        if($paras) $this->bindParam($qu, $paras);
+        if($qu->execute())
             return $qu->fetchAll(); //PDO::FETCH_NAMED
         return null;
     }
@@ -33,7 +48,8 @@ class Entity {
         if(!$this->EntityState()) return null; //判断状态
         if($paras && !is_array($paras)) $paras = null; //检查参数数组
         $qu = $this->conn->prepare($query); //prepare
-        if($qu->execute($paras)){
+        if($paras) $this->bindParam($qu, $paras);
+        if($qu->execute()){
             $res = Array();
             $i = 0;
             do $res[] = $qu->fetchAll(); //PDO::FETCH_NAMED
@@ -47,7 +63,8 @@ class Entity {
         if(!$this->EntityState()) return null;
         if($paras && !is_array($paras)) $paras = null;
         $qu = $this->conn->prepare($query);
-        if($qu->execute($paras)) return $qu->fetch();
+        if($paras) $this->bindParam($qu, $paras);
+        if($qu->execute()) return $qu->fetch();
         return null;
     }
 
@@ -56,7 +73,9 @@ class Entity {
             if(!$this->EntityState()) return null;
             $this->conn->beginTransaction();
             if($paras && !is_array($paras)) $paras = null;
-            $cn = $this->conn->prepare($query)->execute($paras);
+            $qu = $this->conn->prepare($query);
+            if($paras) $this->bindParam($qu, $paras);
+            $cn = execute();
             $this->conn->commit();
             return $cn;
         }catch(Exception $e){
@@ -69,7 +88,8 @@ class Entity {
         if(!$this->EntityState()) return null;
         if($paras && !is_array($paras)) $paras = null;
         $qu = $this->conn->prepare($query);
-        if($qu->execute($paras)) return $qu->fetch()[0];
+        if($paras) $this->bindParam($qu, $paras);
+        if($qu->execute()) return $qu->fetch()[0];
         return null;
     }
 }

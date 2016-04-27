@@ -2,6 +2,8 @@
 /release/sounds/*
 /release/scripts/*
 /release/styles/*
+/release/into.php
+/release/test.php
 /source/ac/*
 /node_modules/*
 /source/bower_components/*

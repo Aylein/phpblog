@@ -20,13 +20,16 @@ app.config(function($routeProvider){
         controller: "adminController"
     }).when("/admintype", {
         templateUrl: "/view/ngAdminType.php",
-        controller: "typeController"
+        controller: "adminTypeController"
     }).when("/adminstage", {
         templateUrl: "/view/ngAdminStage.php",
         controller: "stageController"
-    }).when("/adminuser/:page", {
+    }).when("/adminuser", {
         templateUrl: "/view/ngAdminUser.php",
-        controller: "userController"
+        controller: "adminUserController"
+    }).when("/adminuser/:index", {
+        templateUrl: "/view/ngAdminUser.php",
+        controller: "adminUserController"
     }).otherwise({redirectTo: "/about"});
 });
 app.service("main", function(){
@@ -274,6 +277,10 @@ app.service("cache", function(main){
     this.all = function(){ return main.copy(Cache); };
 });
 app.service("extra", function(main, cache){
+    this.getDateTime = function(timestemp){
+        var d = new Date(timestemp * 1000);
+        return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate() + " " + d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
+    }
     this.random = function(len){
         len = len && parseInt(len) > 5 ? len : 5;
         cache.__random = cache.__random || [];

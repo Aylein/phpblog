@@ -159,7 +159,7 @@ class Page{
             $this->totalnum = $count;
             $this->page = $page;
             $this->rows = $rows;
-            $this->totalpage = ceil($count / $size);
+            $this->totalpage = ceil($count / $rows);
         }
     }
 }

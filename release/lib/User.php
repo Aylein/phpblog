@@ -26,23 +26,40 @@ class User{
             $this->userid = isset($array["userid"]) && is_numeric($array["userid"]) ? (int)$array["userid"] : 0;
             $this->username = isset($array["username"])  ? $array["username"] : "";
             $this->userpass = isset($array["userpass"])  ? $array["userpass"] : "";
-            $this->userimg = isset($array["userimg"])  ? $array["userimg"] : "";
+            $this->userimg = isset($array["userimg"])  ? $array["userimg"] : User::makeImg();
             $this->usertype = isset($array["usertype"])  ? $array["usertype"] : "visit";
             $this->usercreatetime = isset($array["usercreatetime"])  ? strtotime($array["usercreatetime"]) : -1;
             $this->usersort = isset($array["usersort"]) && is_numeric($array["usersort"]) ? (int)$array["usersort"] : 0;
             $this->uservalid = isset($array["uservalid"]) && is_numeric($array["uservalid"]) ? (int)$array["uservalid"] : 1;
         }
     }
+    
+    private static function getPass($id){
+        $id = is_int($id) ? $id : 0;
+        if($id < 1) return null;
+        $str = "select userpass from Users where userid = :userid; ";
+        $paras = array(":userid" => $id);
+        $res = (new Entity())->First($str, $paras);
+        if(!$res) return null;
+        return new User($res);
+    }
+    
+    public static function getUserTypes(){ return Array("visit", "admin", "guest"); }
 
-    public static function Exists($name, $execpt = null){
-        if(!$name) return true;
-        $str = "select count(*) from Users where username = :username";
+    public static function makePass($pass){ return md5($pass."shikinami"); }
+    
+    public static function makeImg(){ return "images/ac/ac_".rand(1, 50).".png"; }
+    
+    public static function Exists($name, $pass, $execpt = null){
+        if(!$name || !$pass) return true;
+        $str = "select count(*) from Users where (username = :username or userpass = :userpass)";
         $paras = array();
         if($execpt != null && is_int($execpt)){
             $str .= " and userid != :userid";
             $paras[":userid"] = $execpt;
         }
         $paras[":username"] = $name;
+        $paras[":userpass"] = $pass;
         $str .= "; ";
         $num = (new Entity())->Scalar($str, $paras);
         return $num != 0;
@@ -50,7 +67,7 @@ class User{
 
     public static function Add($user){
         if(!$user instanceof User) return new Message("对象类型不正确");
-        if(User::Exists($user->username)) return new Message("要添加的用户名已存在");
+        if(User::Exists($user->username, $user->userpass)) return new Message("要添加的用户名或密码已存在");
         $str = "insert into Users (username, userpass, userimg, usertype, usersort, uservalid) "
             ."values (:username, :userpass, :userimg, :usertype, :usersort, :uservalid);";
         $str .= "select userid, username, userimg, usercreatetime, usersort, uservalid from "
@@ -59,12 +76,12 @@ class User{
             ":usertype" => $user->usertype, ":usersort" => $user->usersort, ":uservalid" => $user->uservalid);
         $en = (new Entity())->Querys($str, $paras);
         return count($en) == 2 && count($en[1]) == 1 ? 
-            new Message("创建成功", true, new User($obj[1][0])) : new Message("创建用户失败");
+            new Message("创建成功111111111", true, new User($en[1][0])) : new Message("创建用户失败");
     }
 
     public static function Update($user){
         if(!$user instanceof User) return new Message("对象类型不正确");
-        if(User::Exists($user->username, $user->userid)) return new Message("要添加的用户名已存在");
+        if(User::Exists($user->username, $user->userpass, $user->userid)) return new Message("要添加的用户名已存在");
         $str = "update Users set username = :username, userpass = :userpass, userimg = :userimg, usertype = :usertype, "
             ."usersort = :usersort, uservalid = :uservalid where userid = :userid;";
         $str .= "select userid, username, userimg, usertype, usercreatetime, usersort, uservalid "
@@ -74,11 +91,22 @@ class User{
             ":uservalid" => $user->uservalid);
         $en = (new Entity())->Querys($str, $paras);
         return count($en) == 2 && count($en[1]) == 1 ? 
-            new Message("修改成功", true, new User($en[1][0], $deep)) : new Message("修改失败");
+            new Message("修改成功", true, new User($en[1][0])) : new Message("修改失败");
     }
 
     public static function Add_Update($user){
         if(!$user instanceof User) return new Message("对象类型不正确");
+        if($user->userid > 0){
+            if($user->userpass == ""){
+                $_user = User::getPass($user->userid);
+                if(!$_user) return new Message("获取指定用户失败");
+                $user->userpass = $_user->userpass; 
+            }
+        }
+        else{
+            $user->userpass = User::makePass($user->userpass);
+            $user->userimg = $user->userimg == "" ? User::makeImg() : $user->userimg;
+        }
         return $user->userid > 0 ? User::Update($user) : User::Add($user);
     }
 
@@ -159,7 +187,8 @@ class User{
         $count .= $where."; ";
         $where .= "order by usersort desc, userid desc ";
         $select .= $where;
-        if($search->page > 0 && $search->rows > 0){            
+        if($search->page > 0 && $search->rows > 0){
+            //$select .= "limit ".($search->page - 1) * $search->rows.", ".$search->rows."; ";
             $select .= "limit :page, :rows; ";
             $paras[":page"] = ($search->page - 1) * $search->rows;
             $paras[":rows"] = $search->rows;
@@ -203,13 +232,13 @@ class User{
     public static function SignUp($pass){
         $now = date("H");
         $name = Commen::Rand(3)."#".Commen::Rand(5).".".chr($now + 65).chr($now + 97);
-        $arr = array("username" => $name, "userpass" => md5($name." ".$pass), "userimg" => "images/ac/ac_".rand(1, 50).".png");
+        $arr = array("username" => $name, "userpass" => User::makePass($pass), "userimg" => "images/ac/ac_".rand(1, 50).".png");
         return User::Add(new User($arr));
     }
 
     public static function MakeUser($pass, $name = null){
         if($name == null) return User::SignUp($pass);
-        else return User::SignIn(md5($name." ".$pass));
+        else return User::SignIn(User::makePass($pass));
     }
 }
 ?>

@@ -6,8 +6,15 @@
 
 /*admin users*/
 .l_new { margin-top: 10px; }
+
 .l_new_img { float: left; width: 78px; height: 78px; overflow: hidden; border: 1px solid #666; opacity: 0.7; }
 .l_new_img { -moz-border-radius: 50%; -webkit-border-radius: 50%; border-radius: 50%; }
-.l_new_info { float: left; margin-left: 15px; width: 835px; line-height: 27px; }
-.l_new_info input[type=submit], .l_new_info input[type=reset] { padding: 0 5px; }
+.l_new_info { float: left; margin-left: 15px; width: 835px; line-height: 26px; }
+.l_new_info input[type=submit], .l_new_info input[type=reset], .l_new_info input[type=button] { padding: 0 5px; }
 .l_new_info select { width: 65px; }
+
+.l_update_img { float: left; width: 102px; height: 102px; overflow: hidden; border: 1px solid #666; opacity: 0.7; }
+.l_update_img { -moz-border-radius: 50%; -webkit-border-radius: 50%; border-radius: 50%; }
+.l_update_info { float: left; margin-left: 15px; width: 835px; line-height: 26px; }
+.l_update_info input[type=submit], .l_update_info input[type=reset], .l_update_info input[type=button] { padding: 0 5px; }
+.l_update_info select { width: 65px; }

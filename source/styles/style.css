@@ -43,7 +43,7 @@ body { background-color: #F5F5F5; overflow-y: scroll; }
 .ao_button:hover { opacity: .8; }
 
 /*cd debug*/
-.ao_debug { z-index:100; position: fixed; bottom: 50px; left: 20px; right: 20px; color: #ffffff; }
+.ao_debug { z-index:100; position: fixed; bottom: 50px; left: 0px; right: 20px; color: #ffffff; }
 .ao_debug_line { margin: 20px; max-width: 250px; padding-left: 80px; }
 .ao_debug div { display: inline-block; margin: 10px 0; padding: 3px 40px; }
 .ao_debug_success { border: 2px solid #004401; background: #006E02; }

@@ -39,3 +39,4 @@
 .pr { position: relative; }
 .pa { position: absolute; }
 .cp { cursor: pointer; }
+.allBBB, .allBBB * { border-color: #bbbbbb; color: #bbbbbb; }

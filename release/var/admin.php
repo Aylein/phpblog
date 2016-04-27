@@ -25,8 +25,8 @@
     $str = "";
     try{
         switch($action){
+            case "get": $str = json_encode(Get()); break;
             case "getall": $str = json_encode(GetAll()); break;
-            case "newtype": $str = json_encode(PostType()); break;
             case "post": $str = json_encode(Post()); break;
             case "valid": $str = json_encode(Valid()); break;
             default: $str = json_encode(new Message(false, "no_action", "你想干什么 0 0~")); break;
@@ -50,6 +50,8 @@
             case "doc": $value = Document::Get($id, $deep);
             case "com": $value = Comment::Get($id, $deep);
             case "action": $value = Action::Get($id, $deep);
+            
+            case "userTypes": $value = User::getUserTypes();
             default: break;
         }
         return $value == null ? new Message("木有") : new Message("哈哈", true, $value);
@@ -186,9 +188,9 @@
             case "user":
                 $now = date("H");
                 $obj = new User($_POST);
-                $obj->username = $obj->userid < 1 ? Commen::Rand(3)."#".Commen::Rand(5).".".chr($now + 65).chr($now + 97) : "";
+                $obj->username = $obj->userid < 1 && $obj->username == "" ? Commen::Rand(3)."#".Commen::Rand(5).".".chr($now + 65).chr($now + 97) : $obj->username;
                 if($obj->username == "") return new Message("用户名不能为空", false, null, "no_name");
-                if($obj->userpass == "") return new Message("用户密码不能为空", false, null, "no_pass");
+                if($obj->userid < 1 && $obj->userpass == "") return new Message("用户密码不能为空", false, null, "no_pass");
                 return User::Add_Update($obj);
             default: return new Message("post ...  what ...");
         }

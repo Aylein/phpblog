@@ -31,40 +31,41 @@ app.directive("aoPg", function(dom, main){
         scope: {model: "="},
         templateUrl: "/require/ngPager.html",
         link: function($scope, $elem, $attr){
-            var init = function(){
-                return {
-                    url: $scope.model.url || "javascript: void(0);", //{page}
-                    curLink: $scope.model.curLink || false,
-                    page: $scope.model.page,
-                    total: $scope.model.total,
-                    show: $scope.model.show,
-                    pref: $scope.model.page <= 1 ? 1 : $scope.model.page - 1,
-                    next: $scope.model.page >= $scope.model.total ? $scope.model.total : $scope.model.page + 1,
-                    fn: function($event, index){
-                        if(!pgc.curLink && (index > pgc.total || index < pgc.first || index == pgc.page)) return;
-                        if($scope.model.callback && main.types._function.test(main.typeof($scope.model.callback))) $scope.model.callback.call($scope.$parent, index, $event);
-                    },
-                    first: 1,
-                    pages: [],
-                    middle: parseInt($scope.model.show / 2) + 1,
-                    _middle: parseInt($scope.model.show / 2),
-                    begin: 1
-                }
+            var pgc = $scope.pager = {
+                first: 1,
+                pages: [],
+                begin: 1
             };
-            var getPages = function(){
-                if(pgc.page < 1) pgc.page = 1;
-                if(pgc.page > pgc.total) pgc.page = pgc.total;
-                if(pgc.total <= pgc.show || pgc.page <= pgc.middle) pgc.begin = 1;
-                else if(pgc.page >= (pgc.show % 2 == 0 ? pgc.total - pgc._middle + 1 : pgc.total - pgc._middle)) pgc.begin = pgc.total - pgc.show + 1;
-                else pgc.begin = pgc.page - pgc._middle;
+            var init = function(){
+                pgc.url = $scope.model.url || "javascript: void(0);";
+                pgc.curLink = $scope.model.curLink || false;
+                pgc.page = $scope.model.page;
+                pgc.total = $scope.model.total;
+                pgc.show = $scope.model.show;
+                pgc.fn = function($event, index){
+                    if(!pgc.curLink && (index > pgc.total || index < pgc.first || index == pgc.page)) return;
+                    if($scope.model.callback && main.types._function.test(main.typeof($scope.model.callback))) $scope.model.callback.call($scope.$parent, index, $event);
+                };
+                
+                pgc.show = pgc.total < pgc.show ? pgc.total : pgc.show;
+                    
+                if(pgc.page < 1) pgc._page = 0;
+                else if(pgc.page > pgc.total) pgc._page = pgc.total + 1;
+                else pgc._page = pgc.page;
+                
+                pgc.pref = pgc._page <= 1 ? 1 : pgc._page - 1;
+                pgc.next = pgc._page >= pgc.total ? pgc.total : pgc._page + 1;
+                pgc.middle = parseInt(pgc.show / 2) + 1;
+                pgc._middle = parseInt(pgc.show / 2);
+                
+                if(pgc.total <= pgc.show || pgc._page <= pgc.middle) pgc.begin = 1;
+                else if(pgc._page >= (pgc.show % 2 == 0 ? pgc.total - pgc._middle + 1 : pgc.total - pgc._middle)) pgc.begin = pgc.total - pgc.show + 1;
+                else pgc.begin = pgc._page - pgc._middle;
+                
+                pgc.pages = [];
                 for(var i = 1; i <= pgc.show; i++) pgc.pages.push(pgc.begin + i - 1);
             };
-            var pgc = $scope.pager = init();
-            getPages();
-            $scope.$watchCollection("model", function(model){ 
-                pgc = $scope.pager = init();
-                getPages();
-            });
+            $scope.$watch("model", function(obj){ init(); }, true);
         }
     };
 });

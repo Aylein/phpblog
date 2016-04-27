@@ -88,7 +88,7 @@ app.controller("saysController", function($scope, main, cache, web){
 app.controller("adminController", function($scope, main, cache){
     $scope.path = "admins";
 });
-app.controller("typeController", function($scope, main, cache, web){
+app.controller("adminTypeController", function($scope, main, cache, web){
     $scope.path = "types";
     $scope.types = {};
     var makeNew = function(){
@@ -185,50 +185,40 @@ app.controller("typeController", function($scope, main, cache, web){
 app.controller("stageController", function($scope, main, cache, web){
     $scope.path = "stages";
 });
-app.controller("userController", function($scope, main, cache, web, debug, cv){
+app.controller("adminUserController", function($scope, main, extra, cache, web, debug, cv, $routeParams){
+    $scope.path = "users";
     $scope.pager = {
-        page: 1, 
-        total: 15, 
+        page: 0, 
+        total: 0, 
         show: 10, 
         callback: function(page, event){
-            $scope.pager.page = page;
+            init(page);
             event.preventDefault();
         }
     };
-    $scope.path = "users";
-    $scope.new = {
-        userid: 0,
-        username: "", 
-        userpass: "", 
-        userimg: "", 
-        usertype: "visit", 
-        usercreatetime: "", 
-        userlastaction: "", 
-        usersort: 0, 
-        uservalid: 1
-    };
     $scope.newTest = {
-        usertypes: ["visit", "guest", "admin"],
+        usertypes: [],
+        uservalid: [{val: 1, text: "可用"}, {val: 0, text: "不可用"}],
         usernameRes: "init",
         usernameText: "",
         usernameTest: function(){
-            var va = main.trim($scope.new.username);
-            if(va.length < 1){
-                this.usernameRes = "error";
-                this.usernameText = "登录名不能为空";
-            }
-            else if(va.length < 6){
-                this.usernameRes = "error";
-                this.usernameText = "登录名不能小于6位";
-            }
-            else if(va.length > 18){
-                this.usernameRes = "error";
-                this.usernameText = "登录名不能大于18位";
-            }
-            else{
+            // var va = main.trim($scope.new.username);
+            // if(va.length < 1){
+            //     this.usernameRes = "error";
+            //     this.usernameText = "登录名不能为空";
+            // }
+            // else if(main.charLength(va) < 6){
+            //     this.usernameRes = "error";
+            //     this.usernameText = "登录名不能小于6位";
+            // }
+            // else if(main.charLength(va) > 25){
+            //     this.usernameRes = "error";
+            //     this.usernameText = "登录名不能大于18位";
+            // }
+            // else{
                 this.usernameRes = "ok";
                 this.usernameText = ""; 
-            }
+            // }
         },
         userpassRes: "init",
         userpassText: "",
@@ -238,11 +228,11 @@ app.controller("userController", function($scope, main, cache, web, debug, cv){
                 this.userpassRes = "error";
                 this.userpassText = "登录密码不能为空";
             }
-            else if(va.length < 6){
+            else if(main.charLength(va) < 6){
                 this.userpassRes = "error";
                 this.userpassText = "登录密码不能小于6位";
             }
-            else if(va.length > 25){
+            else if(main.charLength(va) > 25){
                 this.userpassRes = "error";
                 this.userpassText = "登录密码不能大于25位";
             }
@@ -255,7 +245,18 @@ app.controller("userController", function($scope, main, cache, web, debug, cv){
             if(this.usernameRes == "init") this.usernameTest();
             if(this.userpassRes == "init") this.userpassTest();
             if(this.usernameRes == "ok" && this.userpassRes == "ok"){
-                
+                var data = main.copy($scope.new);
+                data._action = "post";
+                data._type = "user";
+                web.post("var/admin.php", data, function(data){
+                    if(data.res){
+                        debug.success("添加新用户成功");
+                        $scope.newTest.resetNew();
+                        $scope.newTest.reset();
+                        init(1);
+                    }
+                    else debug.error("添加新用户失败：" + data.msg);
+                });
             }
             return false;
         },
@@ -264,69 +265,117 @@ app.controller("userController", function($scope, main, cache, web, debug, cv){
             this.usernameText = "";
             this.userpassRes = "init";
             this.userpassText = "";
+        },
+        resetNew: function(){
+            $scope.new = {
+                userid: 0,
+                username: "", 
+                userpass: "", 
+                userimg: "", 
+                usertype: "visit", 
+                usercreatetime: "", 
+                userlastaction: "", 
+                usersort: 0, 
+                uservalid: 1
+            };
         }
     }
+    $scope.updateTest = {
+        updateid: 0,
+        usernameRes: "init",
+        usernameText: "",
+        usernameTest: function(key){
+            var va = main.trim($scope.list[key].u.username);
+            if(va.length < 1){
+                this.usernameRes = "ok";
+                this.usernameText = ""; 
+            }
+            else if(main.charLength(va) < 6){
+                this.usernameRes = "error";
+                this.usernameText = "登录名不能小于6位";
+            }
+            else if(main.charLength(va) > 25){
+                this.usernameRes = "error";
+                this.usernameText = "登录名不能大于18位";
+            }
+            else{
+                this.usernameRes = "ok";
+                this.usernameText = ""; 
+            }
+        },
+        userpassRes: "init",
+        userpassText: "",
+        userpassTest: function(key){
+            var va = main.trim($scope.list[key].u.userpass);
+            if(va.length < 1){
+                this.userpassRes = "ok";
+                this.userpassText = ""; 
+            }
+            else if(main.charLength(va) < 6){
+                this.userpassRes = "error";
+                this.userpassText = "登录密码不能小于6位";
+            }
+            else if(main.charLength(va) > 25){
+                this.userpassRes = "error";
+                this.userpassText = "登录密码不能大于25位";
+            }
+            else{
+                this.userpassRes = "ok";
+                this.userpassText = ""; 
+            }
+        },
+        setUpdate: function(id){ this.updateid = id; },
+        submit: function(key){
+            if(this.usernameRes == "init") this.usernameTest(key);
+            if(this.userpassRes == "init") this.userpassTest(key);
+            if(this.usernameRes == "ok" && this.userpassRes == "ok" && $scope.list[key]){
+                var data = main.copy($scope.list[key].u);
+                data._action = "post";
+                data._type = "user";
+                web.post("var/admin.php", data, function(data){
+                    if(data.res){
+                        debug.success("修改新用户成功");
+                        $scope.updateTest.updateid = 0;
+                        $scope.updateTest.reset();
+                        init($scope.pager.page);
+                    }
+                    else debug.error("修改新用户失败：" + data.msg);
+                });
+            }
+            return false;
+        },
+        reset: function(key, en){
+            if(key) $scope.list[key].u = main.copy($scope.list[key].n);
+            this.usernameRes = "init";
+            this.usernameText = "";
+            this.userpassRes = "init";
+            this.userpassText = "";
+            if(en) en.preventDefault();
+            return false;
+        },
+        cancel: function(key){
+            this.updateid = 0;
+            this.reset(key);
+        }
+    };
     var makeList = function(list){
-        $scope.list = $scope.list || {};
+        $scope.list = {};
         main.each(list, function(i, v){
+            v.usercreatetime = extra.getDateTime(v.usercreatetime);
             $scope.list["u_" + v.userid] = {n: v, u: main.copy(v)};
         });
     };
-    var init = function(){
-        var data = [
-            {
-                userid: 1, 
-                username: "sYs#tsdfet.Aa", 
-                userpass: "safsafsdfsdfsfsafsafsdafsa", 
-                userimg: "/images/ac/ac_1.png", 
-                usertype: "visit", 
-                usercreatetime: "2014-01-01 00:00:00", 
-                userlastaction: "2014-01-01 00:00:00", 
-                usersort: 0, 
-                uservalid: 1
-            },{
-                userid: 2, 
-                username: "sYs#sceedf.Aa", 
-                userpass: "asdfasfsdafsdafeaearwerqrew", 
-                userimg: "/images/ac/ac_2.png", 
-                usertype: "visit", 
-                usercreatetime: "2014-01-01 00:00:00", 
-                userlastaction: "2014-01-01 00:00:00", 
-                usersort: 0, 
-                uservalid: 1
-            },{
-                userid: 3, 
-                username: "sYs#teftgd.Aa", 
-                userpass: "twetrgsffewrwetregdgfswfaewr", 
-                userimg: "/images/ac/ac_3.png", 
-                usertype: "visit", 
-                usercreatetime: "2014-01-01 00:00:00", 
-                userlastaction: "2014-01-01 00:00:00", 
-                usersort: 0, 
-                uservalid: 1
-            },{
-                userid: 4, 
-                username: "sYs#ewdcge.Aa", 
-                userpass: "fgewtwerewrdsfewrwefggerewr", 
-                userimg: "/images/ac/ac_4.png", 
-                usertype: "visit", 
-                usercreatetime: "2014-01-01 00:00:00", 
-                userlastaction: "2014-01-01 00:00:00", 
-                usersort: 0, 
-                uservalid: 1
-            },{
-                userid: 5, 
-                username: "sYs#ertgfc.Aa", 
-                userpass: "hdfshrhrtwewrwefewr", 
-                userimg: "/images/ac/ac_5.png", 
-                usertype: "visit", 
-                usercreatetime: "2014-01-01 00:00:00", 
-                userlastaction: "2014-01-01 00:00:00", 
-                usersort: 0, 
-                uservalid: 1
-            }
-        ];
-        makeList(data);
+    var init = function(page){
+        web.post("var/admin.php", {_action: "getall", _type: "user", valid: -1, page: page, rows: 10}, function(data){
+            $scope.pager.page = data.page.page;
+            $scope.pager.total = data.page.totalpage;
+            makeList(data.list);
+        });
     };
-    init();
+    $scope.newTest.resetNew();
+    web.post("var/admin.php", {_action: "get", _type: "userTypes"}, function(data){
+        if(data.res) $scope.newTest.usertypes = data.obj; 
+    });
+    var index = $routeParams.index ? $routeParams.index : 1;
+    init(index);
 });
