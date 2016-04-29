@@ -2,6 +2,7 @@
     <a ng-href="{{pager.url.replace('{page}', pager.first)}}" class="ng_pager_first" title="首页" ng-click="pager.fn($event, pager.first)">首页</a>
     <a ng-href="{{pager.url.replace('{page}', pager.pref)}}" class="ng_pager_pref" title="上一页" ng-click="pager.fn($event, pager.pref)">上一页</a>
     <a ng-repeat="page in pager.pages" ng-href="{{pager.url.replace('{page}', page)}}"  ng-class="{ng_pager_cur: pager.page == page}" ng-bind="page" ng-click="pager.fn($event, page)"></a>
+    <a href="javascript: void(0);" class="nbd" ng-bind="pager.page + '/' + pager.total"></a>
     <a ng-href="{{pager.url.replace('{page}', pager.next)}}" class="ng_pager_next" title="下一页" ng-click="pager.fn($event, pager.next)">下一页</a>
     <a ng-href="{{pager.url.replace('{page}', pager.total)}}" class="ng_pager_last" title="末尾页" ng-click="pager.fn($event, pager.total)">末尾页</a>
 </div>

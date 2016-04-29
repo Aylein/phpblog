@@ -655,6 +655,10 @@ app.service("cv", function(main, dom){
             }
             else return;
             
+            this.form = dom.Element("form");
+            this.form.method = "post";
+            dom.append(this._dialog, this.form);
+            
             if(this.opt.header){
                 this._header = dom.Element("div");
                 dom.addClass(this._header, this.opt.sign + "_header " + this.opt.header.clsname);
@@ -689,7 +693,7 @@ app.service("cv", function(main, dom){
                     dom.append(this._header, this._close);
                 }
                 else this._close = undefined;
-                dom.append(this._dialog, this._header);
+                dom.append(this.form, this._header);
             }
             else this._header = undefined;
             
@@ -706,7 +710,7 @@ app.service("cv", function(main, dom){
                     dom.show(this._content_c);
                     dom.append(this._content, this._content_c);
                 }
-                dom.append(this._dialog, this._content);
+                dom.append(this.form, this._content);
             }
             else this._content = undefined;
             
@@ -723,23 +727,31 @@ app.service("cv", function(main, dom){
                     main.each(this.opt.button, function(index){
                         var that = this, key = this.key ? this.key : "key_" + index, o = dom.Element("a");
                         dom.attr(o, "href", dom.noUrl);
-                        dom.addClass(o, _this.opt.sign + "_button " + this.clsname);
+                        dom.addClass(o, _this.opt.sign + "_button" + (this.clsname ? " " + this.clsname : ""));
                         if(this.style && main.obj(this.style))
                             for(var key in this.style)
                                 dom.style(o, key, this.style[key]);
                         if(this.text) dom.text(o, this.text);
                         if(this.html) dom.html(o, this.html);
-                        if(this.click && main.types._function.test(main.typeof(this.click))) 
+                        if(this.click && main.types._function.test(main.typeof(this.click))){
+                            if(this.type == "submit") dom.on("submit", _this.form, function(e){ that.click(_this); e = e || window.event; e.preventDefault(); return false; });
+                            else if(this.type == "reset") dom.on("reset", _this.form, function(e){ that.click(_this); });
                             dom.on("click", o, function(){ that.click(_this); });
+                        }
                         _this._button[key] = o;
                         dom.append(_this._footer, o);
                     });
                 }
-                dom.append(this._dialog, this._footer);
+                dom.append(this.form, this._footer);
             }
             else this._footer = undefined;
+            
             dom.append(this._main, this._dialog);
             dom.append(document.body, this._main);
+        },
+        focus: function(id){
+            if(id) setTimeout(function(){ dom.get(id).focus(); }, 1);
+            return this;
         },
         show: function(){
             dom.style(document.body, "overflow", "hidden");
@@ -762,7 +774,7 @@ app.service("cv", function(main, dom){
     this.prop = function(title, message, type, callback){
         return new CV({
             title: {text: title},
-            content: {html: message + "<input type=\"" + type + "\" id=\"cv_input\">"},
+            content: {html: (message ? message + "&nbsp;&nbsp;&nbsp;&nbsp;" : "") + "<input type=\"" + type + "\" id=\"cv_input\">"},
             button: [{
                 key: "no",
                 text: "取消",
@@ -774,12 +786,13 @@ app.service("cv", function(main, dom){
             {
                 key: "yes",
                 text: "确定",
+                type: "submit",
                 click: function(v){
                     var cv_input = dom.get("cv_input");
                     if(!callback || main.types._function.test(main.typeof(callback)) && callback(true, main.trim(cv_input.value), v) !== false) v.hide(); 
                 }
             }]
-        }).show();
+        }).show().focus("cv_input");
     };
     this.alert = function(title, message, callback){
         return new CV({

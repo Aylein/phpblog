@@ -44,7 +44,7 @@ app.directive("aoPg", function(dom, main){
                 pgc.show = $scope.model.show;
                 pgc.fn = function($event, index){
                     if(!pgc.curLink && (index > pgc.total || index < pgc.first || index == pgc.page)) return;
-                    if($scope.model.callback && main.types._function.test(main.typeof($scope.model.callback))) $scope.model.callback.call($scope.$parent, index, $event);
+                    if($scope.model.callback && main.types._function.test(main.typeof($scope.model.callback))) $scope.model.callback.call($scope.model, index, $event);
                 };
                 
                 pgc.show = pgc.total < pgc.show ? pgc.total : pgc.show;
@@ -69,7 +69,7 @@ app.directive("aoPg", function(dom, main){
         }
     };
 });
-app.directive("aoCs", function(dom, main){
+app.directive("aoCs", function(dom, main, extra){
     return {
         restrict: "AE",
         replace: true,
@@ -77,8 +77,12 @@ app.directive("aoCs", function(dom, main){
         templateUrl: "/require/ngComment.html",
         link: function($scope, $elem, $attr){
             var aoCs = $scope.aoSc = {
-                key: $scope.model.comid,
+                key: $scope.model.key || extra.random(7),
                 show: $scope.model.show || false,
+                comment: "", //$scope.model.comment,
+                callback: $scope.model.fn.callback || function(){},
+                show_fn: $scope.model.fn.show || function(){ return true; },
+                hide_fn: $scope.model.fn.hide || function(){ return true; },
                 showHide: $scope.model.showHide === false ? false : true
             };
             aoCs._hide = function(){
@@ -112,14 +116,14 @@ app.directive("aoCs", function(dom, main){
                     document.execCommand("Indent"); //tab
                     dom.no(e);
                 }
-                else if(e.keyCode == 13 && e.ctrlKey) aoCs._send(); //control + enter
+                else if(e.keyCode == 13 && e.ctrlKey) setTimeout(function(){ aoCs._send(); }, 1); //control + enter
                 else if(e.keyCode == 8 && e.ctrlKey) this.innerHTML = ""; //control + backspace
             };
             aoCs._send = function(){
                 var _content = dom.get("sc_content_" + this.key), send = dom.get("sub_coin_" + this.key);
                 _content.blur();
                 _content.focus();
-                if(main.types._function.test(main.typeof($scope.$parent.send))) $scope.$parent.send($scope.model);
+                if(main.types._function.test(main.typeof(this.callback))) this.callback.call($scope.model, this.comment, this.key, this);
             };
             aoCs._clear = function(){
                 var _content = dom.get("sc_content_" + this.key);

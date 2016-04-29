@@ -39,7 +39,7 @@ body { background-color: #F5F5F5; overflow-y: scroll; }
 .ao_close { float: right; margin: 10px 15px 10px 10px; }
 .ao_content { min-height: 40px; font-size: 18px; line-height: 40px; padding: 10px; }
 .ao_footer { height: 36px; border-top-style: solid; border-top-width: 1px; border-top-color: #CCC; text-align: right; }
-.ao_button { height: 26px; margin: 5px; display: inline-block; width: 100px; text-align: center; color: #000000; line-height: 26px; background: #DDD; }
+.ao_button { border: 0; height: 26px; margin: 5px; display: inline-block; width: 100px; text-align: center; color: #000000; line-height: 26px; background: #DDD; }
 .ao_button:hover { opacity: .8; }
 
 /*cd debug*/
@@ -57,3 +57,4 @@ body { background-color: #F5F5F5; overflow-y: scroll; }
 .ng_pager::after { content: ""; clear: both; display: block; }
 .ng_pager a { display: block; float: left; margin-left: 5px; text-align: center; min-width:25px; padding: 3px 5px; border: 1px solid #aaaaaa; }
 .ng_pager a.ng_pager_cur { background: #aaaaaa; color: #ffffff; }
+.ng_pager a.nbd { border: 0; }

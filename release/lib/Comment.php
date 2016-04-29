@@ -3,7 +3,7 @@ include_once("Entity.php");
 include_once("User.php");
 class Comment{
     var $comid; // int primary key auto_increment,
-    var $comtype; // nvarchar(15) not null, //comment document stage
+    var $comtype; // nvarchar(15) not null, //commt docut stage
     var $comtypeid; // int not null,
     var $compid; // int default 0,
     var $userid;
@@ -50,13 +50,13 @@ class Comment{
 
     public static function Add($com){
         if(!$com instanceof Comment) return new Message("对象类型不正确");
-        $str = "insert into Comments (comtype, comtypeid, compid, comname, comrename, comment, comsort, comvalid) values "
-            ."(:comtype, :comtypeid, :compid, :comname, :comrename, :comment, :comsort, :comvalid); ";
-        $str .= "select comid, comtype, comtypeid, compid, comname, comdate, comment, comsort, comvalid "
+        $str = "insert into Comments (comtype, comtypeid, compid, repeatname, comment, comsort, comvalid) values "
+            ."(:comtype, :comtypeid, :compid, :repeatname, :comment, :comsort, :comvalid); ";
+        $str .= "select comid, comtype, comtypeid, compid, comdate, comment, comsort, comvalid "
             ."from Comments where comid = @@identity; ";
         $paras = array(
-            ":comtype" => $com->comtype, ":comtypeid" => $com->comtypeid, ":compid" => $com->compid, ":comname" => $com->comname, 
-            ":comrename" => $com->comrename, ":comment" => $com->comment, ":comsort" => $com->comsort, ":comvalid" => $com->comvalid
+            ":comtype" => $com->comtype, ":comtypeid" => $com->comtypeid, ":compid" => $com->compid, 
+            ":repeatname" => $com->repeatname, ":comment" => $com->comment, ":comsort" => $com->comsort, ":comvalid" => $com->comvalid
         );
         $en = (new Entity())->Querys($str, $paras);
         return count($en) == 2 && count($en[1]) == 1 ? 
@@ -65,13 +65,13 @@ class Comment{
 
     public static function Update($com){
         if(!$com instanceof Comment) return new Message("对象类型不正确");
-        $str = "update Comments set comtype = :comtype, comtypeid = :comtypeid, compid = :compid, comname = :comname, "
-            ."comrename = :comrename, comment = :comment, comsort = :comsort, comvalid = :comvalid where comid = :comid; ";
-        $str .= "select comid, comtype, comtypeid, compid, comname, comdate, comment, comsort, comvalid "
+        $str = "update Comments set comtype = :comtype, comtypeid = :comtypeid, compid = :compid, "
+            ."repeatname = :repeatname, comment = :comment, comsort = :comsort, comvalid = :comvalid where comid = :comid; ";
+        $str .= "select comid, comtype, comtypeid, compid, comdate, comment, comsort, comvalid "
             ."from Comments where comid = :comid; ";
         $paras = array(
-            ":comtype" => $com->comtype, ":comtypeid" => $com->comtypeid, ":compid" => $com->compid, ":comname" => $com->comname, 
-            ":comrename" => $com->comrename, ":comment" => $com->comment, ":comsort" => $com->comsort, ":comvalid" => $com->comvalid, 
+            ":comtype" => $com->comtype, ":comtypeid" => $com->comtypeid, ":compid" => $com->compid,  
+            ":repeatname" => $com->repeatname, ":comment" => $com->comment, ":comsort" => $com->comsort, ":comvalid" => $com->comvalid, 
             ":comid" => $com->comid
         );
         $en = (new Entity())->Querys($str, $paras);
@@ -168,7 +168,7 @@ class Comment{
     public static function Get($id, $deep = false){
         $id = is_int($id) ? $id : 0;
         if($id < 1) return null;
-        $str = "select comid, comtype, comtypeid, compid, comname, comdate, comment, comsort, comvalid "
+        $str = "select comid, comtype, comtypeid, compid, repeatname, comdate, comment, comsort, comvalid "
             ."from Comments where comid = :comid; ";
         $paras = array(":comid" => $id);
         $en = new Entity();

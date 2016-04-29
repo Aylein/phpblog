@@ -1,5 +1,5 @@
 <div>
-    <div class="say_hidden" ng-show="!aoSc.show" ng-click="aoSc._hide()"><a href="javascript: void(0);">点击回复</a></div>
+    <div class="say_hidden" ng-show="aoSc.showHide && !aoSc.show" ng-click="aoSc._hide()"><a href="javascript: void(0);" ng-bind="aoSc.show ? '取消' : '回复'"></a></div>
     <div class="say_border" ng-show="aoSc.show">
         <div class="say_button pr">
             <input class="say_button_item w26" ng-click="aoSc._bold()" value="B" type="button"/>
@@ -14,7 +14,7 @@
             </div>
             <div class="clear"></div>
         </div>
-        <div class="say_comment" ng-keyup="aoSc._keyup($event)" id="sc_content_{{aoSc.key}}" contenteditable="true" ng-model="model.comment"></div>
+        <div class="say_comment" ng-keyup="aoSc._keyup($event)" id="sc_content_{{aoSc.key}}" contenteditable="true" ng-model="aoSc.comment"></div>
         <div class="bt1sccc">
             <div class="say_button_sub fl" id="sub_bt_{{aoSc.key}}" ng-click="aoSc._send()">Send</div>
             <div class="say_subcoin fl" id="sub_coin_{{aoSc.key}}">Now Sending</div>

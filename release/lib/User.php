@@ -76,7 +76,7 @@ class User{
             ":usertype" => $user->usertype, ":usersort" => $user->usersort, ":uservalid" => $user->uservalid);
         $en = (new Entity())->Querys($str, $paras);
         return count($en) == 2 && count($en[1]) == 1 ? 
-            new Message("创建成功111111111", true, new User($en[1][0])) : new Message("创建用户失败");
+            new Message("创建成功", true, new User($en[1][0])) : new Message("创建用户失败");
     }
 
     public static function Update($user){
@@ -220,25 +220,25 @@ class User{
             new Message("修改成功", true) : new Message("修改失败");
     }
 
-    public static function SignIn($pass){
+    public static function SignIn($pass, $name){
         $str = "select userid, username, userimg, usertype, usercreatetime, usersort, uservalid "
-            ."from Users where userpass = :userpass; ";
-        $paras = array(":userpass" => $pass);
+            ."from Users where username = :username and userpass = :userpass; ";
+        $paras = array(":username" => $name, ":userpass" => $pass);
         $res = (new Entity())->First($str, $paras);
-        if(!$res) return new Message("登陆失败");
+        if(!$res) new Message("登陆失败");
         return new Message("登陆成功", true, new User($res)); //new User($res);
     }
 
-    public static function SignUp($pass){
+    public static function SignUp($pass, $name = null){
         $now = date("H");
-        $name = Commen::Rand(3)."#".Commen::Rand(5).".".chr($now + 65).chr($now + 97);
+        $name = $name ? $name : Commen::Rand(3)."#".Commen::Rand(5).".".chr($now + 65).chr($now + 97);
         $arr = array("username" => $name, "userpass" => User::makePass($pass), "userimg" => "images/ac/ac_".rand(1, 50).".png");
         return User::Add(new User($arr));
     }
-
+    
     public static function MakeUser($pass, $name = null){
         if($name == null) return User::SignUp($pass);
-        else return User::SignIn(User::makePass($pass));
+        else return User::SignIn(User::makePass($pass), $name);
     }
 }
 ?>

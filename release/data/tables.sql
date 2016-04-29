@@ -99,7 +99,7 @@ create table if not exists Documents(
 
 create table if not exists Comments(
     comid int primary key auto_increment,
-    comtype char(5) not null, #stage comment
+    comtype char(5) not null, #stage commt
     comtypeid int default 0,
     compid int default 0,
     userid int not null,

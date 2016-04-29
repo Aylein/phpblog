@@ -68,22 +68,79 @@ app.controller("ngMainController", function($scope, $location, $route, web, cach
 app.controller("urlController", function($scope, web, $location, $routeParams){
     var path = $location.path(), typeid = $routeParams.typeid;
 });
-app.controller("saysController", function($scope, main, cache, web){
-    var init = function(){
-        $scope = $scope || {};
-        $scope.comment = {comid: 0, comment: "", show: true, showHide: false};
-        $scope.send = function(model){
-            console.log(model);
-        };  
+app.controller("saysController", function($scope, main, cache, web, cv, debug){
+    $scope.list = [];
+    $scope.pager = {
+        page: 0, 
+        total: 0, 
+        show: 10, 
+        callback: function(page, event){
+            init(page);
+            event.preventDefault();
+        }
+    };
+    $scope.comment = {comid: 0, show: true, comtype: "commt", showHide: false, fn: {callback: function(text, key, comm){
+        if(main.trim(text).length > 0) $scope.send(0, text, comm);
+        else debug.error("随便输入写什么！");
+    }}};
+    $scope.repeat = {
+        show: true, 
+        showHide: false,
+        comid: 0, 
+        fn: {
+            callback: function(text, key, comm){
+                if(main.trim(text).length > 0) $scope.send($scope.repeat.comid, text, comm);
+                else debug.error("随便输入写什么！");
+            }
+        },
+        showRepeat: function(comid){
+            if(this.comid == comid) this.comid = 0;
+            else this.comid = comid;
+        }
+    };
+    $scope.send = function(id, comment, comm){
+        cv.prop("确认密码", "请输入密码", "password", function(res, va){
+            if(res && va.length > 0){
+                debug.working("正在提交");
+                var data = {
+                    comtype: "commt",
+                    comtypeid: 0,
+                    compid: id,
+                    comment: comment,
+                    _action: "post",
+                    _type: "comment",
+                    _pass: va
+                };
+                if(id > 1){
+                    for(var i = 0, z = $scope.list.length; i < z; i++)
+                        if($scope.list[i].comid == id) data.repeatname = $scope.list[i].repeatname;
+                }
+                data.repeatname = data.repeatname ? data.repeatname : "";
+                web.post("/var/action.php", data, function(data){
+                    if(data.res){
+                    comm._clear();
+                    if(id > 0) $scope.repeat.comid = 0;
+                    }
+                    else debug.error("发布评论失败：" + data.msg);
+                });
+            }
+            else debug.warnning("已取消");
+        });
+    };  
+    var init = function(page){
         web.post("/var/ajax.php", {
             action: "getall", 
             type: "comment", 
-            "deep": true
+            page: page || 1,
+            rows: 15,
+            deep: true
         }, function(data){
             $scope.list = data.list;
+            $scope.pager.page = data.page.page;
+            $scope.pager.total = data.page.totalpage;
         });
     };
-    init();
+    init(1);
 });
 app.controller("adminController", function($scope, main, cache){
     $scope.path = "admins";
@@ -202,23 +259,23 @@ app.controller("adminUserController", function($scope, main, extra, cache, web, 
         usernameRes: "init",
         usernameText: "",
         usernameTest: function(){
-            // var va = main.trim($scope.new.username);
-            // if(va.length < 1){
-            //     this.usernameRes = "error";
-            //     this.usernameText = "登录名不能为空";
-            // }
-            // else if(main.charLength(va) < 6){
-            //     this.usernameRes = "error";
-            //     this.usernameText = "登录名不能小于6位";
-            // }
-            // else if(main.charLength(va) > 25){
-            //     this.usernameRes = "error";
-            //     this.usernameText = "登录名不能大于18位";
-            // }
-            // else{
+            var va = main.trim($scope.new.username);
+            if(va.length < 1){
                 this.usernameRes = "ok";
                 this.usernameText = ""; 
-            // }
+            }
+            else if(main.charLength(va) < 6){
+                this.usernameRes = "error";
+                this.usernameText = "登录名不能小于6位";
+            }
+            else if(main.charLength(va) > 25){
+                this.usernameRes = "error";
+                this.usernameText = "登录名不能大于18位";
+            }
+            else{
+                this.usernameRes = "ok";
+                this.usernameText = ""; 
+            }
         },
         userpassRes: "init",
         userpassText: "",

@@ -1,28 +1,3 @@
-<?php
-include_once("lib/User.php");
-/*
-$type = Type::Get(12583);
-print_r($type);
-//$type->typename = "12345";
-$arr = Type::Update($type);
-print_r($arr);
-*/
-/*
-$type = new Type();
-$type->typename = "123456";
-print_r(Type::Add($type));
-*/
-/*
-$obj = new stdClass();
-$obj->name = "snOter";
-print_r(User::GetAll($obj));
-*/
-//define("EWIORWEJORU", "123");
-//echo EWIORWEJORU."<br />";
-//$arr = defined("EWIORWEJORU") ? EWIORWEJORU : "123";
-//echo $arr;
-//die();
-?>
 <!DOCTYPE html>
 <html ng-app="app">
     <head>
@@ -33,61 +8,40 @@ print_r(User::GetAll($obj));
         <link rel="stylesheet" href="styles/admin.min.css" />
         <link rel="stylesheet" href="styles/extra.min.css" />
     </head>
-    <body ng-controller="ngMainController">          
-        <div ng-controller="userController">
-            <ao-nodes></ao-nodes>
-            <div class="l_title">Users</div>
-            <div class="l_s">
-                <div>展开 添加新会员</div>
-                <div class="l_new">
-                    <div class="l_new_img" style="background: url(./images/ac/ac_13.png) no-repeat 100%; background-size: 100%"></div>
-                    <div class="l_new_info">
-                        <form name="new_user" ng-submit="newTest.submit()">
-                            <input type="text" ng-class="{'bA50000': newTest.usernameRes == 'error'}" name="username" ng-model="new.username" ng-blur="newTest.usernameTest()">
-                            <span class="cA50000" ng-bind="newTest.usernameText"></span><br>
-                            <input type="password" ng-class="{'bA50000': newTest.userpassRes == 'error'}" name="userpass" ng-model="new.userpass" ng-blur="newTest.userpassTest()">
-                            <span class="cA50000" ng-bind="newTest.userpassText"></span><br>
-                            <select name="usertype" ng-model="new.usertype" ng-options="type as type for type in newTest.usertypes"></select>
-                            <select name="uservalid" ng-model="new.uservalid" ng-options="type.val as type.text for type in newTest.uservalid"></select>
-                            <input type="submit" value="确定">
-                            <input type="reset" ng-click="newTest.reset()" value="重置">
-                        </form>
+    <body>          
+        <div ng-controller="saysController">
+            <div class="l_title">This is the Says page</div>
+            <div class="says" style="margin-top: 15px;">
+                <div class="says_left bc666"></div>
+                <div class="says_right">
+                    <div>
+                        <div class="say_title">填充 :</div>
+                        <div class="say_item"><ao-cs model="comment" /></div>
+                        <div class="clear"></div>
                     </div>
-                    <div class="clear"></div>
                 </div>
-                <br>
-                <div class="list">
-                    <div ng-repeat="item in list" class="mt15">
-                        <div ng-show="updateTest.updateid != item.n.userid" ng-class="{allBBB: item.n.uservalid == 0}">
-                            <div class="l_new_img" style="background: url({{item.n.userimg}}) no-repeat 100%; background-size: 100%"></div>
-                            <div class="l_new_info">
-                                <a href="javascript: void(0);" ng-bind="item.n.username" ng-click="updateTest.setUpdate(item.n.userid)"></a><br>
-                                <span ng-bind="item.n.usercreatetime"></span><br>
-                                <span ng-bind="item.n.usertype"></span> <span ng-bind="item.n.uservalid == 1 ? '可用' : '不可用'"></span>
-                            </div>
-                            <div class="clear"></div>
-                        </div>
-                        <div ng-show="updateTest.updateid == item.u.userid">
-                            <div class="l_new_img" style="background: url({{item.n.userimg}}) no-repeat 100%; background-size: 100%"></div>
-                            <div class="l_new_info">
-                                <form name="update_user_{{item.u.userid}}" ng-submit="updateTest.submit('u_' + item.u.userid)">
-                                    <input name="username" ng-class="{'bA50000': updateTest.usernameRes == 'error'}" type="text" ng-model="item.u.username">
-                                    <span class="cA50000" ng-bind="updateTest.usernameText"></span><br>
-                                    <input name="userpass" ng-class="{'bA50000': updateTest.usernameRes == 'error'}" type="password" ng-model="item.u.userpass">
-                                    <span class="cA50000" ng-bind="updateTest.userpassText"></span><br>
-                                    <select name="usertype" ng-model="item.u.usertype" ng-options="type as type for type in newTest.usertypes"></select>
-                                    <select name="uservalid" ng-model="item.u.uservalid" ng-options="type.val as type.text for type in newTest.uservalid"></select>
-                                    <input type="submit" value="确定">
-                                    <input type="reset" ng-click="updateTest.reset('u_' + item.u.userid, $event)" value="重置">
-                                    <input type="button" ng-click="updateTest.cancel('u_' + item.u.userid)" value="取消">
-                                </form>
-                            </div>
-                            <div class="clear"></div>
-                        </div>
-                    </div>
-                    <ao-pg model="pager"></ao-pg>
-                </div>
+                <div class="clear"></div>
             </div>
+            <br />
+            <div class="says_pano" ng-repeat="com in list">
+                <div class="says_p_left">
+                    <div class="says_p_head" style="background: url({{com.user.userimg}}) no-repeat 100%; background-size: 82px;"></div>
+                </div>
+                <div class="says_p_right">
+                    <div>
+                        <div class="says_p_hov">
+                            <div class="c666">
+                                <a href="javascript: void(0);" title="raply" ng-bind="com.user.username"></a> 
+                                - <span ng-bind="com.comdate"></span>
+                                <a href="javascript: void(0);" ng-click="repeat.showRepeat(com.comid)" ng-bind="repeat.comid == com.comid ? '取消' : '回复'"></a></div>
+                            <div ng-bind="com.comment"></div>
+                        </div>
+                        <div ng-show="repeat.comid == com.comid"><ao-cs model="repeat"></ao-cs></div>
+                    </div>
+                </div>
+                <div class="clear"></div>
+            </div>
+            <ao-pg model="pager"></ao-pg>
         </div>
     </body>
     <script src="scripts/angular.min.js"></script>
