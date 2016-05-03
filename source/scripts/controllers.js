@@ -113,13 +113,18 @@ app.controller("saysController", function($scope, main, cache, web, cv, debug){
                 };
                 if(id > 1){
                     for(var i = 0, z = $scope.list.length; i < z; i++)
-                        if($scope.list[i].comid == id) data.repeatname = $scope.list[i].repeatname;
+                        if($scope.list[i].comid == id) {
+                            data.repeatname = $scope.list[i].user.username;
+                            data.repeatid = $scope.list[i].user.userid;
+                        }
                 }
                 data.repeatname = data.repeatname ? data.repeatname : "";
                 web.post("/var/action.php", data, function(data){
                     if(data.res){
-                    comm._clear();
-                    if(id > 0) $scope.repeat.comid = 0;
+                        comm._clear();
+                        if(id > 0) $scope.repeat.comid = 0;
+                        debug.warnning("发布评论成功");
+                        init(1);
                     }
                     else debug.error("发布评论失败：" + data.msg);
                 });
@@ -131,6 +136,7 @@ app.controller("saysController", function($scope, main, cache, web, cv, debug){
         web.post("/var/ajax.php", {
             action: "getall", 
             type: "comment", 
+            mtype: "commt",
             page: page || 1,
             rows: 15,
             deep: true

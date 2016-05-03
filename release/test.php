@@ -34,7 +34,7 @@
                                 <a href="javascript: void(0);" title="raply" ng-bind="com.user.username"></a> 
                                 - <span ng-bind="com.comdate"></span>
                                 <a href="javascript: void(0);" ng-click="repeat.showRepeat(com.comid)" ng-bind="repeat.comid == com.comid ? '取消' : '回复'"></a></div>
-                            <div ng-bind="com.comment"></div>
+                            <div class="mt5" ng-bind-html="com.comment | to_trusted"></div>
                         </div>
                         <div ng-show="repeat.comid == com.comid"><ao-cs model="repeat"></ao-cs></div>
                     </div>

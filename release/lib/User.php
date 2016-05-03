@@ -220,10 +220,10 @@ class User{
             new Message("修改成功", true) : new Message("修改失败");
     }
 
-    public static function SignIn($pass, $name){
+    public static function SignIn($pass){
         $str = "select userid, username, userimg, usertype, usercreatetime, usersort, uservalid "
-            ."from Users where username = :username and userpass = :userpass; ";
-        $paras = array(":username" => $name, ":userpass" => $pass);
+            ."from Users where userpass = :userpass; ";
+        $paras = array(":userpass" => $pass);
         $res = (new Entity())->First($str, $paras);
         if(!$res) new Message("登陆失败");
         return new Message("登陆成功", true, new User($res)); //new User($res);
@@ -236,9 +236,12 @@ class User{
         return User::Add(new User($arr));
     }
     
-    public static function MakeUser($pass, $name = null){
-        if($name == null) return User::SignUp($pass);
-        else return User::SignIn(User::makePass($pass), $name);
+    public static function MakeUser($pass){
+        $msg = User::SignIn(User::makePass($pass));
+        if(!$msg->res) $msg = User::SignUp($pass);
+        return $msg;
+        //if($name == null) return User::SignUp($pass);
+        //else return User::SignIn(User::makePass($pass), $name);
     }
 }
 ?>

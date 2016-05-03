@@ -14,8 +14,7 @@
     }
     $action = $_POST["_action"];
     $pass = $_POST["_pass"];
-    $name = isset($_COOKIE["ao"]) ? $_COOKIE["ao"] : null;
-    $msg = User::MakeUser($pass, $name);
+    $msg = User::MakeUser($pass);
     $user = $msg->obj;
     
     if(!$msg->res || $user == null){
@@ -23,7 +22,7 @@
         exit();
     }
     else setCookie("ao", $user->username, strtotime(date('Y-m-d H:i:s', strtotime("+ 1 year"))));
-
+    
     $str = "";
     try{
         switch($action){
@@ -41,10 +40,10 @@
             case "comment":
                 $obj = new Comment($_POST);
                 $obj->userid = $user->userid;
+                $obj->comvalid = 1;
                 if($obj->comtype == "") return new Message("类别不能为空", false, null, "no_type");
                 if($obj->userid < 1) return new Message("用户ID不能为空", false, null, "no_user");
                 if($obj->comment == "") return new Message("评论内容不能为空", false, null, "no_comment");
-                print_r($obj); die();
                 return Comment::Add_Update($obj);
             default: return new Message("post ...  what ...");
         }

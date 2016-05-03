@@ -32,6 +32,11 @@ app.config(function($routeProvider){
         controller: "adminUserController"
     }).otherwise({redirectTo: "/about"});
 });
+app.filter('to_trusted', function ($sce) {
+    return function (text) {
+        if(typeof text=='string') return $sce.trustAsHtml(text);
+    }
+});
 app.service("main", function(){
     var re_typeof = /^\[object (\S+)\]$/;
     var rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g;
