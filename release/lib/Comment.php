@@ -116,6 +116,58 @@ class Comment{
         if(count($res) != 1 || count($res[0]) != 1) return 0;
         return (int)$res[0][0]["count"];
     }
+    
+    public static function GetAll_forEveryAll($search = null, $deep = false){
+        $search = is_object($search) ? $search : new stdClass(); 
+        $search->type = isset($search->type) ? strval($search->type) : "other";
+        $search->typeid = isset($search->typeid) && is_numeric($search->typeid) ? (int)$search->typeid : 0;
+        $search->pid = isset($search->pid) && is_numeric($search->pid) ? (int)$search->pid : -2;
+        $search->userid = isset($search->userid) && is_numeric($search->userid) ? (int)$search->userid : 0;
+        $search->valid = isset($search->valid) && is_numeric($search->valid) ? (int)$search->valid : 1;
+        $search->page = isset($search->page) && is_numeric($search->page) ? (int)$search->page : 0;
+        $search->rows = isset($search->rows) && is_numeric($search->rows) ? (int)$search->rows : 0;
+        $search->order = isset($search->name) ? strval($search->name) : "sort";
+        $count = "select count(*) as count ";
+        $select = "select group_concat(comid) ";
+        $where = "from Comments where 1 = 1 ";
+        $paras = array();
+        if($search->type != "other"){
+            $where .= "and comtype = :comtype ";
+            $paras[":comtype"] = $search->type;
+        }
+        if($search->typeid > 0){
+            $where .= "and comtypeid = :comtypeid ";
+            $paras[":comtypeid"] = $search->typeid;
+        }
+        if($search->pid == -1) $where .= "and compid > 0 ";
+        else if($search->pid > -1){
+            $where .= "and compid = :compid ";
+            $paras[":compid"] = $search->pid;
+        }
+        if($search->valid == 1 || $search->valid == 0){
+            $where .= "and comvalid = :comvalid ";
+            $paras[":comvalid"] = $search->valid;
+        }
+        $count .= $where."; ";
+        $where .= "order by comid desc ";
+        $select .= $where;
+        if($search->page > 0 && $search->rows > 0){
+            $select .= "limit :page, :rows ";
+            $paras[":page"] = ($search->page - 1) * $search->rows;
+            $paras[":rows"] = $search->rows;
+        }
+        $_select = "select comid, comtype, comtypeid, compid, userid, repeatid, repeatname, comdate, comment, comsort, comvalid "
+            ."from comments where find_in_set(comid, allComments((".$select.")));";
+        $select .= "; ";
+        $count .= $select.$_select;
+        $list = array("all" => array());
+        $res = (new Entity())->Querys($count, $paras);
+        if(count($res) != 3 || count($res[0]) != 1) return new Resaults();
+        print_r($select); die();
+        $list["list"] = $res[1][0][0];
+        foreach($res[2] as $key => $value) $list["all"][] = new Comment($value, $deep);
+        return new Resaults($list, (int)$res[0][0]["count"], $search->page, $search->rows);
+    }
 
     public static function GetAll($search = null, $deep = false){
         $search = is_object($search) ? $search : new stdClass(); 

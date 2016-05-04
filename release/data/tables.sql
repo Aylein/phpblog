@@ -28,7 +28,7 @@ create index user_name on Users(username);
 create index user_pass on Users(userpass);
     
 insert into Users(username, userpass, userimg, usertype) values
-    ("AyleinOter", "77abf970792365c929648aecc39d06fc", "/images/master.jpg", "admin");
+    ("AyleinOter", "126bd23a4bda50db3491502c0e14ea9d", "/images/master.jpg", "admin");
 
 create table if not exists Signs(
     signid int primary key auto_increment,
@@ -136,3 +136,19 @@ create table if not exists Action(
     actdate datetime default CURRENT_TIMESTAMP,
     actvalid int default 1
 )auto_increment = 1  charset = utf8;
+
+drop function if exists allComments;
+delimiter //
+create function allComments (ids varchar(2000))
+returns varchar(2000)
+begin
+	declare temp varchar(4000);
+    declare sTemp varchar(4000);
+    set temp = "$";
+    set sTemp = cast(ids as char);
+	while sTemp is not null do
+		set temp = concat(temp,',',sTemp);
+		select group_concat(compid) into sTemp from comments where find_in_set(comid, sTemp) > 0;
+	end while;
+    return temp;
+end //

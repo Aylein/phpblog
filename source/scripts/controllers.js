@@ -132,6 +132,23 @@ app.controller("saysController", function($scope, main, cache, web, cv, debug){
             else debug.warnning("已取消");
         });
     };  
+    var makeItem = function(data, list){
+        if(data.compid > 0) data.repeat_comment = makeItem(list["c_" + data.compid], list);
+        else data.repeat_comment = null;
+        return data;
+    };
+    var makeList = function(data){
+        $scope.itemList = {};
+        for(var i = 0, z = data.all.length; i < z; i++) $scope.itemList["c_" + data.all[i].comid] = data.all[i];
+        $scope.list = [];
+        var items = data.list.split(",");
+        for(var i = 0, z = items.length; i < z; i++){
+            var o = $scope.itemList["c_" + items[i]];
+            o.c_repeat = $scope.repeat;
+            makeItem(o, $scope.itemList);
+            $scope.list.unshift(o);
+        }
+    };
     var init = function(page){
         web.post("/var/ajax.php", {
             action: "getall", 
@@ -141,7 +158,8 @@ app.controller("saysController", function($scope, main, cache, web, cv, debug){
             rows: 15,
             deep: true
         }, function(data){
-            $scope.list = data.list;
+            //$scope.list = data.list;
+            makeList(data.list);
             $scope.pager.page = data.page.page;
             $scope.pager.total = data.page.totalpage;
         });

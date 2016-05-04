@@ -24,13 +24,24 @@ app.directive("contenteditable", function(){
         }
     }
 });
+/* angular 指令递归死循环的问题 http://blog.csdn.net/liuhe688/article/details/50966215 @liuhe688 */
+app.directive("aoRp", function(){
+    return {
+        restrict: "AE",
+        replace: true,
+        scope: {model: "=", repeat: "="},
+        templateUrl: "/require/ngRepeat.html",
+        link: function($scope){
+        }
+    };
+});
 app.directive("aoPg", function(dom, main){
     return {
         restrict: "AE",
         replace: true,
         scope: {model: "="},
         templateUrl: "/require/ngPager.html",
-        link: function($scope, $elem, $attr){
+        link: function($scope){
             var pgc = $scope.pager = {
                 first: 1,
                 pages: [],
@@ -75,7 +86,7 @@ app.directive("aoCs", function(dom, main, extra){
         replace: true,
         scope: {model: "="},
         templateUrl: "/require/ngComment.html",
-        link: function($scope, $elem, $attr){
+        link: function($scope){
             var aoCs = $scope.aoSc = {
                 key: $scope.model.key || extra.random(7),
                 show: $scope.model.show || false,
@@ -145,7 +156,7 @@ app.directive("aoNodes", function(main, cache){
         restrict: "E",
         replace: true,
         templateUrl: "/require/ngAdminHeader.html",
-        link: function($scope, $elem, $attrs){
+        link: function($scope){
             $scope.admin = cache.get("admin_nodes") || {
                 nodes: {
                     contents: {

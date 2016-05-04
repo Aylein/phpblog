@@ -105,7 +105,7 @@
                 $search->page = isset($_POST["page"]) && is_numeric($_POST["page"]) ? (int)$_POST["page"] : 0;
                 $search->rows = isset($_POST["rows"]) && is_numeric($_POST["rows"]) ? (int)$_POST["rows"] : 0;
                 $search->order = isset($_POST["name"]) ? strval($_POST["name"]) : "sort";
-                return Comment::GetAll($search, $deep);
+                return Comment::GetAll_forEveryAll($search, $deep);
             case "action": 
                 $search->type = isset($_POST["mtype"]) ? strval($_POST["mtype"]) : "other";
                 $search->typeid = isset($_POST["typeid"]) && is_numeric($_POST["typeid"]) ? (int)$_POST["typeid"] : 0;
