@@ -21,8 +21,10 @@
 .c000 { color: #000000; }
 .cFF6600 { color: #FF6600; }
 .cA50000 { color: #A50000; }
-.bb1s666 { border-bottom: 1px solid #CCC; }
+.bb1sccc { border-bottom: 1px solid #CCC; }
 .bt1sccc { border-top: 1px solid #CCC; }
+.bl1sccc { border-left: 1px solid #CCC; }
+.br1sccc { border-right: 1px solid #CCC; }
 .bA50000 { border: 1px solid #A50000; }
 .nbd { border: 0; }
 .mt5 { margin-top: 5px; }

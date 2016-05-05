@@ -94,7 +94,7 @@ app.controller("saysController", function($scope, main, cache, web, cv, debug){
                 else debug.error("随便输入写什么！");
             }
         },
-        showRepeat: function(comid, key){
+        showRepeat: function(comid, key, event){
             if(this.comid == comid && this.key == key){
                 this.comid = 0;
                 this.key = "";
@@ -103,6 +103,7 @@ app.controller("saysController", function($scope, main, cache, web, cv, debug){
                 this.comid = comid;
                 this.key = key;
             }
+            event.stopPropagation();
         }
     };
     $scope.send = function(id, comment, comm){
@@ -151,22 +152,21 @@ app.controller("saysController", function($scope, main, cache, web, cv, debug){
             $scope.itemList["c_" + data.all[i].comid] = data.all[i];
         }
         $scope.list = [];
-        for(var i = 0, z = data.list.length; i < z; i++){
-            //var o = $scope.itemList["c_" + data.list[i]];
-            //makeItem($scope.itemList["c_" + data.list[i]], $scope.itemList);
+        for(var i = 0, z = data.list.length; i < z; i++)
             $scope.list.push(makeItem($scope.itemList["c_" + data.list[i]], $scope.itemList));
-        }
     };
     var init = function(page){
+        $scope.list = [];
+        $scope.itemList = {};
+        $scope.pager.total = 0;
         web.post("/var/ajax.php", {
             action: "getall", 
             type: "comment", 
             mtype: "commt",
             page: page || 1,
-            rows: 15,
+            rows: 10,
             deep: true
         }, function(data){
-            //$scope.list = data.list;
             makeList(data.list);
             $scope.pager.page = data.page.page;
             $scope.pager.total = data.page.totalpage;

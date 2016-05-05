@@ -29,6 +29,9 @@
 .l_ground { width: 920px; margin: 0 auto; }
 .says_pano { width: 950px; margin: 0 auto; margin-top: 15px; }
 .says_repeat { width: 97%; margin: 0 auto; border: 1px solid #cccccc; }
+.says_repeat_p { width: 97%; margin: 0 auto; }
+.says_repeat_no { margin: 0 auto; border-left: 1px solid #cccccc; border-bottom: 1px solid #cccccc; border-right: 1px solid #cccccc; margin-top: 2px; }
+.says_hide { height: 30px; line-height: 30px; padding-left: 15px; margin: 0 15px; border: 1px dashed #666666; background: #f5f5f5; cursor: pointer; }
 .says_p_left, .says_p_right { float: left; margin: 15px;  }
 .says_p_left { width: 100px; }
 .says_p_head { width: 80px; height: 80px; float: left; overflow: hidden; border: 1px solid #666; opacity: 0.7; }

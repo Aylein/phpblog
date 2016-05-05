@@ -33,6 +33,14 @@ app.directive("aoRp", function(extra){
         templateUrl: "/require/ngRepeat.html",
         link: function($scope){
             $scope.key = extra.random(7);
+            $scope.show = false;
+            if($scope.repeat > 0) $scope.model.aorp_repeat = true;
+            var init = function(){
+                if($scope.repeat == 0 && $scope.model.aorp_repeat == true) $scope.show = false;
+                else $scope.show = true;
+            }
+            $scope.makeShow = function(){ $scope.show = !$scope.show; };
+            $scope.$watch("model.aorp_repeat", function(obj){ init(); }, true);
         }
     };
 });

@@ -32,7 +32,7 @@ body { background-color: #F5F5F5; overflow-y: scroll; }
 
 /*ca dialog*/
 .ao_cover { position: fixed; top: 0px; left: 0px; right: 0px; bottom: 0px; background: #CCC; opacity: .4; }
-.ao_dialog { top: 24px; position: absolute; margin-left: -300px; left: 50%; width: 600px; border: 1px solid #CCC; background: #ffffff; }
+.ao_dialog { top: 124px; position: fixed; margin-left: -300px; left: 50%; width: 600px; border: 1px solid #CCC; background: #ffffff; }
 .ao_header { height: 41px; border-bottom-style: dashed; border-bottom-width: 1px; border-bottom-color: #CCC; }
 .ao_header:after { clear: both; }
 .ao_title { float: left; margin: 10px; }

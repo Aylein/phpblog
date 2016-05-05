@@ -11,5 +11,5 @@
     <div class="clear"></div>
 </div>
 <br />
-<ao-rp ng-repeat="com in list" model="com"></ao-rp>
-<ao-pg model="pager"></ao-pg>
+<ao-rp ng-repeat="com in list" model="com" repeat="0"></ao-rp>
+<ao-pg model="pager" ng-show="pager.total > 0"></ao-pg>
