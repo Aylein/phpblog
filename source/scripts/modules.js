@@ -780,14 +780,7 @@ app.service("cv", function(main, dom){
         return new CV({
             title: {text: title},
             content: {html: (message ? message + "&nbsp;&nbsp;&nbsp;&nbsp;" : "") + "<input type=\"" + type + "\" id=\"cv_input\">"},
-            button: [{
-                key: "no",
-                text: "取消",
-                click: function(v){
-                    var cv_input = dom.get("cv_input");
-                    if(!callback || main.types._function.test(main.typeof(callback)) && callback(false, main.trim(cv_input.value), v) !== false) v.hide(); 
-                }
-            },
+            button: [
             {
                 key: "yes",
                 text: "确定",
@@ -795,6 +788,14 @@ app.service("cv", function(main, dom){
                 click: function(v){
                     var cv_input = dom.get("cv_input");
                     if(!callback || main.types._function.test(main.typeof(callback)) && callback(true, main.trim(cv_input.value), v) !== false) v.hide(); 
+                }
+            },
+            {
+                key: "no",
+                text: "取消",
+                click: function(v){
+                    var cv_input = dom.get("cv_input");
+                    if(!callback || main.types._function.test(main.typeof(callback)) && callback(false, main.trim(cv_input.value), v) !== false) v.hide(); 
                 }
             }]
         }).show().focus("cv_input");
@@ -816,18 +817,19 @@ app.service("cv", function(main, dom){
         return new CV({
             title: {text: title},
             content: {html: message},
-            button: [{
-                key: "no",
-                text: "取消",
-                click: function(v){
-                    if(!callback || main.types._function.test(main.typeof(callback)) && callback(false, v) !== false) v.hide(); 
-                }
-            },
+            button: [
             {
                 key: "yes",
                 text: "确定",
                 click: function(v){
                     if(!callback || main.types._function.test(main.typeof(callback)) && callback(true, v) !== false) v.hide(); 
+                }
+            },
+            {
+                key: "no",
+                text: "取消",
+                click: function(v){
+                    if(!callback || main.types._function.test(main.typeof(callback)) && callback(false, v) !== false) v.hide(); 
                 }
             }]
         }).show();

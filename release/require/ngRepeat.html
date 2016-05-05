@@ -1,4 +1,4 @@
-<div class="says_pano" style="width: 100%;">
+<div class="says_pano">
     <div ng-if="model.repeat_comment != null" ng-show="show" ng-class="{says_repeat: repeat < 3, says_repeat_p: repeat == 3}"><ao-rp model="model.repeat_comment" repeat="repeat + 1"></ao-rp></div>
     <div class="says_hide" ng-show="!show && repeat == 0 && model.repeat_comment != null && model.aorp_repeat == true" ng-bind="show ? '隐藏' : '已隐藏显示'" ng-click="makeShow()"></div>
     <div ng-class="{says_repeat_no: repeat > 3, bt1sccc: repeat > 3 && model.compid < 1}">
