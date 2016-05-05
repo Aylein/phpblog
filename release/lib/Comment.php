@@ -128,7 +128,7 @@ class Comment{
         $search->rows = isset($search->rows) && is_numeric($search->rows) ? (int)$search->rows : 0;
         $search->order = isset($search->name) ? strval($search->name) : "sort";
         $count = "select count(*) as count ";
-        $select = "select group_concat(comid) ";
+        $select = "select comid ";
         $where = "from Comments where 1 = 1 ";
         $paras = array();
         if($search->type != "other"){
@@ -154,17 +154,16 @@ class Comment{
         if($search->page > 0 && $search->rows > 0){
             $select .= "limit :page, :rows ";
             $paras[":page"] = ($search->page - 1) * $search->rows;
-            $paras[":rows"] = $search->rows;
+            $paras[":rows"] = $search->rows * $search->page;
         }
         $_select = "select comid, comtype, comtypeid, compid, userid, repeatid, repeatname, comdate, comment, comsort, comvalid "
-            ."from comments where find_in_set(comid, allComments((".$select.")));";
+            ."from comments where find_in_set(comid, allComments((select group_concat(comid) from (".$select.") as a)));";
         $select .= "; ";
         $count .= $select.$_select;
-        $list = array("all" => array());
+        $list = array("list" => array(), "all" => array());
         $res = (new Entity())->Querys($count, $paras);
         if(count($res) != 3 || count($res[0]) != 1) return new Resaults();
-        print_r($select); die();
-        $list["list"] = $res[1][0][0];
+        foreach($res[1] as $key => $value) $list["list"][] = $value["comid"];
         foreach($res[2] as $key => $value) $list["all"][] = new Comment($value, $deep);
         return new Resaults($list, (int)$res[0][0]["count"], $search->page, $search->rows);
     }

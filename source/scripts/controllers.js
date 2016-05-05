@@ -87,15 +87,22 @@ app.controller("saysController", function($scope, main, cache, web, cv, debug){
         show: true, 
         showHide: false,
         comid: 0, 
+        key: "",
         fn: {
             callback: function(text, key, comm){
                 if(main.trim(text).length > 0) $scope.send($scope.repeat.comid, text, comm);
                 else debug.error("随便输入写什么！");
             }
         },
-        showRepeat: function(comid){
-            if(this.comid == comid) this.comid = 0;
-            else this.comid = comid;
+        showRepeat: function(comid, key){
+            if(this.comid == comid && this.key == key){
+                this.comid = 0;
+                this.key = "";
+            } 
+            else{
+                this.comid = comid;
+                this.key = key;
+            }
         }
     };
     $scope.send = function(id, comment, comm){
@@ -139,14 +146,15 @@ app.controller("saysController", function($scope, main, cache, web, cv, debug){
     };
     var makeList = function(data){
         $scope.itemList = {};
-        for(var i = 0, z = data.all.length; i < z; i++) $scope.itemList["c_" + data.all[i].comid] = data.all[i];
+        for(var i = 0, z = data.all.length; i < z; i++){
+            data.all[i].c_repeat = $scope.repeat;
+            $scope.itemList["c_" + data.all[i].comid] = data.all[i];
+        }
         $scope.list = [];
-        var items = data.list.split(",");
-        for(var i = 0, z = items.length; i < z; i++){
-            var o = $scope.itemList["c_" + items[i]];
-            o.c_repeat = $scope.repeat;
-            makeItem(o, $scope.itemList);
-            $scope.list.unshift(o);
+        for(var i = 0, z = data.list.length; i < z; i++){
+            //var o = $scope.itemList["c_" + data.list[i]];
+            //makeItem($scope.itemList["c_" + data.list[i]], $scope.itemList);
+            $scope.list.push(makeItem($scope.itemList["c_" + data.list[i]], $scope.itemList));
         }
     };
     var init = function(page){

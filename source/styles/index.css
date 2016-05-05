@@ -28,6 +28,7 @@
 .l_title { width: 950px; height: 30px; margin: 10px auto; font-size: 25px; line-height: 25px; border-bottom: 1px solid #CCC; }
 .l_ground { width: 920px; margin: 0 auto; }
 .says_pano { width: 950px; margin: 0 auto; margin-top: 15px; }
+.says_repeat { width: 97%; margin: 0 auto; border: 1px solid #cccccc; }
 .says_p_left, .says_p_right { float: left; margin: 15px;  }
 .says_p_left { width: 100px; }
 .says_p_head { width: 80px; height: 80px; float: left; overflow: hidden; border: 1px solid #666; opacity: 0.7; }

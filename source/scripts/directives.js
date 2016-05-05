@@ -25,13 +25,14 @@ app.directive("contenteditable", function(){
     }
 });
 /* angular 指令递归死循环的问题 http://blog.csdn.net/liuhe688/article/details/50966215 @liuhe688 */
-app.directive("aoRp", function(){
+app.directive("aoRp", function(extra){
     return {
         restrict: "AE",
         replace: true,
         scope: {model: "=", repeat: "="},
         templateUrl: "/require/ngRepeat.html",
         link: function($scope){
+            $scope.key = extra.random(7);
         }
     };
 });

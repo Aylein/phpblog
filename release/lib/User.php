@@ -225,7 +225,7 @@ class User{
             ."from Users where userpass = :userpass; ";
         $paras = array(":userpass" => $pass);
         $res = (new Entity())->First($str, $paras);
-        if(!$res) new Message("登陆失败");
+        if(!$res) return new Message("登陆失败");
         return new Message("登陆成功", true, new User($res)); //new User($res);
     }
 
@@ -240,8 +240,6 @@ class User{
         $msg = User::SignIn(User::makePass($pass));
         if(!$msg->res) $msg = User::SignUp($pass);
         return $msg;
-        //if($name == null) return User::SignUp($pass);
-        //else return User::SignIn(User::makePass($pass), $name);
     }
 }
 ?>
