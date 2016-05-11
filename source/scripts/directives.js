@@ -34,6 +34,7 @@ app.directive("aoRp", function(extra){
         link: function($scope){
             $scope.key = extra.random(7);
             $scope.show = false;
+            $scope.clab = 5;
             if($scope.repeat > 0) $scope.model.aorp_repeat = true;
             var init = function(){
                 if($scope.repeat == 0 && $scope.model.aorp_repeat == true) $scope.show = false;

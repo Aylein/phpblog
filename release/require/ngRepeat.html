@@ -1,13 +1,14 @@
 <div class="says_pano">
-    <div ng-if="model.repeat_comment != null" ng-show="show" ng-class="{says_repeat: repeat < 3, says_repeat_p: repeat == 3}"><ao-rp model="model.repeat_comment" repeat="repeat + 1"></ao-rp></div>
+    <div ng-if="model.repeat_comment != null" ng-show="show" ng-class="{says_repeat: repeat < clab, says_repeat_p: repeat == clab}"><ao-rp model="model.repeat_comment" repeat="repeat + 1"></ao-rp></div>
     <div class="says_hide" ng-show="!show && repeat == 0 && model.repeat_comment != null && model.aorp_repeat == true" ng-bind="show ? '隐藏' : '已隐藏显示'" ng-click="makeShow()"></div>
-    <div ng-class="{says_repeat_no: repeat > 3, bt1sccc: repeat > 3 && model.compid < 1}">
+    <div ng-class="{says_repeat_no: repeat > clab, bt1sccc: repeat > clab && model.compid < 1}">
         <div class="says_p_left">
             <div class="says_p_head" style="background: url({{model.user.userimg}}) no-repeat 100%; background-size: 100%;"></div>
         </div>
         <div class="says_p_right">
             <div class="says_p_hov">
                 <div class="c666">
+                    <span ng-bind="model.comindex + '#'"></span>
                     <a href="javascript: void(0);" title="raply" ng-bind="model.user.username"></a> 
                     <span ng-if="model.repeat_comment != null">:: <a href="javascript: void(0);" title="raply" ng-bind="model.repeatname"></a></span>
                     / <span ng-bind="model.comdate"></span>

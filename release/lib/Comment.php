@@ -23,6 +23,7 @@ class Comment{
             $this->comtype = "";
             $this->comtypeid = 0;
             $this->compid = 0;
+            $this->comindex = 0;
             $this->userid = 0;
             $this->repeatid = 0;
             $this->repeatname = "";
@@ -36,6 +37,7 @@ class Comment{
             $this->comtype = isset($array["comtype"]) ? $array["comtype"] : "";
             $this->comtypeid = isset($array["comtypeid"]) && is_numeric($array["comtypeid"]) ? (int)$array["comtypeid"] : 0;
             $this->compid = isset($array["compid"]) && is_numeric($array["compid"]) ? (int)$array["compid"] : 0;
+            $this->comindex = isset($array["comindex"]) && is_numeric($array["comindex"]) ? (int)$array["comindex"] : 0;
             $this->userid = isset($array["userid"]) && is_numeric($array["userid"]) ? (int)$array["userid"] : 0;
             $this->repeatid = isset($array["repeatid"]) && is_numeric($array["repeatid"]) ? (int)$array["repeatid"] : 0;
             $this->repeatname = isset($array["repeatname"]) ? $array["repeatname"] : "";
@@ -50,9 +52,9 @@ class Comment{
 
     public static function Add($com){
         if(!$com instanceof Comment) return new Message("对象类型不正确");
-        $str = "insert into Comments (comtype, comtypeid, compid, userid, repeatid, repeatname, comment, comsort, comvalid) values "
-            ."(:comtype, :comtypeid, :compid, :userid, :repeatid, :repeatname, :comment, :comsort, :comvalid); ";
-        $str .= "select comid, comtype, comtypeid, compid, comdate, comment, comsort, comvalid "
+        $str = "insert into Comments (comindex, comtype, comtypeid, compid, userid, repeatid, repeatname, comment, comsort, comvalid) values "
+            ."(com_next(), :comtype, :comtypeid, :compid, :userid, :repeatid, :repeatname, :comment, :comsort, :comvalid); ";
+        $str .= "select comid, comtype, comtypeid, compid, comindex, userid, comdate, comment, comsort, comvalid "
             ."from Comments where comid = @@identity; ";
         $paras = array(
             ":comtype" => $com->comtype, ":comtypeid" => $com->comtypeid, ":compid" => $com->compid, ":userid" => $com->userid, ":repeatid" => $com->repeatid, 
@@ -156,9 +158,15 @@ class Comment{
             $paras[":page"] = ($search->page - 1) * $search->rows;
             $paras[":rows"] = $search->rows * $search->page;
         }
-        $_select = "select comid, comtype, comtypeid, compid, userid, repeatid, repeatname, comdate, comment, comsort, comvalid "
-            ."from comments where find_in_set(comid, allComments((select group_concat(comid) from (".$select.") as a)));";
+        $_select = "select comid, comtype, comtypeid, compid, comindex, userid, repeatid, repeatname, comdate, comment, comsort, comvalid "
+            ."from comments where ";
+        if($search->valid == 1 || $search->valid == 0){
+            $_select .= "comvalid = :comvalid_p and ";
+            $paras[":comvalid_p"] = $search->valid;
+        }
+        $_select .= "find_in_set(comid, allComments((select group_concat(comid) from (".$select.") as a)));";
         $select .= "; ";
+        //print_r($_select); die();
         $count .= $select.$_select;
         $list = array("list" => array(), "all" => array());
         $res = (new Entity())->Querys($count, $paras);
@@ -179,7 +187,7 @@ class Comment{
         $search->rows = isset($search->rows) && is_numeric($search->rows) ? (int)$search->rows : 0;
         $search->order = isset($search->name) ? strval($search->name) : "sort";
         $count = "select count(*) as count ";
-        $select = "select comid, comtype, comtypeid, compid, userid, repeatid, repeatname, comdate, comment, comsort, comvalid ";
+        $select = "select comid, comtype, comtypeid, compid, comindex, userid, repeatid, repeatname, comdate, comment, comsort, comvalid ";
         $where = "from Comments where 1 = 1 ";
         $paras = array();
         if($search->type != "other"){
@@ -219,7 +227,7 @@ class Comment{
     public static function Get($id, $deep = false){
         $id = is_int($id) ? $id : 0;
         if($id < 1) return null;
-        $str = "select comid, comtype, comtypeid, compid, userid, repeatid, repeatname, comdate, comment, comsort, comvalid "
+        $str = "select comid, comtype, comtypeid, compid, comindex, userid, repeatid, repeatname, comdate, comment, comsort, comvalid "
             ."from Comments where comid = :comid; ";
         $paras = array(":comid" => $id);
         $en = new Entity();

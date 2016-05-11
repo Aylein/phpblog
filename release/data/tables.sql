@@ -88,6 +88,16 @@ create table if not exists Stages(
 create index stag_title on Stages(stgtitle);
 create index stag_subtitle on Stages(stgsubtitle);
 
+drop function if exists stage_com_next;
+delimiter //
+create function stage_com_next(int id) returns int
+begin
+    declare va int;
+	update Stages set stgcomnum = stgcomnum + 1 where stgid = id;
+    select stgcomnum into va from Stages where stgid = id;
+    return va;
+end //
+
 create table if not exists Documents(
     docid int primary key auto_increment,
     stgid int not null,
@@ -102,6 +112,7 @@ create table if not exists Comments(
     comtype char(5) not null, #stage commt
     comtypeid int default 0,
     compid int default 0,
+    comindex int default 0,
     userid int not null,
     foreign key(userid) references Users(userid) on delete cascade on update cascade,
     repeatid int default 0,
@@ -115,27 +126,6 @@ create table if not exists Comments(
 create index com_type on Comments(comtype);
 create index com_typeid on Comments(comtypeid);
 create index com_pid on Comments(compid);
-
-create table if not exists Main(
-    id int primary key auto_increment,
-    _key nvarchar(15) unique not null,
-    _value nvarchar(125)
-)auto_increment = 1 charset = utf8;
-
-insert into Main (_key, _value) values 
-    ("name", "AyleinOter"),
-    ("fullname", "The IVth AyleinOter"),
-    ("sign", "What a loser");
-
-create table if not exists Action(
-    actid int primary key auto_increment,
-    acttype nvarchar(15) not null,
-    acttypeid int default 0,
-    acttitle nvarchar(25) not null,
-    actlink nvarchar(50),
-    actdate datetime default CURRENT_TIMESTAMP,
-    actvalid int default 1
-)auto_increment = 1  charset = utf8;
 
 drop function if exists allComments;
 delimiter //
@@ -152,3 +142,35 @@ begin
 	end while;
     return temp;
 end //
+
+create table if not exists Main(
+    id int primary key auto_increment,
+    _key nvarchar(15) unique not null,
+    _value nvarchar(125)
+)auto_increment = 1 charset = utf8;
+
+insert into Main (_key, _value) values 
+    ("name", "AyleinOter"),
+    ("fullname", "The IVth AyleinOter"),
+    ("sign", "What a loser"),
+    ("comnum", 0);
+    
+drop function if exists com_next;
+delimiter //
+create function com_next() returns int
+begin
+    declare va int;
+	update main set _value = _value + 1 where _key = "comnum";
+    select _value into va from main where _key = "comnum";
+    return va;
+end //
+
+create table if not exists Action(
+    actid int primary key auto_increment,
+    acttype nvarchar(15) not null,
+    acttypeid int default 0,
+    acttitle nvarchar(25) not null,
+    actlink nvarchar(50),
+    actdate datetime default CURRENT_TIMESTAMP,
+    actvalid int default 1
+)auto_increment = 1  charset = utf8;

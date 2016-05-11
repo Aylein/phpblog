@@ -141,19 +141,22 @@ app.controller("saysController", function($scope, main, cache, web, cv, debug){
         });
     };  
     var makeItem = function(data, list){
-        if(data.compid > 0) data.repeat_comment = makeItem(list["c_" + data.compid], list);
+        if(data.compid > 0 && list["c_" + data.compid]) data.repeat_comment = makeItem(list["c_" + data.compid], list);
         else data.repeat_comment = null;
         return data;
     };
     var makeList = function(data){
         $scope.itemList = {};
-        for(var i = 0, z = data.all.length; i < z; i++){
-            data.all[i].c_repeat = $scope.repeat;
-            $scope.itemList["c_" + data.all[i].comid] = data.all[i];
-        }
         $scope.list = [];
-        for(var i = 0, z = data.list.length; i < z; i++)
-            $scope.list.push(makeItem($scope.itemList["c_" + data.list[i]], $scope.itemList));
+        if(data.all && data.list){
+            for(var i = 0, z = data.all.length; i < z; i++){
+                data.all[i].c_repeat = $scope.repeat;
+                $scope.itemList["c_" + data.all[i].comid] = data.all[i];
+            }
+            console.log($scope.itemList);
+            for(var i = 0, z = data.list.length; i < z; i++)
+                $scope.list.push(makeItem($scope.itemList["c_" + data.list[i]], $scope.itemList));
+        }
     };
     var init = function(page){
         $scope.list = [];
@@ -271,8 +274,18 @@ app.controller("adminTypeController", function($scope, main, cache, web){
     };
     init();
 });
-app.controller("stageController", function($scope, main, cache, web){
+app.controller("adminStageController", function($scope, main, cache, web){
     $scope.path = "stages";
+    $scope.pager = {
+        page: 0, 
+        total: 0, 
+        show: 10, 
+        callback: function(page, event){
+            init(page);
+            event.preventDefault();
+        }
+    };
+    var init = function(){};
 });
 app.controller("adminUserController", function($scope, main, extra, cache, web, debug, cv, $routeParams){
     $scope.path = "users";

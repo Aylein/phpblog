@@ -1,12 +1,3 @@
-<?php
-/*
-include_once("./lib/User.php");
-echo User::makePass("mm19880209");
-die();
-*/
-?>
-
-
 <!DOCTYPE html>
 <html ng-app="app">
     <head>
@@ -19,22 +10,19 @@ die();
         <link rel="stylesheet" href="styles/extra.min.css" />
     </head>
     <body>          
-        <div ng-controller="saysController">
-            <div class="l_title">This is the Says page</div>
-            <div class="says" style="margin-top: 15px;">
-                <div class="says_left bc666"></div>
-                <div class="says_right">
-                    <div>
-                        <div class="say_title">填充 :</div>
-                        <div class="say_item"><ao-cs model="comment" /></div>
-                        <div class="clear"></div>
-                    </div>
-                </div>
-                <div class="clear"></div>
+        <div ng-controller="adminStageController">
+        <ao-nodes></ao-nodes>
+        <div class="l_title">Stages</div>
+        <div class="l_s">
+            <div>展开 添加新章节</div>
+            <div class="l_new">
+                
             </div>
-            <br />
-            <ao-rp ng-repeat="com in list" model="com"></ao-rp>
-            <ao-pg model="pager"></ao-pg>
+            <br>
+            <div class="list">
+
+            </div>
+        </div>
         </div>
     </body>
     <script src="scripts/angular.min.js"></script>

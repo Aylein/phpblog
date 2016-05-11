@@ -30,6 +30,9 @@ app.config(function($routeProvider){
     }).when("/adminuser/:index", {
         templateUrl: "/view/ngAdminUser.php",
         controller: "adminUserController"
+    }).when("/adminstage", {
+        templateUrl: "/view/ngAdminStage.php",
+        controller: "adminStageController"
     }).otherwise({redirectTo: "/about"});
 });
 app.filter('to_trusted', function ($sce) {
